@@ -1,3 +1,7 @@
+## V12.0.28
+- Fix missing tags (perhaps).
+- Refactor GroupFrames logic.
+- Add Unhalted Unit Frames to the Main Menu.
 ## V12.0.27
 - *Hopefully* fix when units join/leave, the frames update.
 - *Hopefully* fix some dancing tags.
