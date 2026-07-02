@@ -1,13 +1,14 @@
-## V12.0.28
-- Fix missing tags (perhaps).
-- Refactor GroupFrames logic.
-- Add Unhalted Unit Frames to the Main Menu.
-## V12.0.27
-- *Hopefully* fix when units join/leave, the frames update.
-- *Hopefully* fix some dancing tags.
-## V12.0.26
+## V12.0.28 (Alpha)
+- Fixed Missing Tags.
+- Small Refactor.
+- Added `Unhalted Unit Frames` to Main Menu.
+- Added `Interrupt on Cooldown` Colour for Cast Bars.
+## V12.0.27 (Alpha)
+- Fixed Units not updating correctly when disconnected.
+- Fixed some minor bugs with tags.
+## V12.0.26 (Alpha)
 - Hopefully fix Pet Frames not being Class Coloured.
-## V12.0.25
+## V12.0.25 (Alpha)
 - Add Party / Raid Frames.
 - Indicators:
   - Ready Check.
@@ -38,7 +39,6 @@
 - Added Sorting for Auras - `Blizzard`, `Blizzard Reversed`, `Duration` & `Duration Reversed`.
 - Added `Typed` Filter. This will show all debuffs that are `Magic`, `Poison`, `Curse`, `Bleed` or `Disease`.
 - Added `Custom` Aura Container. This allows you to create an additional container per unit which can be used as either `Buffs` or `Debuffs`.
-
 ## V12.0.22
 - Added `OUTLINE, SLUG` to the Font Selection.
 - Fixed the double creation of Absorbs & Heal Absorbs (Thanks Permok).
