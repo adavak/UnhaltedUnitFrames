@@ -32,7 +32,7 @@ local function StopMoving(frameMover)
 	FrameDB.Layout[3] = FrameDB.Layout[3] + moverX - frameMover.startX
 	FrameDB.Layout[4] = FrameDB.Layout[4] + moverY - frameMover.startY
 
-	if frameMover.unit == "boss" then UUF:LayoutBossFrames() elseif frameMover.unit == "party" then UUF:LayoutPartyFrames() elseif frameMover.unit == "raid" then UUF:LayoutRaidFrames() else UUF:UpdateUnitFrame(unitFrame, frameMover.unit) end
+	if frameMover.unit == "boss" then UUF:LayoutBossFrames() elseif frameMover.unit == "party" or frameMover.unit == "raid" then UUF:LayoutGroupFrames(frameMover.unit) else UUF:UpdateUnitFrame(unitFrame, frameMover.unit) end
 	RefreshMover(frameMover)
 end
 

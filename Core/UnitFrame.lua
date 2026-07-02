@@ -49,7 +49,7 @@ function UUF:CreateUnitFrame(unitFrame, unit)
 	if isRaid then
 		unitFrame.UUFConfiguredUnit = unit
 		unitFrame:HookScript("OnAttributeChanged", function(frame, attribute, value)
-			if attribute == "unit" and value and UUF.RefreshGroupFrame then UUF:RefreshGroupFrame(frame, value) end
+			if attribute == "unit" and value then UUF:UpdateGroupIndicators("raid") end
 		end)
 	end
     ApplyScripts(unitFrame)
@@ -95,7 +95,7 @@ function UUF:SpawnUnitFrame(unit)
         oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame) UUF:CreateUnitFrame(unitFrame, unit) end)
     end
     oUF:SetActiveStyle(UUF:FetchFrameName(unit))
-	if unit == "party" or unit == "raid" then return UUF:SpawnGroupFrame(unit, FrameDB) end
+	if unit == "party" or unit == "raid" then return UUF:SpawnGroupFrame(unit) end
 
     if unit == "boss" then
         for i = 1, UUF.MAX_BOSS_FRAMES do
@@ -202,6 +202,6 @@ function UUF:UpdateAllUnitFrames()
 		if UUF[unit:upper()] then UUF:UpdateUnitFrame(UUF[unit:upper()], unit) end
 	end
 	UUF:UpdateBossFrames()
-	UUF:UpdatePartyFrames()
-	UUF:UpdateRaidFrames()
+	UUF:UpdateGroupFrame("party")
+	UUF:UpdateGroupFrame("raid")
 end

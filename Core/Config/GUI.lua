@@ -27,9 +27,9 @@ local function UpdateUnitSettings(unit, updateCallback, element)
 	elseif unit == "boss" then
 		UUF:UpdateBossFrames()
 	elseif unit == "party" then
-		UUF:UpdatePartyFrames()
+		UUF:UpdateGroupFrame("party")
 	elseif unit == "raid" then
-		UUF:UpdateRaidFrames()
+		UUF:UpdateGroupFrame("raid")
 	elseif updateCallback then
 		updateCallback()
 	end

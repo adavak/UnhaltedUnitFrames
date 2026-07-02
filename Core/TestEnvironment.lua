@@ -362,14 +362,14 @@ function UUF:EnableTestGroupFrames(unit)
 	if unit == "party" then
 		local UnitDB = UUF.db.profile.Units.party
 		if not UnitDB or not UnitDB.Enabled then if UUF.PARTY_CONTAINER then UUF.PARTY_CONTAINER:Hide() end return end
-		UUF:CreatePartyContainer()
+		if not UUF.PARTY_CONTAINER then UUF:SpawnGroupFrame("party") end
 		UnregisterStateDriver(UUF.PARTY_CONTAINER, "visibility")
 		UUF.PARTY_CONTAINER:Show()
 		UUF:UpdateTestEnvironment("party", "all")
 	elseif unit == "raid" then
 		local UnitDB = UUF.db.profile.Units.raid
 		if not UnitDB or not UnitDB.Enabled then if UUF.RAID_CONTAINER then UUF.RAID_CONTAINER:Hide() end return end
-		UUF:CreateRaidContainer()
+		if not UUF.RAID_CONTAINER then UUF:SpawnGroupFrame("raid") end
 		UUF:CreateRaidTestFrames()
 		for _, header in ipairs(UUF.RAID_HEADERS) do header:Hide() end
 		UUF:UpdateTestEnvironment("raid", "all")
@@ -383,7 +383,7 @@ local function UpdatePartyTestEnvironment(element)
 		if element ~= "all" then return end
 		for i = 1, UUF.MAX_PARTY_FRAMES do if UUF["PARTY" .. i] then RestoreGroupFrame(UUF["PARTY" .. i], "party" .. i) end end
 		if UUF.PARTYPLAYER then RestoreGroupFrame(UUF.PARTYPLAYER, "partyplayer") end
-		UUF:UpdatePartyFrames()
+		UUF:UpdateGroupFrame("party")
 		UUF:UpdateUnitTags("party")
 		return
 	end
@@ -392,7 +392,7 @@ local function UpdatePartyTestEnvironment(element)
 		if UUF["PARTY" .. i] then ApplyTestGroupFrame(UUF["PARTY" .. i], "party" .. i, i + (UnitDB.Frame.ShowPlayer and 1 or 0), "Party" .. (i + (UnitDB.Frame.ShowPlayer and 1 or 0)), element) end
 	end
 	if UUF.PARTYPLAYER then ApplyTestGroupFrame(UUF.PARTYPLAYER, "partyplayer", 1, "Party1", element) end
-	if element == "all" or element == "Frame" or element == "HealthBar" then UUF:LayoutPartyFrames() end
+	if element == "all" or element == "Frame" or element == "HealthBar" then UUF:LayoutGroupFrames("party") end
 end
 
 local function UpdateRaidTestEnvironment(element)
@@ -409,7 +409,7 @@ local function UpdateRaidTestEnvironment(element)
 			raidFrame:Hide()
 		end
 		for _, header in ipairs(UUF.RAID_HEADERS) do header:Show() end
-		UUF:UpdateRaidFrames()
+		UUF:UpdateGroupFrame("raid")
 		UUF:UpdateUnitTags("raid")
 		return
 	end
