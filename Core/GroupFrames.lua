@@ -136,13 +136,12 @@ local function SortPartyFrames(firstFrame, secondFrame)
 	elseif Frame.SortBy == "ROLE" then
 		local firstRole = UUF.PARTY_TEST_MODE and firstFrame.testRole or UnitGroupRolesAssigned(firstFrame.unit)
 		local secondRole = UUF.PARTY_TEST_MODE and secondFrame.testRole or UnitGroupRolesAssigned(secondFrame.unit)
-		local firstRoleOrder = 99
-		local secondRoleOrder = 99
-		for index, orderedRole in ipairs(Frame.RoleOrder or {}) do
-			if firstRole == orderedRole then firstRoleOrder = index end
-			if secondRole == orderedRole then secondRoleOrder = index end
+		if firstRole ~= secondRole then
+			for _, orderedRole in ipairs(Frame.RoleOrder or {}) do
+				if firstRole == orderedRole then return true end
+				if secondRole == orderedRole then return false end
+			end
 		end
-		if firstRoleOrder ~= secondRoleOrder then return firstRoleOrder < secondRoleOrder end
 	end
 	return (firstFrame.partyIndex or 0) < (secondFrame.partyIndex or 0)
 end
@@ -185,28 +184,29 @@ function UUF:SpawnGroupFrame(unit, FrameDB)
 	if unit == "party" then
 		UUF:CreatePartyContainer()
 		for i = 1, UUF.MAX_PARTY_FRAMES do
-			UUF[unit:upper() .. i] = oUF:Spawn(unit .. i, UUF:FetchFrameName(unit .. i))
-			UUF[unit:upper() .. i].partyIndex = i + 1
-			UUF[unit:upper() .. i]:SetParent(UUF.PARTY_CONTAINER)
-			UUF[unit:upper() .. i]:SetSize(FrameDB.Width, FrameDB.Height)
-			UUF[unit:upper() .. i]:SetFrameStrata(FrameDB.FrameStrata)
-			UUF.PARTY_FRAMES[i] = UUF[unit:upper() .. i]
+			local partyFrame = oUF:Spawn(unit .. i, UUF:FetchFrameName(unit .. i))
+			partyFrame.partyIndex = i + 1
+			partyFrame:SetParent(UUF.PARTY_CONTAINER)
+			partyFrame:SetSize(FrameDB.Width, FrameDB.Height)
+			partyFrame:SetFrameStrata(FrameDB.FrameStrata)
+			UUF[unit:upper() .. i] = partyFrame
+			UUF.PARTY_FRAMES[i] = partyFrame
 			UUF:RegisterTargetGlowIndicatorFrame(UUF:FetchFrameName(unit .. i), unit .. i)
 			UUF:RegisterRangeFrame(UUF:FetchFrameName(unit .. i), unit .. i)
-			UUF:RegisterDispelHighlightEvents(UUF[unit:upper() .. i], unit .. i)
+			UUF:RegisterDispelHighlightEvents(partyFrame, unit .. i)
 		end
 		if FrameDB.ShowPlayer then
-			UUF.PARTYPLAYER = oUF:Spawn("player", UUF:FetchFrameName("partyplayer"))
-			UUF.PARTYPLAYER.partyIndex = 1
-			UUF.PARTYPLAYER:SetParent(UUF.PARTY_CONTAINER)
-			UUF.PARTYPLAYER:SetSize(FrameDB.Width, FrameDB.Height)
-			UUF.PARTYPLAYER:SetFrameStrata(FrameDB.FrameStrata)
-			UUF.PARTY_FRAMES[#UUF.PARTY_FRAMES + 1] = UUF.PARTYPLAYER
-			UUF:RegisterTargetGlowIndicatorFrame(UUF.PARTYPLAYER, "partyplayer")
-			UUF:RegisterRangeFrame(UUF.PARTYPLAYER, "player")
-			UUF:RegisterDispelHighlightEvents(UUF.PARTYPLAYER, "player")
+			local partyPlayerFrame = oUF:Spawn("player", UUF:FetchFrameName("partyplayer"))
+			partyPlayerFrame.partyIndex = 1
+			partyPlayerFrame:SetParent(UUF.PARTY_CONTAINER)
+			partyPlayerFrame:SetSize(FrameDB.Width, FrameDB.Height)
+			partyPlayerFrame:SetFrameStrata(FrameDB.FrameStrata)
+			UUF.PARTYPLAYER = partyPlayerFrame
+			UUF.PARTY_FRAMES[#UUF.PARTY_FRAMES + 1] = partyPlayerFrame
+			UUF:RegisterTargetGlowIndicatorFrame(partyPlayerFrame, "partyplayer")
+			UUF:RegisterRangeFrame(partyPlayerFrame, "player")
+			UUF:RegisterDispelHighlightEvents(partyPlayerFrame, "player")
 		end
-		UUF:LayoutPartyFrames()
 		UUF:CreateMover(unit)
 		for i = 1, UUF.MAX_PARTY_FRAMES do RegisterUnitWatch(UUF[unit:upper() .. i]) end
 		UUF.PARTY_CONTAINER:Show()
@@ -245,7 +245,6 @@ function UUF:SpawnGroupFrame(unit, FrameDB)
 			header:SetAttribute("startingIndex", 1)
 			UUF.RAID_HEADERS[groupIndex] = header
 		end
-		UUF:LayoutRaidFrames()
 		UUF:CreateMover(unit)
 		UUF.RAID_CONTAINER:Show()
 		for _, header in ipairs(UUF.RAID_HEADERS) do header:Show() end
@@ -261,7 +260,8 @@ function UUF:UpdatePartyFrames()
 	end
 	UUF:CreatePartyContainer()
 	for i = 1, UUF.MAX_PARTY_FRAMES do
-		if UUF["PARTY"..i] then UUF:UpdateUnitFrame(UUF["PARTY"..i], "party"..i) end
+		local partyFrame = UUF["PARTY" .. i]
+		if partyFrame then UUF:UpdateUnitFrame(partyFrame, "party" .. i) end
 	end
 	if UUF.PARTYPLAYER then UUF:UpdateUnitFrame(UUF.PARTYPLAYER, "partyplayer") end
 	UUF:LayoutPartyFrames()
@@ -279,7 +279,8 @@ function UUF:RefreshGroupFrame(unitFrame, unit)
 	end
 	if unitFrame.Health then unitFrame.Health:ForceUpdate() end
 	if unitFrame.Tags then
-		for configuredTag in pairs(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Tags) do UUF:UpdateUnitTag(unitFrame, unit, configuredTag) end
+		local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+		for configuredTag in pairs(UnitDB.Tags) do UUF:UpdateUnitTag(unitFrame, unit, configuredTag) end
 	elseif unitFrame.UpdateTags then
 		unitFrame:UpdateTags()
 	end
@@ -346,22 +347,23 @@ PartyRosterEventFrame:RegisterEvent("PLAYER_DIFFICULTY_CHANGED")
 PartyRosterEventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 PartyRosterEventFrame:SetScript("OnEvent", function(_, event, addonName)
 	if not UUF.db then return end
+	local RaidDB = UUF.db.profile.Units.raid
 	if event == "ADDON_LOADED" then
-		if addonName == "Blizzard_CompactRaidFrames" and UUF.db.profile.Units.raid and UUF.db.profile.Units.raid.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
+		if addonName == "Blizzard_CompactRaidFrames" and RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		return
 	end
 	if InCombatLockdown() then PartyRosterEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") return end
 	if event == "PLAYER_REGEN_ENABLED" then PartyRosterEventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED") end
 	if event == "GROUP_ROSTER_UPDATE" then
-		if UUF.db.profile.Units.raid and UUF.db.profile.Units.raid.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
+		if RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		UUF:RefreshPartyFrames()
 		UUF:RefreshRaidFrames()
 	elseif event == "PLAYER_ROLES_ASSIGNED" then
 		UUF:RefreshGroupRoles()
 	elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED_NEW_AREA" then
-		if UUF.db.profile.Units.raid.Frame.AutoAdjustGroups then UUF:LayoutRaidFrames() end
+		if RaidDB and RaidDB.Frame.AutoAdjustGroups then UUF:LayoutRaidFrames() end
 	elseif event == "PLAYER_REGEN_ENABLED" then
-		if UUF.db.profile.Units.raid and UUF.db.profile.Units.raid.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
+		if RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		UUF:RefreshPartyFrames()
 		UUF:RefreshRaidFrames()
 	end
