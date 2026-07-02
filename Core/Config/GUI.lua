@@ -484,7 +484,7 @@ local function CreateTextureSettings(containerParent)
     CastBarForegroundColourPicker:SetLabel("Foreground Colour")
     local CR, CG, CB = 128/255, 128/255, 255/255
     CastBarForegroundColourPicker:SetColor(CR, CG, CB)
-    CastBarForegroundColourPicker:SetRelativeWidth(0.33)
+    CastBarForegroundColourPicker:SetRelativeWidth(0.25)
     CastBarForegroundColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) for _, unitDB in pairs(UUF.db.profile.Units) do if unitDB.CastBar then unitDB.CastBar.Foreground = {r, g, b} end end UUF:UpdateAllUnitFrames() end)
     CastBarContainer:AddChild(CastBarForegroundColourPicker)
 
@@ -492,17 +492,25 @@ local function CreateTextureSettings(containerParent)
     CastBarBackgroundColourPicker:SetLabel("Background Colour")
     local CR2, CG2, CB2 = 34/255, 34/255, 34/255
     CastBarBackgroundColourPicker:SetColor(CR2, CG2, CB2)
-    CastBarBackgroundColourPicker:SetRelativeWidth(0.33)
+    CastBarBackgroundColourPicker:SetRelativeWidth(0.25)
     CastBarBackgroundColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) for _, unitDB in pairs(UUF.db.profile.Units) do if unitDB.CastBar then unitDB.CastBar.Background = {r, g, b} end end UUF:UpdateAllUnitFrames() end)
     CastBarContainer:AddChild(CastBarBackgroundColourPicker)
 
-    local CastBarInterruptibleColourPicker = AG:Create("ColorPicker")
-    CastBarInterruptibleColourPicker:SetLabel("Interruptible Colour")
+    local CastBarNotInterruptibleColourPicker = AG:Create("ColorPicker")
+    CastBarNotInterruptibleColourPicker:SetLabel("Not Interruptible Colour")
     local CR3, CG3, CB3 = 255/255, 64/255, 64/255
-    CastBarInterruptibleColourPicker:SetColor(CR3, CG3, CB3)
-    CastBarInterruptibleColourPicker:SetRelativeWidth(0.33)
-    CastBarInterruptibleColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) for _, unitDB in pairs(UUF.db.profile.Units) do if unitDB.CastBar then unitDB.CastBar.NotInterruptibleColour = {r, g, b} end end UUF:UpdateAllUnitFrames() end)
-    CastBarContainer:AddChild(CastBarInterruptibleColourPicker)
+    CastBarNotInterruptibleColourPicker:SetColor(CR3, CG3, CB3)
+    CastBarNotInterruptibleColourPicker:SetRelativeWidth(0.25)
+    CastBarNotInterruptibleColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) for _, unitDB in pairs(UUF.db.profile.Units) do if unitDB.CastBar then unitDB.CastBar.NotInterruptibleColour = {r, g, b} end end UUF:UpdateAllUnitFrames() end)
+    CastBarContainer:AddChild(CastBarNotInterruptibleColourPicker)
+
+    local CastBarInterruptCooldownColourPicker = AG:Create("ColorPicker")
+    CastBarInterruptCooldownColourPicker:SetLabel("Interrupt on Cooldown Colour")
+    local CR4, CG4, CB4 = 235/255, 90/255, 50/255
+    CastBarInterruptCooldownColourPicker:SetColor(CR4, CG4, CB4)
+    CastBarInterruptCooldownColourPicker:SetRelativeWidth(0.25)
+    CastBarInterruptCooldownColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) for _, unitDB in pairs(UUF.db.profile.Units) do if unitDB.CastBar then unitDB.CastBar.InterruptCooldownColour = {r, g, b} end end UUF:UpdateAllUnitFrames() end)
+    CastBarContainer:AddChild(CastBarInterruptCooldownColourPicker)
 end
 
 local function CreateRangeSettings(containerParent)
@@ -1206,6 +1214,8 @@ end
 local function CreateCastBarBarSettings(containerParent, unit, updateCallback)
     local FrameDB = UUF.db.profile.Units[unit].Frame
     local CastBarDB = UUF.db.profile.Units[unit].CastBar
+    local DefaultCastBarDB = UUF:GetDefaultDB().profile.Units[unit].CastBar
+    if not CastBarDB.InterruptCooldownColour then CastBarDB.InterruptCooldownColour = {unpack(DefaultCastBarDB.InterruptCooldownColour)} end
     local isPlayerorPet = unit == "player" or unit == "pet"
 
     local LayoutContainer = GUIWidgets.CreateInlineGroup(containerParent, "Cast Bar Settings")
@@ -1302,7 +1312,7 @@ local function CreateCastBarBarSettings(containerParent, unit, updateCallback)
         ClassColourToggle:SetLabel("Foreground: Colour by Class")
         ClassColourToggle:SetValue(CastBarDB.ColourByClass)
         ClassColourToggle:SetCallback("OnValueChanged", function(_, _, value) CastBarDB.ColourByClass = value UUFGUI.ForegroundColourPicker:SetDisabled(CastBarDB.ColourByClass) updateCallback() end)
-        ClassColourToggle:SetRelativeWidth(0.33)
+        ClassColourToggle:SetRelativeWidth(0.5)
         ColourContainer:AddChild(ClassColourToggle)
         UUFGUI.ClassColourToggle = ClassColourToggle
     end
@@ -1313,7 +1323,7 @@ local function CreateCastBarBarSettings(containerParent, unit, updateCallback)
     ForegroundColourPicker:SetColor(R, G, B, A)
     ForegroundColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) CastBarDB.Foreground = {r, g, b, a} updateCallback() end)
     ForegroundColourPicker:SetHasAlpha(true)
-    ForegroundColourPicker:SetRelativeWidth(isPlayerorPet and 0.33 or 0.25)
+    ForegroundColourPicker:SetRelativeWidth(0.5)
     ColourContainer:AddChild(ForegroundColourPicker)
 
     UUFGUI.ForegroundColourPicker = ForegroundColourPicker
@@ -1324,7 +1334,7 @@ local function CreateCastBarBarSettings(containerParent, unit, updateCallback)
     BackgroundColourPicker:SetColor(R2, G2, B2, A2)
     BackgroundColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) CastBarDB.Background = {r, g, b, a} updateCallback() end)
     BackgroundColourPicker:SetHasAlpha(true)
-    BackgroundColourPicker:SetRelativeWidth(isPlayerorPet and 0.33 or 0.25)
+    BackgroundColourPicker:SetRelativeWidth(0.5)
     ColourContainer:AddChild(BackgroundColourPicker)
 
     local NotInterruptibleColourPicker = AG:Create("ColorPicker")
@@ -1333,17 +1343,26 @@ local function CreateCastBarBarSettings(containerParent, unit, updateCallback)
     NotInterruptibleColourPicker:SetColor(R3, G3, B3)
     NotInterruptibleColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) CastBarDB.NotInterruptibleColour = {r, g, b, a} updateCallback() end)
     NotInterruptibleColourPicker:SetHasAlpha(true)
-    NotInterruptibleColourPicker:SetRelativeWidth(isPlayerorPet and 0.5 or 0.25)
+    NotInterruptibleColourPicker:SetRelativeWidth(0.5)
     ColourContainer:AddChild(NotInterruptibleColourPicker)
 
-    local InterruptedFailedColour = AG:Create("ColorPicker")
-    InterruptedFailedColour:SetLabel("Interrupted / Failed")
-    local R4, G4, B4 = unpack(CastBarDB.InterruptedFailedColour)
-    InterruptedFailedColour:SetColor(R4, G4, B4)
-    InterruptedFailedColour:SetCallback("OnValueChanged", function(_, _, r, g, b, a) CastBarDB.InterruptedFailedColour = {r, g, b, a} updateCallback() end)
-    InterruptedFailedColour:SetHasAlpha(true)
-    InterruptedFailedColour:SetRelativeWidth(isPlayerorPet and 0.5 or 0.25)
-    ColourContainer:AddChild(InterruptedFailedColour)
+    local InterruptCooldownColourPicker = AG:Create("ColorPicker")
+    InterruptCooldownColourPicker:SetLabel("Interrupt on Cooldown")
+    local R4, G4, B4 = unpack(CastBarDB.InterruptCooldownColour)
+    InterruptCooldownColourPicker:SetColor(R4, G4, B4)
+    InterruptCooldownColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) CastBarDB.InterruptCooldownColour = {r, g, b, a} updateCallback() end)
+    InterruptCooldownColourPicker:SetHasAlpha(true)
+    InterruptCooldownColourPicker:SetRelativeWidth(0.5)
+    ColourContainer:AddChild(InterruptCooldownColourPicker)
+
+    local InterruptedFailedColourPicker = AG:Create("ColorPicker")
+    InterruptedFailedColourPicker:SetLabel("Interrupted / Failed")
+    local R5, G5, B5 = unpack(CastBarDB.InterruptedFailedColour)
+    InterruptedFailedColourPicker:SetColor(R5, G5, B5)
+    InterruptedFailedColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b, a) CastBarDB.InterruptedFailedColour = {r, g, b, a} updateCallback() end)
+    InterruptedFailedColourPicker:SetHasAlpha(true)
+    InterruptedFailedColourPicker:SetRelativeWidth(isPlayerorPet and 0.2 or 0.2)
+    ColourContainer:AddChild(InterruptedFailedColourPicker)
 
     function RefreshCastBarBarSettings()
         if CastBarDB.Enabled then
@@ -1358,7 +1377,8 @@ local function CreateCastBarBarSettings(containerParent, unit, updateCallback)
             ForegroundColourPicker:SetDisabled(CastBarDB.ColourByClass)
             BackgroundColourPicker:SetDisabled(false)
             NotInterruptibleColourPicker:SetDisabled(false)
-            InterruptedFailedColour:SetDisabled(false)
+            InterruptCooldownColourPicker:SetDisabled(false)
+            InterruptedFailedColourPicker:SetDisabled(false)
             if isPlayerorPet then UUFGUI.ClassColourToggle:SetDisabled(false) end
         else
             MatchParentWidthToggle:SetDisabled(true)
@@ -1372,7 +1392,8 @@ local function CreateCastBarBarSettings(containerParent, unit, updateCallback)
             ForegroundColourPicker:SetDisabled(true)
             BackgroundColourPicker:SetDisabled(true)
             NotInterruptibleColourPicker:SetDisabled(true)
-            InterruptedFailedColour:SetDisabled(true)
+            InterruptCooldownColourPicker:SetDisabled(true)
+            InterruptedFailedColourPicker:SetDisabled(true)
             if isPlayerorPet then UUFGUI.ClassColourToggle:SetDisabled(true) end
         end
     end

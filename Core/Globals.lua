@@ -139,7 +139,46 @@ UUF.ReadyCheckTextures = {
 	},
 }
 
+UUF.InterruptSpellIDs = {
+	["DEATHKNIGHT"] = {47528},
+	["DEMONHUNTER"] = {183752},
+	["DRUID"] = {106839, 78675, 38675},
+	["EVOKER"] = {351338},
+	["HUNTER"] = {187707, 147362},
+	["MAGE"] = {2139},
+	["MONK"] = {116705},
+	["PALADIN"] = {96231, 31935},
+	["PRIEST"] = {15487},
+	["ROGUE"] = {1766},
+	["SHAMAN"] = {57994},
+	["WARLOCK"] = {19647, 132409, 89766, 119910, 1276467},
+	["WARRIOR"] = {6552},
+}
+
 function UUF:PrettyPrint(MSG) print(UUF.ADDON_NAME .. ":|r " .. MSG) end
+
+function UUF:GetInterruptSpellID()
+	local playerInterrupt = UUF.InterruptSpellIDs[UnitClassBase("player")]
+	if not playerInterrupt then return end
+	for i = 1, #playerInterrupt do
+		local spellID = playerInterrupt[i]
+		if C_SpellBook.IsSpellKnownOrInSpellBook then
+			if C_SpellBook.IsSpellKnownOrInSpellBook(spellID) or C_SpellBook.IsSpellKnownOrInSpellBook(spellID, Enum.SpellBookSpellBank.Pet) then return spellID end
+		elseif IsSpellKnown and IsSpellKnown(spellID) then
+			return spellID
+		end
+	end
+end
+
+function UUF:IsInterruptOnCooldown()
+	local spellID = UUF:GetInterruptSpellID()
+	if not spellID then return false end
+	if C_Spell.GetSpellCooldown then
+		local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+		return cooldownInfo and cooldownInfo.isEnabled and cooldownInfo.isActive and not cooldownInfo.isOnGCD or false
+	end
+	return false
+end
 
 function UUF:FetchFrameName(unit)
     local UnitToFrame = {
