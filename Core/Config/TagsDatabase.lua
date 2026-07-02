@@ -52,27 +52,28 @@ local Tags = {
     ["maxpp:colour"] = "UNIT_POWER_UPDATE UNIT_MAXPOWER",
     ["maxpp:abbr:colour"] = "UNIT_POWER_UPDATE UNIT_MAXPOWER",
 
-    ["name:colour"] = "UNIT_CLASSIFICATION_CHANGED UNIT_FACTION UNIT_NAME_UPDATE",
-    ["name:target"] = "UNIT_NAME_UPDATE UNIT_TARGET",
-    ["name:target:colour"] = "UNIT_NAME_UPDATE UNIT_TARGET",
+    ["name"] = "UNIT_CONNECTION GROUP_ROSTER_UPDATE",
+    ["name:colour"] = "UNIT_CLASSIFICATION_CHANGED UNIT_CONNECTION UNIT_FACTION UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE",
+    ["name:target"] = "UNIT_CONNECTION UNIT_NAME_UPDATE UNIT_TARGET GROUP_ROSTER_UPDATE",
+    ["name:target:colour"] = "UNIT_CONNECTION UNIT_NAME_UPDATE UNIT_TARGET GROUP_ROSTER_UPDATE",
 
     ["reactioncolour"] = "UNIT_FACTION UNIT_NAME_UPDATE",
 }
 
 for i = 1, 25 do
-    Tags["name:short:" .. i] = "UNIT_NAME_UPDATE"
+    Tags["name:short:" .. i] = "UNIT_CONNECTION UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
 end
 
 for i = 1, 25 do
-    Tags["name:short:" .. i .. ":colour"] = "UNIT_NAME_UPDATE"
+    Tags["name:short:" .. i .. ":colour"] = "UNIT_CONNECTION UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
 end
 
 for i = 1, 25 do
-    Tags["name:target:short:" .. i] = "UNIT_NAME_UPDATE UNIT_TARGET"
+    Tags["name:target:short:" .. i] = "UNIT_CONNECTION UNIT_NAME_UPDATE UNIT_TARGET GROUP_ROSTER_UPDATE"
 end
 
 for i = 1, 25 do
-    Tags["name:target:short:" .. i .. ":colour"] = "UNIT_NAME_UPDATE UNIT_TARGET"
+    Tags["name:target:short:" .. i .. ":colour"] = "UNIT_CONNECTION UNIT_NAME_UPDATE UNIT_TARGET GROUP_ROSTER_UPDATE"
 end
 
 for i = 1, 3 do

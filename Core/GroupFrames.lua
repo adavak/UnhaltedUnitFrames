@@ -278,7 +278,11 @@ function UUF:RefreshGroupFrame(unitFrame, unit)
 		if unitFrame.DispelHighlight then UUF:UpdateUnitDispelHighlight(unitFrame, unit) end
 	end
 	if unitFrame.Health then unitFrame.Health:ForceUpdate() end
-	if unitFrame.UpdateTags then unitFrame:UpdateTags() end
+	if unitFrame.Tags then
+		for configuredTag in pairs(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Tags) do UUF:UpdateUnitTag(unitFrame, unit, configuredTag) end
+	elseif unitFrame.UpdateTags then
+		unitFrame:UpdateTags()
+	end
 	UUF:UpdateUnitPowerBar(unitFrame, unit)
 	UUF:UpdateUnitRoleIndicator(unitFrame, unit)
 end
