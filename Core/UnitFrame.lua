@@ -49,7 +49,20 @@ function UUF:CreateUnitFrame(unitFrame, unit)
 	if isRaid then
 		unitFrame.UUFConfiguredUnit = unit
 		unitFrame:HookScript("OnAttributeChanged", function(frame, attribute, value)
-			if attribute == "unit" and value then UUF:UpdateGroupIndicators("raid") end
+			if attribute ~= "unit" or not value then return end
+			local RaidDB = UUF.db.profile.Units.raid
+			if not RaidDB or not RaidDB.Enabled then return end
+			if frame.DispelHighlightUnit and frame.DispelHighlightUnit ~= value then UUF:UnregisterDispelHighlightEvents(frame) end
+			UUF:RegisterRangeFrame(frame, value)
+			UUF:RegisterTargetGlowIndicatorFrame(frame, value)
+			if frame.UUFGroupUnit ~= value then
+				frame.UUFGroupUnit = value
+				if frame.DispelHighlight then UUF:UpdateUnitDispelHighlight(frame, value) end
+			end
+			if frame.Health then frame.Health:ForceUpdate() end
+			if frame.Tags then for configuredTag in pairs(RaidDB.Tags) do UUF:UpdateUnitTag(frame, value, configuredTag) end elseif frame.UpdateTags then frame:UpdateTags() end
+			UUF:UpdateUnitPowerBar(frame, value)
+			UUF:UpdateUnitRoleIndicator(frame, value)
 		end)
 	end
     ApplyScripts(unitFrame)

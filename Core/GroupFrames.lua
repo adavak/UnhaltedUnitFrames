@@ -226,7 +226,7 @@ function UUF:UpdateGroupIndicators(groupType)
 			end
 		end, false, UUF.RAID_TEST_MODE)
 	end
-	UUF:LayoutGroupFrames(groupType)
+	if groupType == "party" then UUF:LayoutGroupFrames(groupType) end
 end
 
 function UUF:LayoutGroupFrames(groupType)
