@@ -337,7 +337,6 @@ PartyRosterEventFrame:SetScript("OnEvent", function(_, event, addonName)
 	if event == "GROUP_ROSTER_UPDATE" then
 		if RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		UUF:UpdateGroupIndicators("party")
-		UUF:UpdateGroupIndicators("raid")
 	elseif event == "PLAYER_ROLES_ASSIGNED" then
 		UUF:UpdateGroupIndicators("party")
 		UUF:UpdateGroupIndicators("raid")
