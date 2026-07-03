@@ -5,31 +5,28 @@ local function PositionGameMenuButton()
 	local height = GameMenuFrame:GetHeight()
 	if GameMenuFrame.UUFAdjustedHeight == height then height = height - (GameMenuFrame.UUFAddedHeight or 0) end
 
-	local anchorButton, macroButton, firstExitButton, previousExitButton
+	local anchorButton
 	for button in GameMenuFrame.buttonPool:EnumerateActive() do
 		local text = button:GetText()
+		local point, relativeTo, relativePoint, offsetX, offsetY = button:GetPoint()
 		if text and (text == LOGOUT or text == LOG_OUT or text == EXIT_GAME or text == RETURN_TO_GAME) then
-			if not firstExitButton then firstExitButton = button end
-			if previousExitButton then
+			if point then
 				button:ClearAllPoints()
-				button:SetPoint("TOPLEFT", previousExitButton, "BOTTOMLEFT", 0, -1)
+				button:SetPoint(point, relativeTo, relativePoint, offsetX, (offsetY or 0) - 25)
 			end
-			previousExitButton = button
 		else
-			if text == MACROS then macroButton = button end
-			anchorButton = button
+			if text == MACROS then anchorButton = button end
+			if point then
+				button:ClearAllPoints()
+				button:SetPoint(point, relativeTo, relativePoint, offsetX, (offsetY or 0) + 10)
+			end
 		end
 	end
-	anchorButton = macroButton or anchorButton
 	if anchorButton then
 		GameMenuFrame.UUF:ClearAllPoints()
-		GameMenuFrame.UUF:SetPoint("TOPLEFT", anchorButton, "BOTTOMLEFT", 0, -1)
+		GameMenuFrame.UUF:SetPoint("TOPLEFT", anchorButton, "BOTTOMLEFT", 0, 0)
 		GameMenuFrame.UUF:SetText(UUF.ADDON_NAME)
 		GameMenuFrame.UUF:Show()
-		if firstExitButton then
-			firstExitButton:ClearAllPoints()
-			firstExitButton:SetPoint("TOPLEFT", GameMenuFrame.UUF, "BOTTOMLEFT", 0, -20)
-		end
 		GameMenuFrame.UUFAddedHeight = GameMenuFrame.UUF:GetHeight() + 10
 		GameMenuFrame.UUFAdjustedHeight = height + GameMenuFrame.UUFAddedHeight
 		GameMenuFrame:SetHeight(GameMenuFrame.UUFAdjustedHeight)
