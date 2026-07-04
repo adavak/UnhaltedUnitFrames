@@ -768,3 +768,12 @@ UUF.AURA_BLACKLIST = {
     [80354] = true,     -- Temporal Displacement
     [95809] = true,     -- Hunter Pet Insanity
 }
+
+UUF.SCMAnchors = {
+    ["Player"] = "UUF_Player",
+    ["Target"] = "UUF_Target",
+    ["Pet"] = "UUF_Pet",
+    ["Focus"] = "UUF_Focus",
+    ["Focus Target"] = "UUF_FocusTarget",
+    ["Target of Target"] = "UUF_TargetTarget",
+}
