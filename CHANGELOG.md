@@ -1,3 +1,5 @@
+## V12.0.25
+- Fix Font Shadows.
 ## V12.0.24
 - Fixed `Classification` Textures not appearing.
 - File Restructure.
