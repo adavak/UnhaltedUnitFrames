@@ -26,6 +26,7 @@
 	<Script file="Indicators/Resting.lua"/>
 	<Script file="Indicators/Resurrect.lua"/>
 	<Script file="Indicators/Role.lua"/>
+	<Script file="Indicators/Summon.lua"/>
 	<Script file="Indicators/TargetGlow.lua"/>
 	<Script file="Indicators/Threat.lua"/>
 	<Script file="Indicators/Totems.lua"/>

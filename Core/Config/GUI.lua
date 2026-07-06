@@ -2278,6 +2278,66 @@ local function CreateResurrectIndicatorSettings(containerParent, unit, updateCal
 	GUIWidgets.DeepDisable(LayoutContainer, not ResurrectDB.Enabled)
 end
 
+local function CreateSummonIndicatorSettings(containerParent, unit, updateCallback)
+	UUF.db.profile.Units[unit].Indicators.Summon = UUF.db.profile.Units[unit].Indicators.Summon or {}
+	local SummonDB = UUF.db.profile.Units[unit].Indicators.Summon
+	local DefaultSummonDB = UUF:GetDefaultDB().profile.Units[unit].Indicators.Summon
+	for key, value in pairs(DefaultSummonDB) do
+		if SummonDB[key] == nil then SummonDB[key] = type(value) == "table" and {unpack(value)} or value end
+	end
+
+	local ToggleContainer = GUIWidgets.CreateInlineGroup(containerParent, "Summon Indicator Settings")
+	local Toggle = AG:Create("CheckBox")
+	Toggle:SetLabel("Enable |cFF8080FFSummon|r Indicator")
+	Toggle:SetValue(SummonDB.Enabled)
+	Toggle:SetRelativeWidth(1)
+	ToggleContainer:AddChild(Toggle)
+
+	local LayoutContainer = GUIWidgets.CreateInlineGroup(containerParent, "Layout & Positioning")
+	local AnchorFromDropdown = AG:Create("Dropdown")
+	AnchorFromDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
+	AnchorFromDropdown:SetLabel("Anchor From")
+	AnchorFromDropdown:SetValue(SummonDB.Layout[1])
+	AnchorFromDropdown:SetRelativeWidth(0.5)
+	AnchorFromDropdown:SetCallback("OnValueChanged", function(_, _, value) SummonDB.Layout[1] = value updateCallback() end)
+	LayoutContainer:AddChild(AnchorFromDropdown)
+
+	local AnchorToDropdown = AG:Create("Dropdown")
+	AnchorToDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
+	AnchorToDropdown:SetLabel("Anchor To")
+	AnchorToDropdown:SetValue(SummonDB.Layout[2])
+	AnchorToDropdown:SetRelativeWidth(0.5)
+	AnchorToDropdown:SetCallback("OnValueChanged", function(_, _, value) SummonDB.Layout[2] = value updateCallback() end)
+	LayoutContainer:AddChild(AnchorToDropdown)
+
+	local XPosSlider = AG:Create("Slider")
+	XPosSlider:SetLabel("X Position")
+	XPosSlider:SetValue(SummonDB.Layout[3])
+	XPosSlider:SetSliderValues(-3000, 3000, 0.1)
+	XPosSlider:SetRelativeWidth(0.33)
+	XPosSlider:SetCallback("OnValueChanged", function(_, _, value) SummonDB.Layout[3] = value updateCallback() end)
+	LayoutContainer:AddChild(XPosSlider)
+
+	local YPosSlider = AG:Create("Slider")
+	YPosSlider:SetLabel("Y Position")
+	YPosSlider:SetValue(SummonDB.Layout[4])
+	YPosSlider:SetSliderValues(-3000, 3000, 0.1)
+	YPosSlider:SetRelativeWidth(0.33)
+	YPosSlider:SetCallback("OnValueChanged", function(_, _, value) SummonDB.Layout[4] = value updateCallback() end)
+	LayoutContainer:AddChild(YPosSlider)
+
+	local SizeSlider = AG:Create("Slider")
+	SizeSlider:SetLabel("Size")
+	SizeSlider:SetValue(SummonDB.Size)
+	SizeSlider:SetSliderValues(8, 64, 1)
+	SizeSlider:SetRelativeWidth(0.33)
+	SizeSlider:SetCallback("OnValueChanged", function(_, _, value) SummonDB.Size = value updateCallback() end)
+	LayoutContainer:AddChild(SizeSlider)
+
+	Toggle:SetCallback("OnValueChanged", function(_, _, value) SummonDB.Enabled = value updateCallback() GUIWidgets.DeepDisable(LayoutContainer, not value) end)
+	GUIWidgets.DeepDisable(LayoutContainer, not SummonDB.Enabled)
+end
+
 local function CreateLeaderAssistaintSettings(containerParent, unit, updateCallback)
     local LeaderAssistantDB = UUF.db.profile.Units[unit].Indicators.LeaderAssistantIndicator
 
@@ -3026,6 +3086,8 @@ local function CreateIndicatorSettings(containerParent, unit)
 			CreateReadyCheckIndicatorSettings(IndicatorContainer, unit, function() UpdateUnitSettings(unit, nil, "Indicators") end)
 		elseif IndicatorTab == "ResurrectIndicator" then
 			CreateResurrectIndicatorSettings(IndicatorContainer, unit, function() UpdateUnitSettings(unit, nil, "Indicators") end)
+		elseif IndicatorTab == "Summon" then
+			CreateSummonIndicatorSettings(IndicatorContainer, unit, function() UpdateUnitSettings(unit, nil, "Indicators") end)
         elseif IndicatorTab == "Resting" then
             CreateStatusSettings(IndicatorContainer, unit, "Resting", function() UUF:UpdateUnitRestingIndicator(UUF[unit:upper()], unit) end)
         elseif IndicatorTab == "Combat" then
@@ -3083,6 +3145,7 @@ local function CreateIndicatorSettings(containerParent, unit)
             { text = "Phase", value = "Phase" },
 			{ text = "Ready Check", value = "ReadyCheckIndicator" },
 			{ text = "Resurrect", value = "ResurrectIndicator" },
+			{ text = "Summon", value = "Summon" },
         })
     elseif unit == "focus" or unit == "pet" then
         IndicatorContainerTabGroup:SetTabs({

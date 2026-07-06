@@ -59,6 +59,11 @@ local TestRaidTargetCoords = {
 	{0.5, 0.75, 0.25, 0.5},
 	{0.75, 1, 0.25, 0.5},
 }
+local TestSummonAtlas = {
+	"RaidFrame-Icon-SummonPending",
+	"RaidFrame-Icon-SummonAccepted",
+	"RaidFrame-Icon-SummonDeclined",
+}
 local function GetTestUnitColour(id, defaultColour, colourByClass, opacity)
 	if colourByClass then
 		local temporaryClass = TestData[id].class
@@ -124,6 +129,7 @@ local function ApplyTestGroupFrame(unitFrame, unit, index, displayName, element)
 		UUF:UpdateUnitLeaderAssistantIndicator(unitFrame, unit)
 		UUF:UpdateUnitReadyCheckIndicator(unitFrame, unit)
 		UUF:UpdateUnitResurrectIndicator(unitFrame, unit)
+		UUF:UpdateUnitSummonIndicator(unitFrame, unit)
 		UUF:UpdateUnitRoleIndicator(unitFrame, unit)
 		UUF:UpdateUnitPhaseIndicator(unitFrame, unit)
 		UUF:UpdateUnitMouseoverIndicator(unitFrame, unit)
@@ -241,6 +247,14 @@ local function ApplyTestGroupFrame(unitFrame, unit, index, displayName, element)
 			unitFrame.ResurrectIndicator:Show()
 		else
 			unitFrame.ResurrectIndicator:Hide()
+		end
+	end
+	if (updateAll or element == "Indicators") and unitFrame.SummonIndicator and IndicatorDB.Summon then
+		if IndicatorDB.Summon.Enabled and index % 2 == 1 then
+			unitFrame.SummonIndicator:SetAtlas(TestSummonAtlas[((index - 1) % #TestSummonAtlas) + 1])
+			unitFrame.SummonIndicator:Show()
+		else
+			unitFrame.SummonIndicator:Hide()
 		end
 	end
 
