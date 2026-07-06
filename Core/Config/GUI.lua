@@ -2935,6 +2935,7 @@ end
 
 local function CreateTargetIndicatorSettings(containerParent, unit, updateCallback)
     local TargetIndicatorDB = UUF.db.profile.Units[unit].Indicators.Target
+    TargetIndicatorDB.Style = TargetIndicatorDB.Style or "Glow"
 
     local ToggleContainer = GUIWidgets.CreateInlineGroup(containerParent, "Target Indicator Settings")
 
@@ -2942,7 +2943,7 @@ local function CreateTargetIndicatorSettings(containerParent, unit, updateCallba
     Toggle:SetLabel("Enable |cFF8080FFTarget Indicator|r")
     Toggle:SetValue(TargetIndicatorDB.Enabled)
     Toggle:SetCallback("OnValueChanged", function(_, _, value) TargetIndicatorDB.Enabled = value updateCallback() RefreshTargetIndicatorGUI() end)
-    Toggle:SetRelativeWidth(0.5)
+    Toggle:SetRelativeWidth(0.33)
     ToggleContainer:AddChild(Toggle)
 
     local ColourPicker = AG:Create("ColorPicker")
@@ -2950,8 +2951,16 @@ local function CreateTargetIndicatorSettings(containerParent, unit, updateCallba
     ColourPicker:SetColor(TargetIndicatorDB.Colour[1], TargetIndicatorDB.Colour[2], TargetIndicatorDB.Colour[3])
     ColourPicker:SetCallback("OnValueChanged", function(_, _, r, g, b) TargetIndicatorDB.Colour = {r, g, b} updateCallback() end)
     ColourPicker:SetHasAlpha(false)
-    ColourPicker:SetRelativeWidth(0.5)
+    ColourPicker:SetRelativeWidth(0.33)
     ToggleContainer:AddChild(ColourPicker)
+
+    local StyleDropdown = AG:Create("Dropdown")
+    StyleDropdown:SetList({["Glow"] = "Glow", ["Border"] = "Border"}, {"Glow", "Border"})
+    StyleDropdown:SetLabel("Indicator Style")
+    StyleDropdown:SetValue(TargetIndicatorDB.Style)
+    StyleDropdown:SetRelativeWidth(0.33)
+    StyleDropdown:SetCallback("OnValueChanged", function(_, _, value) TargetIndicatorDB.Style = value updateCallback() end)
+    ToggleContainer:AddChild(StyleDropdown)
 
     function RefreshTargetIndicatorGUI()
         if TargetIndicatorDB.Enabled then

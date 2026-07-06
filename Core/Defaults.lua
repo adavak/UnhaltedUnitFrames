@@ -526,6 +526,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = false,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     },
                     Threat = {
@@ -735,6 +736,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = false,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     }
                 },
@@ -943,6 +945,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = false,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     },
                     Threat = {
@@ -1135,6 +1138,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = false,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     }
                 },
@@ -1339,6 +1343,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = false,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     },
                     Threat = {
@@ -1567,6 +1572,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = true,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     }
                 },
@@ -1757,6 +1763,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = true,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     },
                     Threat = {
@@ -1999,6 +2006,7 @@ local Defaults = {
                     },
                     Target = {
                         Enabled = true,
+                        Style = "Glow",
                         Colour = {1, 1, 1},
                     },
                     Threat = {

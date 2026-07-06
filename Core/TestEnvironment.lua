@@ -264,6 +264,17 @@ local function ApplyTestGroupFrame(unitFrame, unit, index, displayName, element)
 	end
 
 	if (updateAll or element == "Indicators") and unitFrame.TargetIndicator and IndicatorDB.Target then
+		unitFrame.TargetIndicator:ClearAllPoints()
+		unitFrame.TargetIndicator:SetBackdropColor(0, 0, 0, 0)
+		unitFrame.TargetIndicator:SetBackdropBorderColor(IndicatorDB.Target.Colour[1], IndicatorDB.Target.Colour[2], IndicatorDB.Target.Colour[3], IndicatorDB.Target.Colour[4])
+		if IndicatorDB.Target.Style == "Border" then
+			unitFrame.TargetIndicator:SetBackdrop(UUF.BACKDROP)
+			unitFrame.TargetIndicator:SetAllPoints(unitFrame.Container)
+		else
+			unitFrame.TargetIndicator:SetBackdrop({ edgeFile = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Glow.tga", edgeSize = 3, insets = {left = -3, right = -3, top = -3, bottom = -3} })
+			unitFrame.TargetIndicator:SetPoint("TOPLEFT", unitFrame.Container, "TOPLEFT", -3, 3)
+			unitFrame.TargetIndicator:SetPoint("BOTTOMRIGHT", unitFrame.Container, "BOTTOMRIGHT", 3, -3)
+		end
 		unitFrame.TargetIndicator:SetAlpha(IndicatorDB.Target.Enabled and index == 1 and 1 or 0)
 	end
 	if (updateAll or element == "Indicators") and unitFrame.ThreatIndicator and IndicatorDB.Threat then
@@ -541,9 +552,22 @@ local function UpdateBossTestEnvironment(element)
 
 			if (updateAll or element == "Indicators") and BossFrame.TargetIndicator then
 				local TargetIndicatorDB = BossDB.Indicators.Target
+				BossFrame.TargetIndicator:ClearAllPoints()
+				BossFrame.TargetIndicator:SetBackdropColor(0, 0, 0, 0)
+				BossFrame.TargetIndicator:SetBackdropBorderColor(TargetIndicatorDB.Colour[1], TargetIndicatorDB.Colour[2], TargetIndicatorDB.Colour[3], TargetIndicatorDB.Colour[4])
+				if TargetIndicatorDB.Style == "Border" then
+					BossFrame.TargetIndicator:SetBackdrop(UUF.BACKDROP)
+					BossFrame.TargetIndicator:SetAllPoints(BossFrame.Container)
+				else
+					BossFrame.TargetIndicator:SetBackdrop({ edgeFile = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Glow.tga", edgeSize = 3, insets = {left = -3, right = -3, top = -3, bottom = -3} })
+					BossFrame.TargetIndicator:SetPoint("TOPLEFT", BossFrame.Container, "TOPLEFT", -3, 3)
+					BossFrame.TargetIndicator:SetPoint("BOTTOMRIGHT", BossFrame.Container, "BOTTOMRIGHT", 3, -3)
+				end
 				if TargetIndicatorDB.Enabled and i % 2 == 1 then
+					BossFrame.TargetIndicator:SetAlpha(1)
 					BossFrame.TargetIndicator:Show()
 				else
+					BossFrame.TargetIndicator:SetAlpha(0)
 					BossFrame.TargetIndicator:Hide()
 				end
 			end
