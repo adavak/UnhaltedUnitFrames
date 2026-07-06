@@ -1776,6 +1776,11 @@ local Defaults = {
                         Size = 16,
                         Layout = {"CENTER", "CENTER", 0, 0},
                     },
+                    Summon = {
+                        Enabled = true,
+                        Size = 24,
+                        Layout = {"CENTER", "CENTER", 0, 0},
+                    },
 					ReadyCheckIndicator = {
 						Enabled = true,
 						Texture = "Default",
@@ -2011,6 +2016,11 @@ local Defaults = {
                     Phase = {
                         Enabled = true,
                         Size = 12,
+                        Layout = {"CENTER", "CENTER", 0, 0},
+                    },
+                    Summon = {
+                        Enabled = true,
+                        Size = 24,
                         Layout = {"CENTER", "CENTER", 0, 0},
                     },
 					ReadyCheckIndicator = {
