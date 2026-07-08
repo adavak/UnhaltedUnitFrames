@@ -264,18 +264,25 @@ local function ApplyTestGroupFrame(unitFrame, unit, index, displayName, element)
 	end
 
 	if (updateAll or element == "Indicators") and unitFrame.TargetIndicator and IndicatorDB.Target then
-		unitFrame.TargetIndicator:ClearAllPoints()
-		unitFrame.TargetIndicator:SetBackdropColor(0, 0, 0, 0)
-		unitFrame.TargetIndicator:SetBackdropBorderColor(IndicatorDB.Target.Colour[1], IndicatorDB.Target.Colour[2], IndicatorDB.Target.Colour[3], IndicatorDB.Target.Colour[4])
 		if IndicatorDB.Target.Style == "Border" then
-			unitFrame.TargetIndicator:SetBackdrop(UUF.BACKDROP)
-			unitFrame.TargetIndicator:SetAllPoints(unitFrame.Container)
+			if unitFrame.TargetIndicator ~= unitFrame.Container then unitFrame.TargetIndicator:SetAlpha(0) end
+			unitFrame.TargetIndicator = unitFrame.Container
+			unitFrame.Container:SetBackdropBorderColor(IndicatorDB.Target.Enabled and index == 1 and IndicatorDB.Target.Colour[1] or 0, IndicatorDB.Target.Enabled and index == 1 and IndicatorDB.Target.Colour[2] or 0, IndicatorDB.Target.Enabled and index == 1 and IndicatorDB.Target.Colour[3] or 0, IndicatorDB.Target.Enabled and index == 1 and (IndicatorDB.Target.Colour[4] or 1) or 1)
 		else
+			if not unitFrame.TargetIndicatorFrame then
+				unitFrame.TargetIndicatorFrame = CreateFrame("Frame", UUF:FetchFrameName(unit).."_TargetIndicator", unitFrame.Container, "BackdropTemplate")
+				unitFrame.TargetIndicatorFrame:SetFrameLevel(unitFrame.Container:GetFrameLevel() + 3)
+			end
+			unitFrame.TargetIndicator = unitFrame.TargetIndicatorFrame
+			unitFrame.Container:SetBackdropBorderColor(0, 0, 0, 1)
+			unitFrame.TargetIndicator:ClearAllPoints()
+			unitFrame.TargetIndicator:SetBackdropColor(0, 0, 0, 0)
 			unitFrame.TargetIndicator:SetBackdrop({ edgeFile = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Glow.tga", edgeSize = 3, insets = {left = -3, right = -3, top = -3, bottom = -3} })
 			unitFrame.TargetIndicator:SetPoint("TOPLEFT", unitFrame.Container, "TOPLEFT", -3, 3)
 			unitFrame.TargetIndicator:SetPoint("BOTTOMRIGHT", unitFrame.Container, "BOTTOMRIGHT", 3, -3)
+			unitFrame.TargetIndicator:SetBackdropBorderColor(IndicatorDB.Target.Colour[1], IndicatorDB.Target.Colour[2], IndicatorDB.Target.Colour[3], IndicatorDB.Target.Colour[4])
+			unitFrame.TargetIndicator:SetAlpha(IndicatorDB.Target.Enabled and index == 1 and 1 or 0)
 		end
-		unitFrame.TargetIndicator:SetAlpha(IndicatorDB.Target.Enabled and index == 1 and 1 or 0)
 	end
 	if (updateAll or element == "Indicators") and unitFrame.ThreatIndicator and IndicatorDB.Threat then
 		local threatColour = UUF.db.profile.General.Colours.Threat[((index - 1) % 3) + 1]
@@ -552,23 +559,30 @@ local function UpdateBossTestEnvironment(element)
 
 			if (updateAll or element == "Indicators") and BossFrame.TargetIndicator then
 				local TargetIndicatorDB = BossDB.Indicators.Target
-				BossFrame.TargetIndicator:ClearAllPoints()
-				BossFrame.TargetIndicator:SetBackdropColor(0, 0, 0, 0)
-				BossFrame.TargetIndicator:SetBackdropBorderColor(TargetIndicatorDB.Colour[1], TargetIndicatorDB.Colour[2], TargetIndicatorDB.Colour[3], TargetIndicatorDB.Colour[4])
 				if TargetIndicatorDB.Style == "Border" then
-					BossFrame.TargetIndicator:SetBackdrop(UUF.BACKDROP)
-					BossFrame.TargetIndicator:SetAllPoints(BossFrame.Container)
+					if BossFrame.TargetIndicator ~= BossFrame.Container then BossFrame.TargetIndicator:SetAlpha(0) BossFrame.TargetIndicator:Hide() end
+					BossFrame.TargetIndicator = BossFrame.Container
+					BossFrame.Container:SetBackdropBorderColor(TargetIndicatorDB.Enabled and i % 2 == 1 and TargetIndicatorDB.Colour[1] or 0, TargetIndicatorDB.Enabled and i % 2 == 1 and TargetIndicatorDB.Colour[2] or 0, TargetIndicatorDB.Enabled and i % 2 == 1 and TargetIndicatorDB.Colour[3] or 0, TargetIndicatorDB.Enabled and i % 2 == 1 and (TargetIndicatorDB.Colour[4] or 1) or 1)
 				else
+					if not BossFrame.TargetIndicatorFrame then
+						BossFrame.TargetIndicatorFrame = CreateFrame("Frame", UUF:FetchFrameName("boss" .. i).."_TargetIndicator", BossFrame.Container, "BackdropTemplate")
+						BossFrame.TargetIndicatorFrame:SetFrameLevel(BossFrame.Container:GetFrameLevel() + 3)
+					end
+					BossFrame.TargetIndicator = BossFrame.TargetIndicatorFrame
+					BossFrame.Container:SetBackdropBorderColor(0, 0, 0, 1)
+					BossFrame.TargetIndicator:ClearAllPoints()
+					BossFrame.TargetIndicator:SetBackdropColor(0, 0, 0, 0)
 					BossFrame.TargetIndicator:SetBackdrop({ edgeFile = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Glow.tga", edgeSize = 3, insets = {left = -3, right = -3, top = -3, bottom = -3} })
 					BossFrame.TargetIndicator:SetPoint("TOPLEFT", BossFrame.Container, "TOPLEFT", -3, 3)
 					BossFrame.TargetIndicator:SetPoint("BOTTOMRIGHT", BossFrame.Container, "BOTTOMRIGHT", 3, -3)
-				end
-				if TargetIndicatorDB.Enabled and i % 2 == 1 then
-					BossFrame.TargetIndicator:SetAlpha(1)
-					BossFrame.TargetIndicator:Show()
-				else
-					BossFrame.TargetIndicator:SetAlpha(0)
-					BossFrame.TargetIndicator:Hide()
+					BossFrame.TargetIndicator:SetBackdropBorderColor(TargetIndicatorDB.Colour[1], TargetIndicatorDB.Colour[2], TargetIndicatorDB.Colour[3], TargetIndicatorDB.Colour[4])
+					if TargetIndicatorDB.Enabled and i % 2 == 1 then
+						BossFrame.TargetIndicator:SetAlpha(1)
+						BossFrame.TargetIndicator:Show()
+					else
+						BossFrame.TargetIndicator:SetAlpha(0)
+						BossFrame.TargetIndicator:Hide()
+					end
 				end
 			end
 
