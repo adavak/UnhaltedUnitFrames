@@ -115,9 +115,9 @@ UUF.RoleTextures = {
         ["DAMAGER"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\Colour\\DPS.tga",
     },
     ["White"] = {
-        ["TANK"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\White\\Tank.tga",
-        ["HEALER"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\White\\Healer.tga",
-        ["DAMAGER"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\White\\DPS.tga",
+        ["TANK"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\White\\Tank.png",
+        ["HEALER"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\White\\Healer.png",
+        ["DAMAGER"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\White\\DPS.png",
     },
     ["ElvUI"] = {
         ["TANK"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\Role\\ElvUI\\Tank.tga",
