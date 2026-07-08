@@ -896,14 +896,14 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     ColourWhenTappedToggle:SetRelativeWidth(primaryToggleWidth)
     ColourContainer:AddChild(ColourWhenTappedToggle)
 
-    if unit == "party" or unit == "raid" then
-        local ColourWhenDisconnectedToggle = AG:Create("CheckBox")
-        ColourWhenDisconnectedToggle:SetLabel("Colour When Disconnected")
-        ColourWhenDisconnectedToggle:SetValue(HealthBarDB.ColourWhenDisconnected)
-        ColourWhenDisconnectedToggle:SetCallback("OnValueChanged", function(_, _, value) HealthBarDB.ColourWhenDisconnected = value updateCallback("HealthBar") end)
-        ColourWhenDisconnectedToggle:SetRelativeWidth(secondaryToggleWidth)
-        ColourContainer:AddChild(ColourWhenDisconnectedToggle)
+    local ColourWhenDisconnectedToggle = AG:Create("CheckBox")
+    ColourWhenDisconnectedToggle:SetLabel("Colour When Disconnected")
+    ColourWhenDisconnectedToggle:SetValue(HealthBarDB.ColourWhenDisconnected)
+    ColourWhenDisconnectedToggle:SetCallback("OnValueChanged", function(_, _, value) HealthBarDB.ColourWhenDisconnected = value updateCallback("HealthBar") end)
+    ColourWhenDisconnectedToggle:SetRelativeWidth(secondaryToggleWidth)
+    ColourContainer:AddChild(ColourWhenDisconnectedToggle)
 
+    if unit == "party" or unit == "raid" then
         local ColourBackdropWhenDeadToggle = AG:Create("CheckBox")
         ColourBackdropWhenDeadToggle:SetLabel("Colour Backdrop When Dead")
         ColourBackdropWhenDeadToggle:SetValue(HealthBarDB.ColourBackdropWhenDead)
