@@ -1,5 +1,24 @@
 local _, UUF = ...
 
+local function SetCastBarColour(castBar, unit, CastBarDB)
+	local r, g, b, a
+	if CastBarDB.ColourByClass then
+		local unitForClass = unit == "pet" and "player" or unit
+		local unitClass = select(2, UnitClass(unitForClass))
+		local unitColor = RAID_CLASS_COLORS[unitClass]
+		if unitColor then r, g, b, a = unitColor.r, unitColor.g, unitColor.b, CastBarDB.ForegroundOpacity end
+	end
+	if not r then r, g, b, a = unpack(CastBarDB.Foreground) end
+	if UUF.IsInterruptOnCooldown and C_CurveUtil.EvaluateColorValueFromBoolean and (castBar.casting or castBar.channeling or castBar.empowering) and castBar.notInterruptible ~= nil and UnitCanAttack("player", unit) and UUF:IsInterruptOnCooldown() then
+		local CDR, CDG, CDB, CDA = unpack(CastBarDB.InterruptCooldownColour or CastBarDB.InterruptOnCooldownColour)
+		r = C_CurveUtil.EvaluateColorValueFromBoolean(castBar.notInterruptible, r, CDR)
+		g = C_CurveUtil.EvaluateColorValueFromBoolean(castBar.notInterruptible, g, CDG)
+		b = C_CurveUtil.EvaluateColorValueFromBoolean(castBar.notInterruptible, b, CDB)
+		a = C_CurveUtil.EvaluateColorValueFromBoolean(castBar.notInterruptible, a or 1, CDA or a or 1)
+	end
+	castBar:SetStatusBarColor(r, g, b, a)
+end
+
 function UUF:CreateUnitCastBar(unitFrame, unit)
     local GeneralDB = UUF.db.profile.General
     local FrameDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Frame
@@ -25,16 +44,7 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
     CastBar:SetPoint("BOTTOMRIGHT", CastBarContainer, "BOTTOMRIGHT", -1, 1)
     CastBar:SetFrameLevel(CastBarContainer:GetFrameLevel() + 1)
     CastBar.timeToHold = CastBarDB.HoldTime
-    if CastBarDB.ColourByClass then
-        local unitForClass = unit == "pet" and "player" or unit
-        local unitClass = select(2, UnitClass(unitForClass))
-        local unitColor = RAID_CLASS_COLORS[unitClass]
-        if unitColor then
-            CastBar:SetStatusBarColor(unitColor.r, unitColor.g, unitColor.b, CastBarDB.ForegroundOpacity)
-        end
-    else
-        CastBar:SetStatusBarColor(unpack(CastBarDB.Foreground))
-    end
+    SetCastBarColour(CastBar, unit, CastBarDB)
 
     CastBar.Background = CastBar:CreateTexture(nil, "BACKGROUND")
     CastBar.Background:SetAllPoints(CastBar)
@@ -112,16 +122,7 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
         unitFrame.Castbar:HookScript("OnHide", function() CastBarContainer:Hide() end)
 
         unitFrame.Castbar.PostCastStart = function(frameCastBar)
-            if CastBarDB.ColourByClass then
-                local unitForClass = unit == "pet" and "player" or unit
-                local unitClass = select(2, UnitClass(unitForClass))
-                local unitColor = RAID_CLASS_COLORS[unitClass]
-                if unitColor then
-                    frameCastBar:SetStatusBarColor(unitColor.r, unitColor.g, unitColor.b, CastBarDB.ForegroundOpacity)
-                end
-            else
-                frameCastBar:SetStatusBarColor(unpack(CastBarDB.Foreground))
-            end
+            SetCastBarColour(frameCastBar, unit, CastBarDB)
 
             local spellInfo = C_Spell.GetSpellInfo(frameCastBar.spellID)
             local spellName = spellInfo and spellInfo.name
@@ -143,6 +144,7 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
 
         unitFrame.Castbar.PostCastInterruptible = function(frameCastBar)
             if frameCastBar.NotInterruptibleOverlay and frameCastBar.notInterruptible ~= nil then frameCastBar.NotInterruptibleOverlay:SetAlphaFromBoolean(frameCastBar.notInterruptible, 1, 0) end
+            SetCastBarColour(frameCastBar, unit, CastBarDB)
         end
         unitFrame.Castbar.PostCastFail = function(frameCastBar)
             frameCastBar:SetStatusBarColor(unpack(CastBarDB.InterruptedFailedColour))
@@ -194,16 +196,7 @@ function UUF:UpdateUnitCastBar(unitFrame, unit)
             unitFrame.Castbar:SetStatusBarTexture(UUF.Media.Foreground)
             unitFrame.Castbar.timeToHold = CastBarDB.HoldTime
             unitFrame.Castbar.Background:SetTexture(UUF.Media.Background)
-            if CastBarDB.ColourByClass then
-                local unitForClass = unit == "pet" and "player" or unit
-                local unitClass = select(2, UnitClass(unitForClass))
-                local unitColor = RAID_CLASS_COLORS[unitClass]
-                if unitColor then
-                    unitFrame.Castbar:SetStatusBarColor(unitColor.r, unitColor.g, unitColor.b, CastBarDB.ForegroundOpacity)
-                end
-            else
-                unitFrame.Castbar:SetStatusBarColor(unpack(CastBarDB.Foreground))
-            end
+            SetCastBarColour(unitFrame.Castbar, unit, CastBarDB)
             unitFrame.Castbar.Background:SetVertexColor(unpack(CastBarDB.Background))
 
             if unitFrame.Castbar.NotInterruptibleOverlay then
@@ -311,24 +304,10 @@ function UUF:CreateTestCastBar(unitFrame, unit)
             if maxChars and maxChars > 0 then spellName = string.format("%." .. maxChars .. "s", spellName) end
             spellName = UUF:CleanTruncateUTF8String(spellName)
             if CastBarDB.ShowTarget then unitFrame.Castbar.Text:SetFormattedText("%s » %s", spellName, "Target") else unitFrame.Castbar.Text:SetText(spellName) end
-            unitFrame.Castbar.Time:SetText("0.0")
+            unitFrame.Castbar.Time:SetText("2.5")
             unitFrame.Castbar:SetMinMaxValues(0, 1000)
-            unitFrame.Castbar.testValue = 0
-            unitFrame.Castbar:SetScript("OnUpdate", function(self, elapsed)
-                self.testValue = ((self.testValue or 0) + elapsed) % 5
-                self:SetValue((self.testValue / 5) * 1000)
-                self.Time:SetText(string.format("%.1f", self.testValue))
-            end)
-            if CastBarDB.ColourByClass then
-                local unitForClass = unit == "pet" and "player" or unit
-                local unitClass = select(2, UnitClass(unitForClass))
-                local unitColor = RAID_CLASS_COLORS[unitClass]
-                if unitColor then
-                    unitFrame.Castbar:SetStatusBarColor(unitColor.r, unitColor.g, unitColor.b, CastBarDB.ForegroundOpacity)
-                end
-            else
-                unitFrame.Castbar:SetStatusBarColor(unpack(CastBarDB.Foreground))
-            end
+            unitFrame.Castbar:SetValue(500)
+            SetCastBarColour(unitFrame.Castbar, unit, CastBarDB)
             if unitFrame.Castbar.NotInterruptibleOverlay then
                 unitFrame.Castbar.NotInterruptibleOverlay:SetAlpha(0)
             end
@@ -339,7 +318,6 @@ function UUF:CreateTestCastBar(unitFrame, unit)
         end
     else
         if unitFrame.Castbar then
-            unitFrame.Castbar:SetScript("OnUpdate", nil)
             unitFrame.Castbar:Hide()
             if CastBarContainer then CastBarContainer:Hide() end
             if CastBarDB.Enabled then
@@ -349,3 +327,17 @@ function UUF:CreateTestCastBar(unitFrame, unit)
         end
     end
 end
+
+local InterruptCooldownFrame = CreateFrame("Frame")
+InterruptCooldownFrame:RegisterEvent("SPELLS_CHANGED")
+InterruptCooldownFrame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+InterruptCooldownFrame:SetScript("OnEvent", function()
+	if not UUF.db or not UUF.GetNormalizedUnit then return end
+	for i = 1, 9 do
+		local unitFrame = i == 1 and UUF.PLAYER or i == 2 and UUF.TARGET or i == 3 and UUF.FOCUS or i == 4 and UUF.PET or UUF["BOSS" .. (i - 4)]
+		local castBar = unitFrame and unitFrame.Castbar
+		local unit = unitFrame and unitFrame.unit
+		local UnitDB = unit and UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+		if castBar and castBar:IsShown() and (castBar.casting or castBar.channeling or castBar.empowering) and UnitDB and UnitDB.CastBar then SetCastBarColour(castBar, unit, UnitDB.CastBar) end
+	end
+end)
