@@ -284,6 +284,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     PrivateAuras = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         Layout = {"BOTTOMRIGHT", "TOPRIGHT", 0, 124},
                         FrameStrata = "MEDIUM",
@@ -298,6 +299,7 @@ local Defaults = {
                         DisableCooldownText = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 42,
@@ -318,6 +320,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 48,
@@ -338,6 +341,7 @@ local Defaults = {
                         }
                     },
                     Custom = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         Type = "Buffs",
                         OnlyShowPlayer = false,
@@ -560,6 +564,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 34,
@@ -580,6 +585,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 34,
@@ -600,6 +606,7 @@ local Defaults = {
                         }
                     },
                     Custom = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         Type = "Buffs",
                         OnlyShowPlayer = false,
@@ -751,6 +758,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -771,6 +779,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -964,6 +973,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -984,6 +994,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -1004,6 +1015,7 @@ local Defaults = {
                         }
                     },
                     Custom = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         Type = "Buffs",
                         OnlyShowPlayer = false,
@@ -1155,6 +1167,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -1175,6 +1188,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -1364,6 +1378,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -1384,6 +1399,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 22,
@@ -1404,6 +1420,7 @@ local Defaults = {
                         }
                     },
                     Custom = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         Type = "Buffs",
                         OnlyShowPlayer = false,
@@ -1591,6 +1608,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 52,
@@ -1611,6 +1629,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         OnlyShowPlayer = false,
                         Size = 34,
@@ -1631,6 +1650,7 @@ local Defaults = {
                         }
                     },
                     Custom = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         Type = "Buffs",
                         OnlyShowPlayer = false,
@@ -1820,6 +1840,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     PrivateAuras = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         Layout = {"CENTER", "CENTER", 0, 0},
                         FrameStrata = "MEDIUM",
@@ -1834,6 +1855,7 @@ local Defaults = {
                         DisableCooldownText = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 30,
@@ -1854,6 +1876,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 30,
@@ -1874,6 +1897,7 @@ local Defaults = {
                         }
                     },
                     Custom = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         Type = "Buffs",
                         OnlyShowPlayer = false,
@@ -2063,6 +2087,7 @@ local Defaults = {
                         ScaleByIconSize = false,
                     },
                     PrivateAuras = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         Layout = {"CENTER", "CENTER", 0, 0},
                         FrameStrata = "HIGH",
@@ -2077,6 +2102,7 @@ local Defaults = {
                         DisableCooldownText = false,
                     },
                     Buffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 28,
@@ -2097,6 +2123,7 @@ local Defaults = {
                         }
                     },
                     Debuffs = {
+						AnchorParent = "Frame",
                         Enabled = true,
                         OnlyShowPlayer = false,
                         Size = 31,
@@ -2117,6 +2144,7 @@ local Defaults = {
                         }
                     },
                     Custom = {
+						AnchorParent = "Frame",
                         Enabled = false,
                         Type = "Buffs",
                         OnlyShowPlayer = false,

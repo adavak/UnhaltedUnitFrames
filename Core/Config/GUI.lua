@@ -76,6 +76,7 @@ local CooldownBreakpointSettings = {
 }
 
 local AnchorPoints = { { ["TOPLEFT"] = "Top Left", ["TOP"] = "Top", ["TOPRIGHT"] = "Top Right", ["LEFT"] = "Left", ["CENTER"] = "Center", ["RIGHT"] = "Right", ["BOTTOMLEFT"] = "Bottom Left", ["BOTTOM"] = "Bottom", ["BOTTOMRIGHT"] = "Bottom Right" }, { "TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "CENTER", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT", } }
+local AuraAnchorParents = {{Frame = "Unit Frame", Health = "Health Bar"}, {"Frame", "Health"}}
 local FrameStrataList = {{ ["BACKGROUND"] = "Background", ["LOW"] = "Low", ["MEDIUM"] = "Medium", ["HIGH"] = "High", ["DIALOG"] = "Dialog", ["FULLSCREEN"] = "Fullscreen", ["FULLSCREEN_DIALOG"] = "Fullscreen Dialog", ["TOOLTIP"] = "Tooltip" }, { "BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP" }}
 local TopBottomList = {{ ["TOP"] = "Top", ["BOTTOM"] = "Bottom" }, { "TOP", "BOTTOM" }}
 local RaidGrowthDirectionList = {
@@ -3421,11 +3422,19 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraDB)
 
     local LayoutContainer = GUIWidgets.CreateInlineGroup(containerParent, "Layout & Positioning")
 
+	local AnchorParentDropdown = AG:Create("Dropdown")
+	AnchorParentDropdown:SetList(AuraAnchorParents[1], AuraAnchorParents[2])
+	AnchorParentDropdown:SetLabel("Anchor Parent")
+	AnchorParentDropdown:SetValue(AuraDB.AnchorParent)
+	AnchorParentDropdown:SetRelativeWidth(0.25)
+	AnchorParentDropdown:SetCallback("OnValueChanged", function(_, _, value) AuraDB.AnchorParent = value UpdateAuras() end)
+	LayoutContainer:AddChild(AnchorParentDropdown)
+
     local AnchorFromDropdown = AG:Create("Dropdown")
     AnchorFromDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
     AnchorFromDropdown:SetLabel("Anchor From")
     AnchorFromDropdown:SetValue(AuraDB.Layout[1])
-    AnchorFromDropdown:SetRelativeWidth(0.33)
+    AnchorFromDropdown:SetRelativeWidth(0.25)
     AnchorFromDropdown:SetCallback("OnValueChanged", function(_, _, value) AuraDB.Layout[1] = value UpdateAuras() end)
     LayoutContainer:AddChild(AnchorFromDropdown)
 
@@ -3433,7 +3442,7 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraDB)
     AnchorToDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
     AnchorToDropdown:SetLabel("Anchor To")
     AnchorToDropdown:SetValue(AuraDB.Layout[2])
-    AnchorToDropdown:SetRelativeWidth(0.33)
+    AnchorToDropdown:SetRelativeWidth(0.25)
     AnchorToDropdown:SetCallback("OnValueChanged", function(_, _, value) AuraDB.Layout[2] = value UpdateAuras() end)
     LayoutContainer:AddChild(AnchorToDropdown)
 
@@ -3446,7 +3455,7 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraDB)
     }, {"BLIZZARD", "BLIZZARD_REVERSED", "DURATION", "DURATION_REVERSED"})
     SortingDropdown:SetLabel("Aura Sorting")
     SortingDropdown:SetValue(AuraDB.Sorting or "BLIZZARD")
-    SortingDropdown:SetRelativeWidth(0.33)
+    SortingDropdown:SetRelativeWidth(0.25)
     SortingDropdown:SetCallback("OnValueChanged", function(_, _, value) AuraDB.Sorting = value UpdateAuras() end)
     for _, dropdownItem in SortingDropdown.pullout:IterateItems() do
         local value = dropdownItem.userdata and dropdownItem.userdata.value
@@ -3659,11 +3668,19 @@ local function CreatePrivateAuraSettings(containerParent, unit)
     FrameStrataDropdown:SetCallback("OnValueChanged", function(_, _, value) PrivateAurasDB.FrameStrata = value UpdatePrivateAuras() end)
     GeneralContainer:AddChild(FrameStrataDropdown)
 
+	local AnchorParentDropdown = AG:Create("Dropdown")
+	AnchorParentDropdown:SetList(AuraAnchorParents[1], AuraAnchorParents[2])
+	AnchorParentDropdown:SetLabel("Anchor Parent")
+	AnchorParentDropdown:SetValue(PrivateAurasDB.AnchorParent)
+	AnchorParentDropdown:SetRelativeWidth(0.33)
+	AnchorParentDropdown:SetCallback("OnValueChanged", function(_, _, value) PrivateAurasDB.AnchorParent = value UpdatePrivateAuras() end)
+	LayoutContainer:AddChild(AnchorParentDropdown)
+
     local AnchorFromDropdown = AG:Create("Dropdown")
     AnchorFromDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
     AnchorFromDropdown:SetLabel("Anchor From")
     AnchorFromDropdown:SetValue(PrivateAurasDB.Layout[1])
-    AnchorFromDropdown:SetRelativeWidth(0.5)
+    AnchorFromDropdown:SetRelativeWidth(0.33)
     AnchorFromDropdown:SetCallback("OnValueChanged", function(_, _, value) PrivateAurasDB.Layout[1] = value UpdatePrivateAuras() end)
     LayoutContainer:AddChild(AnchorFromDropdown)
 
@@ -3671,7 +3688,7 @@ local function CreatePrivateAuraSettings(containerParent, unit)
     AnchorToDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
     AnchorToDropdown:SetLabel("Anchor To")
     AnchorToDropdown:SetValue(PrivateAurasDB.Layout[2])
-    AnchorToDropdown:SetRelativeWidth(0.5)
+    AnchorToDropdown:SetRelativeWidth(0.33)
     AnchorToDropdown:SetCallback("OnValueChanged", function(_, _, value) PrivateAurasDB.Layout[2] = value UpdatePrivateAuras() end)
     LayoutContainer:AddChild(AnchorToDropdown)
 
