@@ -4458,6 +4458,27 @@ local function CreateProfileSettings(containerParent)
     SharingContainer:AddChild(ImportProfileButton)
     GlobalProfileDropdown:SetDisabled(not UUF.db.global.UseGlobalProfile)
     if UUF.db.global.UseGlobalProfile then for _, child in ipairs(ProfileContainer.children) do if child ~= UseGlobalProfileToggle and child ~= GlobalProfileDropdown then GUIWidgets.DeepDisable(child, true) end end end
+
+    local DefaultsExportHeading = AG:Create("Heading")
+    DefaultsExportHeading:SetText("Export Profile (Table)")
+    DefaultsExportHeading:SetFullWidth(true)
+    SharingContainer:AddChild(DefaultsExportHeading)
+
+    GUIWidgets.CreateInformationTag(SharingContainer, "Export the active profile as a readable Lua table matching the structure used by |cFF8080FFDefaults.lua|r.\nThis is intended for |cFF8080FFadvanced|r users or |cFF8080FFdevelopers|r.")
+
+    local DefaultsExportEditBox = AG:Create("MultiLineEditBox")
+    DefaultsExportEditBox:SetLabel("Export Table...")
+    DefaultsExportEditBox:SetText("")
+    DefaultsExportEditBox:SetNumLines(14)
+    DefaultsExportEditBox:SetFullWidth(true)
+    DefaultsExportEditBox:DisableButton(true)
+    SharingContainer:AddChild(DefaultsExportEditBox)
+
+    local ExportDefaultsButton = AG:Create("Button")
+    ExportDefaultsButton:SetText("Export Profile (Table)")
+    ExportDefaultsButton:SetFullWidth(true)
+    ExportDefaultsButton:SetCallback("OnClick", function() DefaultsExportEditBox:SetText(UUF:ExportDefaultsTable()) DefaultsExportEditBox:HighlightText() DefaultsExportEditBox:SetFocus() end)
+    SharingContainer:AddChild(ExportDefaultsButton)
 end
 
 function UUF:CreateGUI()
