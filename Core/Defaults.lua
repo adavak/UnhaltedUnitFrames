@@ -9,7 +9,7 @@ local Defaults = {
     },
     profile = {
         General = {
-            BorderSize = 0,
+            BorderSize = 1,
             Colours = {
                 Dispel = {
                     Bleed = {0.6, 0, 0.1},
@@ -151,7 +151,7 @@ local Defaults = {
             },
             ToTSeparator = "»",
             UIScale = {
-                Enabled = true,
+                Enabled = false,
                 Scale = 0.53333333333333,
             },
             UseCustomAbbreviations = true,
