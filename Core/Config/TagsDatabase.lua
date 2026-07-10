@@ -29,6 +29,8 @@ function UUFG:AddTag(tagString, tagEvents, tagMethod, tagType, tagDescription)
 end
 
 local Tags = {
+    ["perhp"] = "UNIT_HEALTH UNIT_MAXHEALTH",
+    ["perhp-with-sign"] = "UNIT_HEALTH UNIT_MAXHEALTH",
     ["curhp:abbr"] = "UNIT_HEALTH UNIT_MAXHEALTH",
     ["curhpperhp"] = "UNIT_HEALTH UNIT_MAXHEALTH",
     ["curhpperhp:abbr"] = "UNIT_HEALTH UNIT_MAXHEALTH",
@@ -78,6 +80,7 @@ end
 
 for i = 1, 3 do
     Tags["perhp" .. ":" .. i] = "UNIT_HEALTH UNIT_MAXHEALTH"
+    Tags["perhp-with-sign" .. ":" .. i] = "UNIT_HEALTH UNIT_MAXHEALTH"
     Tags["curhpperhp" .. ":" .. i] = "UNIT_HEALTH UNIT_MAXHEALTH"
     Tags["curhpperhp:abbr" .. ":" .. i] = "UNIT_HEALTH UNIT_MAXHEALTH"
     Tags["perpp" .. ":" .. i] = "UNIT_POWER_UPDATE UNIT_MAXPOWER"
@@ -214,6 +217,37 @@ local function FetchUnitPowerColour(unit)
         return powerColourR, powerColourG, powerColourB
     end
     return 1, 1, 1
+end
+
+oUF.Tags.Methods["perhp"] = function(unit)
+    if not unit or not UnitExists(unit) then return "" end
+    local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
+    local unitStatus = UnitIsDead(unit) and "Dead" or UnitIsGhost(unit) and "Ghost" or not UnitIsConnected(unit) and "Offline"
+    if unitStatus then
+        return unitStatus
+    else
+        return string.format("%.0f", unitHealthPercent)
+    end
+end
+
+oUF.Tags.Methods["perhp-with-sign"] = function(unit)
+    if not unit or not UnitExists(unit) then return "" end
+    local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
+    local unitStatus = UnitIsDead(unit) and "Dead" or UnitIsGhost(unit) and "Ghost" or not UnitIsConnected(unit) and "Offline"
+    if unitStatus then
+        return unitStatus
+    else
+        return string.format("%+.0f%%", unitHealthPercent)
+    end
+end
+
+for i = 1, 3 do
+    local precision = i
+    oUF.Tags.Methods["perhp-with-sign" .. ":" .. precision] = function(unit)
+        if not unit or not UnitExists(unit) then return "" end
+        local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
+        return string.format("%+." .. precision .. "f", unitHealthPercent)
+    end
 end
 
 oUF.Tags.Methods["curhp:abbr"] = function(unit)
@@ -544,6 +578,12 @@ for i = 1, 3 do
         if not unit or not UnitExists(unit) then return "" end
         local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
         return string.format("%." .. precision .. "f", unitHealthPercent)
+    end
+
+    oUF.Tags.Methods["perhp-with-sign" .. ":" .. precision] = function(unit)
+        if not unit or not UnitExists(unit) then return "" end
+        local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
+        return string.format("%+." .. precision .. "f", unitHealthPercent)
     end
 
     oUF.Tags.Methods["curhpperhp" .. ":" .. precision] = function(unit)
