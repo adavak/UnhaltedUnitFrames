@@ -357,6 +357,10 @@ PartyRosterEventFrame:SetScript("OnEvent", function(_, event, addonName)
 		UUF:UpdateGroupIndicators("raid", true)
 	elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED_NEW_AREA" then
 		if RaidDB and RaidDB.Frame.AutoAdjustGroups then UUF:LayoutGroupFrames("raid") end
+		if event == "PLAYER_ENTERING_WORLD" then
+			UUF:UpdateGroupIndicators("party", true)
+			UUF:UpdateGroupIndicators("raid", true)
+		end
 	elseif event == "PLAYER_REGEN_ENABLED" then
 		if RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		UUF:UpdateGroupIndicators("party")
