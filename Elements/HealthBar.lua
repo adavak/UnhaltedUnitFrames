@@ -2,13 +2,27 @@ local _, UUF = ...
 local StatusBarInterpolation = Enum.StatusBarInterpolation
 local oUF = UUF.oUF
 
-local function SetHealthBackgroundColour(unitFrame, unit, HealthBarDB)
-    if HealthBarDB.ColourBackdropWhenDead and UnitIsDeadOrGhost(unitFrame.unit or unit) then
+local function SetHealthBackgroundColour(unitFrame, unit, HealthBarDB, forceUpdate)
+	local backgroundUnit = unitFrame.unit or unit
+	local isDead = HealthBarDB.ColourBackdropWhenDead and UnitIsDeadOrGhost(backgroundUnit)
+	local backgroundClass
+	local backgroundReaction
+	if HealthBarDB.ColourBackgroundByClass then
+		local unitToColour = backgroundUnit ~= "pet" and backgroundUnit or "player"
+		backgroundClass = select(2, UnitClass(unitToColour))
+		if not backgroundClass then backgroundReaction = UnitReaction(unitToColour, "player") end
+	end
+	if not forceUpdate and unitFrame.HealthBackgroundClass == backgroundClass and unitFrame.HealthBackgroundReaction == backgroundReaction and unitFrame.HealthBackgroundIsDead == isDead then return end
+	unitFrame.HealthBackgroundClass = backgroundClass
+	unitFrame.HealthBackgroundReaction = backgroundReaction
+	unitFrame.HealthBackgroundIsDead = isDead
+
+    if isDead then
         local deadBackdropColour = oUF.colors.deadBackdrop
         local r, g, b = deadBackdropColour:GetRGB()
         unitFrame.HealthBackground:SetStatusBarColor(r, g, b, HealthBarDB.BackgroundOpacity)
     elseif HealthBarDB.ColourBackgroundByClass then
-        local unitToColour = (unitFrame.unit or unit) ~= "pet" and (unitFrame.unit or unit) or "player"
+        local unitToColour = backgroundUnit ~= "pet" and backgroundUnit or "player"
         local r, g, b = UUF:GetUnitColour(unitToColour)
         unitFrame.HealthBackground:SetStatusBarColor(r, g, b, HealthBarDB.BackgroundOpacity)
     else
@@ -28,7 +42,7 @@ function UUF:CreateUnitHealthBar(unitFrame, unit)
             unitFrame.HealthBackground:SetSize(FrameDB.Width - 2, FrameDB.Height - 2)
             unitFrame.HealthBackground:SetStatusBarTexture(UUF.Media.Background)
             unitFrame.HealthBackground:SetFrameLevel(unitContainer:GetFrameLevel() + 1)
-            SetHealthBackgroundColour(unitFrame, unit, HealthBarDB)
+            SetHealthBackgroundColour(unitFrame, unit, HealthBarDB, true)
         end
 
         local HealthBar = CreateFrame("StatusBar", UUF:FetchFrameName(unit) .. "_HealthBar", unitContainer)
@@ -119,7 +133,7 @@ function UUF:UpdateUnitHealthBar(unitFrame, unit)
 
     if unitFrame.HealthBackground then
         unitFrame.HealthBackground:SetSize(FrameDB.Width - 2, FrameDB.Height - 2)
-        SetHealthBackgroundColour(unitFrame, unit, HealthBarDB)
+        SetHealthBackgroundColour(unitFrame, unit, HealthBarDB, true)
         unitFrame.HealthBackground:SetStatusBarTexture(UUF.Media.Background)
     end
 

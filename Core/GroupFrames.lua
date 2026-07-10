@@ -126,7 +126,22 @@ function UUF:UpdateGroupFrame(groupType)
 	local UnitDB = UUF.db.profile.Units[groupType]
 	if not UnitDB or not UnitDB.Enabled then
 		local container = groupType == "party" and UUF.PARTY_CONTAINER or UUF.RAID_CONTAINER
-		if container then container:Hide() end
+		if container then if not InCombatLockdown() then UnregisterStateDriver(container, "visibility") end container:Hide() end
+		if groupType == "party" then
+			for _, partyFrame in ipairs(UUF.PARTY_FRAMES) do
+				UUF:UnregisterRangeFrame(partyFrame)
+				UUF:UnregisterTargetGlowIndicatorFrame(partyFrame)
+				if partyFrame.DispelHighlightUnit then UUF:UnregisterDispelHighlightEvents(partyFrame) end
+				partyFrame.UUFGroupUnit = nil
+			end
+		else
+			UUF:ForEachRaidFrame(function(raidFrame)
+				UUF:UnregisterRangeFrame(raidFrame)
+				UUF:UnregisterTargetGlowIndicatorFrame(raidFrame)
+				if raidFrame.DispelHighlightUnit then UUF:UnregisterDispelHighlightEvents(raidFrame) end
+				raidFrame.UUFGroupUnit = nil
+			end, true, UUF.RAID_TEST_MODE)
+		end
 		return
 	end
 	if groupType == "party" then
@@ -171,54 +186,54 @@ function UUF:UpdateGroupFrame(groupType)
 	if groupType == "party" and UUF.PARTY_TEST_MODE or groupType == "raid" and UUF.RAID_TEST_MODE then UUF:UpdateTestEnvironment(groupType, "all") end
 end
 
-function UUF:UpdateGroupIndicators(groupType)
+function UUF:UpdateGroupIndicators(groupType, onlyUpdateRoles)
 	local UnitDB = UUF.db.profile.Units[groupType]
 	if not UnitDB or not UnitDB.Enabled then return end
 	if groupType == "party" then
 		for i = 1, UUF.MAX_PARTY_FRAMES do
 			local partyFrame = UUF["PARTY" .. i]
 			if partyFrame then
-				if partyFrame.DispelHighlightUnit and partyFrame.DispelHighlightUnit ~= "party" .. i then UUF:UnregisterDispelHighlightEvents(partyFrame) end
-				UUF:RegisterRangeFrame(partyFrame, "party" .. i)
-				UUF:RegisterTargetGlowIndicatorFrame(partyFrame, "party" .. i)
-				if partyFrame.UUFGroupUnit ~= "party" .. i then
-					partyFrame.UUFGroupUnit = "party" .. i
-					if partyFrame.DispelHighlight then UUF:UpdateUnitDispelHighlight(partyFrame, "party" .. i) end
+				if not onlyUpdateRoles then
+					if partyFrame.DispelHighlightUnit and partyFrame.DispelHighlightUnit ~= "party" .. i then UUF:UnregisterDispelHighlightEvents(partyFrame) end
+					UUF:RegisterRangeFrame(partyFrame, "party" .. i)
+					UUF:RegisterTargetGlowIndicatorFrame(partyFrame, "party" .. i)
+					if partyFrame.UUFGroupUnit ~= "party" .. i then
+						partyFrame.UUFGroupUnit = "party" .. i
+						if partyFrame.DispelHighlight then UUF:UpdateUnitDispelHighlight(partyFrame, "party" .. i) end
+					end
 				end
-				if partyFrame.Health then partyFrame.Health:ForceUpdate() end
-				if partyFrame.Tags then for configuredTag in pairs(UnitDB.Tags) do UUF:UpdateUnitTag(partyFrame, "party" .. i, configuredTag) end elseif partyFrame.UpdateTags then partyFrame:UpdateTags() end
-				UUF:UpdateUnitPowerBar(partyFrame, "party" .. i)
+				if UnitDB.PowerBar.Enabled and UnitDB.PowerBar.OnlyShowHealers then UUF:UpdateUnitPowerBar(partyFrame, "party" .. i) end
 				UUF:UpdateUnitRoleIndicator(partyFrame, "party" .. i)
 			end
 		end
 		if UUF.PARTYPLAYER then
-			if UUF.PARTYPLAYER.DispelHighlightUnit and UUF.PARTYPLAYER.DispelHighlightUnit ~= "partyplayer" then UUF:UnregisterDispelHighlightEvents(UUF.PARTYPLAYER) end
-			UUF:RegisterRangeFrame(UUF.PARTYPLAYER, "player")
-			UUF:RegisterTargetGlowIndicatorFrame(UUF.PARTYPLAYER, "partyplayer")
-			if UUF.PARTYPLAYER.UUFGroupUnit ~= "partyplayer" then
-				UUF.PARTYPLAYER.UUFGroupUnit = "partyplayer"
-				if UUF.PARTYPLAYER.DispelHighlight then UUF:UpdateUnitDispelHighlight(UUF.PARTYPLAYER, "partyplayer") end
+			if not onlyUpdateRoles then
+				if UUF.PARTYPLAYER.DispelHighlightUnit and UUF.PARTYPLAYER.DispelHighlightUnit ~= "partyplayer" then UUF:UnregisterDispelHighlightEvents(UUF.PARTYPLAYER) end
+				UUF:RegisterRangeFrame(UUF.PARTYPLAYER, "player")
+				UUF:RegisterTargetGlowIndicatorFrame(UUF.PARTYPLAYER, "partyplayer")
+				if UUF.PARTYPLAYER.UUFGroupUnit ~= "partyplayer" then
+					UUF.PARTYPLAYER.UUFGroupUnit = "partyplayer"
+					if UUF.PARTYPLAYER.DispelHighlight then UUF:UpdateUnitDispelHighlight(UUF.PARTYPLAYER, "partyplayer") end
+				end
 			end
-			if UUF.PARTYPLAYER.Health then UUF.PARTYPLAYER.Health:ForceUpdate() end
-			if UUF.PARTYPLAYER.Tags then for configuredTag in pairs(UnitDB.Tags) do UUF:UpdateUnitTag(UUF.PARTYPLAYER, "partyplayer", configuredTag) end elseif UUF.PARTYPLAYER.UpdateTags then UUF.PARTYPLAYER:UpdateTags() end
-			UUF:UpdateUnitPowerBar(UUF.PARTYPLAYER, "partyplayer")
+			if UnitDB.PowerBar.Enabled and UnitDB.PowerBar.OnlyShowHealers then UUF:UpdateUnitPowerBar(UUF.PARTYPLAYER, "partyplayer") end
 			UUF:UpdateUnitRoleIndicator(UUF.PARTYPLAYER, "partyplayer")
 		end
 	elseif groupType == "raid" then
 		UUF:ForEachRaidFrame(function(raidFrame, unit)
 			if unit and unit ~= "raid" then
-				if raidFrame.DispelHighlightUnit and raidFrame.DispelHighlightUnit ~= unit then UUF:UnregisterDispelHighlightEvents(raidFrame) end
-				UUF:RegisterRangeFrame(raidFrame, unit)
-				UUF:RegisterTargetGlowIndicatorFrame(raidFrame, unit)
-				if raidFrame.UUFGroupUnit ~= unit then
-					raidFrame.UUFGroupUnit = unit
-					if raidFrame.DispelHighlight then UUF:UpdateUnitDispelHighlight(raidFrame, unit) end
+				if not onlyUpdateRoles then
+					if raidFrame.DispelHighlightUnit and raidFrame.DispelHighlightUnit ~= unit then UUF:UnregisterDispelHighlightEvents(raidFrame) end
+					UUF:RegisterRangeFrame(raidFrame, unit)
+					UUF:RegisterTargetGlowIndicatorFrame(raidFrame, unit)
+					if raidFrame.UUFGroupUnit ~= unit then
+						raidFrame.UUFGroupUnit = unit
+						if raidFrame.DispelHighlight then UUF:UpdateUnitDispelHighlight(raidFrame, unit) end
+					end
 				end
-				if raidFrame.Health then raidFrame.Health:ForceUpdate() end
-				if raidFrame.Tags then for configuredTag in pairs(UnitDB.Tags) do UUF:UpdateUnitTag(raidFrame, unit, configuredTag) end elseif raidFrame.UpdateTags then raidFrame:UpdateTags() end
-				UUF:UpdateUnitPowerBar(raidFrame, unit)
+				if UnitDB.PowerBar.Enabled and UnitDB.PowerBar.OnlyShowHealers then UUF:UpdateUnitPowerBar(raidFrame, unit) end
 				UUF:UpdateUnitRoleIndicator(raidFrame, unit)
-			else
+			elseif not onlyUpdateRoles then
 				UUF:UnregisterRangeFrame(raidFrame)
 				UUF:UnregisterTargetGlowIndicatorFrame(raidFrame)
 				if raidFrame.DispelHighlightUnit then UUF:UnregisterDispelHighlightEvents(raidFrame) end
@@ -338,8 +353,8 @@ PartyRosterEventFrame:SetScript("OnEvent", function(_, event, addonName)
 		if RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		UUF:UpdateGroupIndicators("party")
 	elseif event == "PLAYER_ROLES_ASSIGNED" then
-		UUF:UpdateGroupIndicators("party")
-		UUF:UpdateGroupIndicators("raid")
+		UUF:UpdateGroupIndicators("party", true)
+		UUF:UpdateGroupIndicators("raid", true)
 	elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED_NEW_AREA" then
 		if RaidDB and RaidDB.Frame.AutoAdjustGroups then UUF:LayoutGroupFrames("raid") end
 	elseif event == "PLAYER_REGEN_ENABLED" then

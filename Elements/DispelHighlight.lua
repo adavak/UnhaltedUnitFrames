@@ -9,6 +9,17 @@ local dispelTypeMap = {
     Bleed = oUF.Enum.DispelType.Bleed,
 }
 
+local DispelHighlightFrames = {}
+local DispelTypes
+
+local DispelEventFrame = CreateFrame("Frame")
+DispelEventFrame:RegisterEvent("SPELLS_CHANGED")
+DispelEventFrame:RegisterEvent("PLAYER_TALENT_UPDATE")
+DispelEventFrame:SetScript("OnEvent", function()
+	DispelTypes = UUF.LD and UUF.LD:GetMyDispelTypes()
+	for unitFrame in pairs(DispelHighlightFrames) do UUF:UpdateUnitDispelState(unitFrame, unitFrame.DispelHighlightUnit) end
+end)
+
 function UUF:UpdateDispelColorCurve(unitFrame)
     if not unitFrame.dispelColorCurve then return end
     unitFrame.dispelColorCurve:ClearPoints()
@@ -109,8 +120,8 @@ function UUF:UpdateUnitDispelState(unitFrame, unit)
 		return
 	end
 
-	local dispelList = LibDispel:GetMyDispelTypes()
-	if not (dispelList.Magic or dispelList.Curse or dispelList.Disease or dispelList.Poison or dispelList.Bleed) then
+	DispelTypes = DispelTypes or LibDispel:GetMyDispelTypes()
+	if not (DispelTypes.Magic or DispelTypes.Curse or DispelTypes.Disease or DispelTypes.Poison or DispelTypes.Bleed) then
 		unitFrame.DispelHighlight:Hide()
 		return
 	end
@@ -145,14 +156,13 @@ function UUF:RegisterDispelHighlightEvents(unitFrame, unit)
     end
 
     unitFrame.DispelHighlightHandler:RegisterUnitEvent("UNIT_AURA", unitToken)
-    unitFrame.DispelHighlightHandler:RegisterEvent("SPELLS_CHANGED")
-    unitFrame.DispelHighlightHandler:RegisterEvent("PLAYER_TALENT_UPDATE")
-    unitFrame.DispelHighlightHandler:RegisterEvent("PLAYER_TARGET_CHANGED")
+	DispelHighlightFrames[unitFrame] = true
 end
 
 function UUF:UnregisterDispelHighlightEvents(unitFrame)
     if not unitFrame.DispelHighlightHandler then return end
 
     unitFrame.DispelHighlightHandler:UnregisterAllEvents()
+	DispelHighlightFrames[unitFrame] = nil
     unitFrame.DispelHighlightUnit = nil
 end

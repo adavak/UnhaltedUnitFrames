@@ -408,7 +408,6 @@ RangeEventFrame:RegisterEvent("PLAYER_FOCUS_CHANGED")
 RangeEventFrame:RegisterEvent("UNIT_TARGET")
 RangeEventFrame:RegisterEvent("UNIT_IN_RANGE_UPDATE")
 RangeEventFrame:RegisterEvent("UNIT_CONNECTION")
-RangeEventFrame:RegisterEvent("UNIT_HEALTH")
 RangeEventFrame:RegisterEvent("UNIT_PHASE")
 local function UpdateRangeUnit(rangeUnit)
 	local unitFrames = UUF.RangeEvtFrames[rangeUnit]
