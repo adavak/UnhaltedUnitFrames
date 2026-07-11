@@ -237,7 +237,7 @@ oUF.Tags.Methods["perhp-with-sign"] = function(unit)
     if unitStatus then
         return unitStatus
     else
-        return string.format("%+.0f%%", unitHealthPercent)
+        return string.format("%.0f%%", unitHealthPercent)
     end
 end
 
@@ -246,7 +246,7 @@ for i = 1, 3 do
     oUF.Tags.Methods["perhp-with-sign" .. ":" .. precision] = function(unit)
         if not unit or not UnitExists(unit) then return "" end
         local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
-        return string.format("%+." .. precision .. "f", unitHealthPercent)
+        return string.format("%." .. precision .. "f", unitHealthPercent)
     end
 end
 
@@ -583,7 +583,7 @@ for i = 1, 3 do
     oUF.Tags.Methods["perhp-with-sign" .. ":" .. precision] = function(unit)
         if not unit or not UnitExists(unit) then return "" end
         local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
-        return string.format("%+." .. precision .. "f", unitHealthPercent)
+        return string.format("%." .. precision .. "f", unitHealthPercent)
     end
 
     oUF.Tags.Methods["curhpperhp" .. ":" .. precision] = function(unit)
