@@ -9,12 +9,12 @@ unitIsTargetEvtFrame:SetScript("OnEvent", function(_, event, eventUnit)
 	local changedUnit = eventUnit and eventUnit .. "target"
 	for frame, unit in pairs(UUF.TargetHighlightEvtFrames) do
 		local unitChanged = event == "PLAYER_TARGET_CHANGED" or (event == "PLAYER_FOCUS_CHANGED" and (unit == "focus" or unit == "focustarget")) or unit == changedUnit
-		if unitChanged and UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Target.Enabled then UUF:UpdateTargetGlowIndicator(frame, unit) end
+		if unitChanged and UUF:GetUnitDB(frame, unit).Indicators.Target.Enabled then UUF:UpdateTargetGlowIndicator(frame, unit) end
 	end
 end)
 
 function UUF:CreateUnitTargetGlowIndicator(unitFrame, unit)
-    local TargetIndicatorDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Target
+    local TargetIndicatorDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Target
     if TargetIndicatorDB then
         if TargetIndicatorDB.Style == "Border" then
             unitFrame.TargetIndicator = unitFrame.Container
@@ -33,7 +33,7 @@ function UUF:CreateUnitTargetGlowIndicator(unitFrame, unit)
 end
 
 function UUF:UpdateUnitTargetGlowIndicator(unitFrame, unit)
-    local TargetIndicatorDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Target
+    local TargetIndicatorDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Target
     if unitFrame and TargetIndicatorDB then
         if unitFrame.TargetIndicator and unitFrame.TargetIndicator ~= unitFrame.Container then unitFrame.TargetIndicator:SetAlpha(0) end
         if TargetIndicatorDB.Style == "Border" then
@@ -60,7 +60,7 @@ end
 
 function UUF:UpdateTargetGlowIndicator(unitFrame, unit)
     if unitFrame and unitFrame.TargetIndicator then
-        local TargetIndicatorDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Target
+        local TargetIndicatorDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Target
         if TargetIndicatorDB.Style == "Border" then
             local isTarget = TargetIndicatorDB.Enabled and UnitIsUnit("target", unit == "partyplayer" and "player" or unit)
             unitFrame.Container:SetBackdropBorderColor(isTarget and TargetIndicatorDB.Colour[1] or 0, isTarget and TargetIndicatorDB.Colour[2] or 0, isTarget and TargetIndicatorDB.Colour[3] or 0, isTarget and (TargetIndicatorDB.Colour[4] or 1) or 1)
@@ -78,7 +78,7 @@ end
 function UUF:RegisterTargetGlowIndicatorFrame(frameName, unit)
 	if not unit or not frameName then return end
 	local unitFrame = type(frameName) == "table" and frameName or _G[frameName]
-	local DB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+	local DB = UUF:GetUnitDB(unitFrame, unit)
 	if not unitFrame or not DB or not DB.Indicators.Target then return end
 	if DB.Indicators.Target.Enabled then
 		UUF.TargetHighlightEvtFrames[unitFrame] = unit

@@ -13,6 +13,7 @@ UUF.MAX_PARTY_FRAMES = 4
 UUF.RAID_FRAMES = {}
 UUF.RAID_TEST_FRAMES = {}
 UUF.RAID_HEADERS = {}
+UUF.AUGMENTATION_RAID_FRAME_COUNT = 0
 UUF.MAX_RAID_FRAMES = 40
 UUF.MAX_RAID_GROUPS = 8
 UUF.MAX_RAID_FRAMES_PER_GROUP = 5
@@ -226,7 +227,7 @@ function UUF:GetCooldownDurationComponents(displayStyle, minValue)
     end
 end
 
-function UUF:ApplyCooldownText(icon, textRegion, unit)
+function UUF:ApplyCooldownText(icon, textRegion, unit, unitFrame)
     if not icon then return end
     local CooldownTextDB = UUF.db.profile.General.CooldownText
     for _, breakpoint in ipairs(CooldownTextDB.CooldownBreakpoints) do
@@ -236,12 +237,12 @@ function UUF:ApplyCooldownText(icon, textRegion, unit)
         CooldownDurationFormatter:SetBreakpoints(CooldownTextDB.CooldownBreakpoints)
         icon:SetCountdownFormatter(CooldownDurationFormatter)
     end
-    if CooldownTextDB.Advanced and unit then CooldownTextDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras.AuraDuration end
+	if CooldownTextDB.Advanced and unit then CooldownTextDB = UUF:GetUnitDB(unitFrame, unit).Auras.AuraDuration end
     if not textRegion then
         C_Timer.After(0.01, function()
             for _, region in ipairs({icon:GetRegions()}) do
                 if region:GetObjectType() == "FontString" then
-                    UUF:ApplyCooldownText(icon, region, unit)
+					UUF:ApplyCooldownText(icon, region, unit, unitFrame)
                     return
                 end
             end
@@ -463,6 +464,10 @@ function UUF:GetNormalizedUnit(unit)
     return normalizedUnit
 end
 
+function UUF:GetUnitDB(unitFrame, unit)
+	return UUF.db.profile.Units[unitFrame and unitFrame.isAugmentationRaidFrame and "augmentation" or UUF:GetNormalizedUnit(unit)]
+end
+
 function UUF:RequiresAlternativePowerBar()
     local SpecsNeedingAltPower = {
         PRIEST = { 258 },           -- Shadow
@@ -598,7 +603,7 @@ function UUF:GetSecondaryPowerType()
 end
 
 function UUF:HasActiveSecondaryPowerBar(unitFrame, unit)
-    local SecondaryPowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].SecondaryPowerBar
+	local SecondaryPowerBarDB = UUF:GetUnitDB(unitFrame, unit).SecondaryPowerBar
     return SecondaryPowerBarDB and SecondaryPowerBarDB.Enabled and (unitFrame.Runes or unitFrame.ClassPower)
 end
 
@@ -609,8 +614,8 @@ local function NormalizeBarPosition(value, fallback)
     return fallback
 end
 
-function UUF:GetConfiguredPowerBarPosition(unit)
-    local PowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].PowerBar
+function UUF:GetConfiguredPowerBarPosition(unit, unitFrame)
+	local PowerBarDB = UUF:GetUnitDB(unitFrame, unit).PowerBar
     if not PowerBarDB then return "BOTTOM" end
     if PowerBarDB.Position then
         return NormalizeBarPosition(PowerBarDB.Position, "BOTTOM")
@@ -621,8 +626,8 @@ function UUF:GetConfiguredPowerBarPosition(unit)
     return "BOTTOM"
 end
 
-function UUF:GetConfiguredSecondaryPowerBarPosition(unit)
-    local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+function UUF:GetConfiguredSecondaryPowerBarPosition(unit, unitFrame)
+	local UnitDB = UUF:GetUnitDB(unitFrame, unit)
     local SecondaryPowerBarDB = UnitDB.SecondaryPowerBar
     if not SecondaryPowerBarDB then return "TOP" end
     if SecondaryPowerBarDB.Position then
@@ -637,12 +642,12 @@ end
 function UUF:GetSecondaryPowerBarStackOffset(unitFrame, unit)
     if not UUF:HasActiveSecondaryPowerBar(unitFrame, unit) then return 0 end
 
-    local PowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].PowerBar
+	local PowerBarDB = UUF:GetUnitDB(unitFrame, unit).PowerBar
     if not (PowerBarDB and PowerBarDB.Enabled and unitFrame.Power) then
         return 0
     end
 
-    if UUF:GetConfiguredPowerBarPosition(unit) ~= UUF:GetConfiguredSecondaryPowerBarPosition(unit) then
+	if UUF:GetConfiguredPowerBarPosition(unit, unitFrame) ~= UUF:GetConfiguredSecondaryPowerBarPosition(unit, unitFrame) then
         return 0
     end
 
@@ -650,8 +655,8 @@ function UUF:GetSecondaryPowerBarStackOffset(unitFrame, unit)
 end
 
 function UUF:UpdateHealthBarLayout(unitFrame, unit)
-    local PowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].PowerBar
-    local SecondaryPowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].SecondaryPowerBar
+	local PowerBarDB = UUF:GetUnitDB(unitFrame, unit).PowerBar
+	local SecondaryPowerBarDB = UUF:GetUnitDB(unitFrame, unit).SecondaryPowerBar
 
     local topDepth = 0
     local bottomDepth = 0
@@ -660,7 +665,7 @@ function UUF:UpdateHealthBarLayout(unitFrame, unit)
     local hasSecondaryPower = UUF:HasActiveSecondaryPowerBar(unitFrame, unit)
 
     if hasPrimaryPower then
-        if UUF:GetConfiguredPowerBarPosition(unit) == "TOP" then
+		if UUF:GetConfiguredPowerBarPosition(unit, unitFrame) == "TOP" then
             topDepth = topDepth + PowerBarDB.Height + 1
         else
             bottomDepth = bottomDepth + PowerBarDB.Height + 1
@@ -668,7 +673,7 @@ function UUF:UpdateHealthBarLayout(unitFrame, unit)
     end
 
     if hasSecondaryPower then
-        if UUF:GetConfiguredSecondaryPowerBarPosition(unit) == "TOP" then
+		if UUF:GetConfiguredSecondaryPowerBarPosition(unit, unitFrame) == "TOP" then
             topDepth = topDepth + SecondaryPowerBarDB.Height + 1
         else
             bottomDepth = bottomDepth + SecondaryPowerBarDB.Height + 1

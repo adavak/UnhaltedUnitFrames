@@ -1,5 +1,6 @@
 local _, UUF = ...
 local oUF = UUF.oUF
+local GroupRosterEventFrame = CreateFrame("Frame")
 
 local BlizzardRaidHiddenParent = CreateFrame("Frame", "UUF_BlizzardRaidHiddenParent", UIParent)
 BlizzardRaidHiddenParent:Hide()
@@ -30,6 +31,103 @@ function UUF:ForEachRaidFrame(callback, includeInactive, includeTestFrames, ...)
 			callback(raidFrame, unit, assignedUnit, ...)
 		end
 	end
+end
+
+function UUF:LayoutAugmentationRaidFrames()
+	if not UUF.AUGMENTATION_RAID_CONTAINER or not UUF.AUGMENTATION_RAID_HEADER then return end
+	local FrameDB = UUF.db.profile.Units.augmentation.Frame
+	local unitGrowth, groupGrowth = (FrameDB.GrowthDirection or "RIGHT_DOWN"):match("^(%a+)_(%a+)$")
+	unitGrowth = unitGrowth or "RIGHT"
+	groupGrowth = groupGrowth or "DOWN"
+	local spacing = FrameDB.Layout[5] or 0
+	local frameCount = math.max(UUF.AUGMENTATION_RAID_FRAME_COUNT, 1)
+	local unitsPerColumn = UUF.MAX_RAID_FRAMES_PER_GROUP
+	local columns = math.ceil(frameCount / unitsPerColumn)
+	local rows = math.min(frameCount, unitsPerColumn)
+	local point = unitGrowth == "RIGHT" and "RIGHT" or unitGrowth == "UP" and "TOP" or unitGrowth == "DOWN" and "BOTTOM" or "LEFT"
+	local xOffset = unitGrowth == "RIGHT" and -spacing or unitGrowth == "LEFT" and spacing or 0
+	local yOffset = unitGrowth == "UP" and -spacing or unitGrowth == "DOWN" and spacing or 0
+	local columnAnchorPoint = groupGrowth == "RIGHT" and "LEFT" or groupGrowth == "LEFT" and "RIGHT" or groupGrowth == "UP" and "BOTTOM" or "TOP"
+	local columnWidth = (unitGrowth == "UP" or unitGrowth == "DOWN") and FrameDB.Width or (FrameDB.Width + spacing) * rows - spacing
+	local columnHeight = (unitGrowth == "UP" or unitGrowth == "DOWN") and (FrameDB.Height + spacing) * rows - spacing or FrameDB.Height
+
+	UUF.AUGMENTATION_RAID_CONTAINER:ClearAllPoints()
+	UUF.AUGMENTATION_RAID_CONTAINER:SetPoint(FrameDB.Layout[1], UIParent, FrameDB.Layout[2], FrameDB.Layout[3], FrameDB.Layout[4])
+	UUF.AUGMENTATION_RAID_CONTAINER:SetFrameStrata(FrameDB.FrameStrata)
+	UUF.AUGMENTATION_RAID_CONTAINER:SetSize((groupGrowth == "LEFT" or groupGrowth == "RIGHT") and (columnWidth + spacing) * columns - spacing or columnWidth, (groupGrowth == "UP" or groupGrowth == "DOWN") and (columnHeight + spacing) * columns - spacing or columnHeight)
+
+	local header = UUF.AUGMENTATION_RAID_HEADER
+	for childIndex = 1, UUF.MAX_RAID_FRAMES do
+		local child = header:GetAttribute("child" .. childIndex)
+		if child then
+			child:ClearAllPoints()
+			child:SetSize(FrameDB.Width, FrameDB.Height)
+			child:SetFrameStrata(FrameDB.FrameStrata)
+		end
+	end
+	header:SetAttribute("point", point)
+	header:SetAttribute("xOffset", xOffset)
+	header:SetAttribute("yOffset", yOffset)
+	header:SetAttribute("initial-width", FrameDB.Width)
+	header:SetAttribute("initial-height", FrameDB.Height)
+	header:SetAttribute("oUF-initialConfigFunction", ("self:SetWidth(%s); self:SetHeight(%s)"):format(FrameDB.Width, FrameDB.Height))
+	header:SetAttribute("unitsPerColumn", unitsPerColumn)
+	header:SetAttribute("maxColumns", UUF.MAX_RAID_GROUPS)
+	header:SetAttribute("columnSpacing", spacing)
+	header:SetAttribute("columnAnchorPoint", columnAnchorPoint)
+	header:SetFrameStrata(FrameDB.FrameStrata)
+	header:SetSize(UUF.AUGMENTATION_RAID_CONTAINER:GetSize())
+	header:ClearAllPoints()
+	local horizontalAnchor = groupGrowth == "LEFT" and "RIGHT" or groupGrowth == "RIGHT" and "LEFT" or unitGrowth == "RIGHT" and "RIGHT" or "LEFT"
+	local verticalAnchor = groupGrowth == "UP" and "BOTTOM" or groupGrowth == "DOWN" and "TOP" or unitGrowth == "DOWN" and "BOTTOM" or "TOP"
+	header:SetPoint(verticalAnchor .. horizontalAnchor, UUF.AUGMENTATION_RAID_CONTAINER, verticalAnchor .. horizontalAnchor)
+end
+
+function UUF:UpdateAugmentationRaidFrames()
+	if not UUF.AUGMENTATION_RAID_HEADER then return end
+	if InCombatLockdown() then
+		GroupRosterEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+		return
+	end
+
+	local AugmentationDB = UUF.db.profile.Units.augmentation
+	local names, seen = {}, {}
+	for configuredName in (AugmentationDB and AugmentationDB.Names or ""):gmatch("[^,;\n]+") do
+		local strippedName = strtrim(configuredName)
+		if strippedName ~= "" then
+			local configuredNameLower = strippedName:lower()
+			for raidIndex = 1, GetNumGroupMembers() do
+				local rosterName = GetRaidRosterInfo(raidIndex)
+				if rosterName and not seen[rosterName] and (rosterName:lower() == configuredNameLower or Ambiguate(rosterName, "short"):lower() == configuredNameLower) then
+					seen[rosterName] = true
+					names[#names + 1] = rosterName
+					break
+				end
+			end
+		end
+	end
+	local specializationIndex = C_SpecializationInfo.GetSpecialization()
+	local active = AugmentationDB and AugmentationDB.Enabled and UnitClassBase("player") == "EVOKER" and specializationIndex and C_SpecializationInfo.GetSpecializationInfo(specializationIndex) == 1473 and not UUF.RAID_TEST_MODE and #names > 0
+	UUF.AUGMENTATION_RAID_FRAME_COUNT = #names
+	local nameList = table.concat(names, ",")
+	local activeNameList = active and nameList or ""
+	local sortMethod = AugmentationDB.Frame.SortBy == "NAME" and "NAME" or "NAMELIST"
+	if UUF.AUGMENTATION_RAID_HEADER:GetAttribute("sortMethod") ~= sortMethod then UUF.AUGMENTATION_RAID_HEADER:SetAttribute("sortMethod", sortMethod) end
+	if UUF.AUGMENTATION_RAID_HEADER:GetAttribute("nameList") ~= activeNameList then UUF.AUGMENTATION_RAID_HEADER:SetAttribute("nameList", activeNameList) end
+	UUF:ForEachRaidFrame(function(raidFrame, unit, assignedUnit)
+		if not raidFrame.isAugmentationRaidFrame or not unit then return end
+		raidFrame:SetSize(AugmentationDB.Frame.Width, AugmentationDB.Frame.Height)
+		raidFrame:SetFrameStrata(AugmentationDB.Frame.FrameStrata)
+		UUF:UpdateUnitFrame(raidFrame, unit)
+		if not assignedUnit then
+			UUF:UnregisterRangeFrame(raidFrame)
+			UUF:UnregisterTargetGlowIndicatorFrame(raidFrame)
+			if raidFrame.DispelHighlightUnit then UUF:UnregisterDispelHighlightEvents(raidFrame) end
+			raidFrame.UUFGroupUnit = nil
+		end
+	end, true, false)
+	UUF:LayoutAugmentationRaidFrames()
+	UUF.AUGMENTATION_RAID_CONTAINER:SetShown(active)
 end
 
 function UUF:SpawnGroupFrame(groupType)
@@ -115,9 +213,37 @@ function UUF:SpawnGroupFrame(groupType)
 			header:SetAttribute("startingIndex", 1)
 			UUF.RAID_HEADERS[groupIndex] = header
 		end
+		if UnitClassBase("player") == "EVOKER" then
+			local AugmentationFrameDB = UUF.db.profile.Units.augmentation.Frame
+			if not UUF.AUGMENTATION_RAID_CONTAINER then
+				UUF.AUGMENTATION_RAID_CONTAINER = CreateFrame("Frame", "UUF_AugmentationRaidContainer", UIParent, "BackdropTemplate")
+				UUF.AUGMENTATION_RAID_CONTAINER:SetBackdrop(UUF.BACKDROP)
+				UUF.AUGMENTATION_RAID_CONTAINER:SetBackdropColor(0, 0, 0, 0)
+				UUF.AUGMENTATION_RAID_CONTAINER:SetBackdropBorderColor(0, 0, 0, 0)
+			end
+			if not UUF.AUGMENTATION_RAID_HEADER then
+				UUF.AUGMENTATION_RAID_HEADER = oUF:SpawnHeader("UUF_AugmentationRaidHeader", nil,
+					"showRaid", true,
+					"showParty", false,
+					"showPlayer", true,
+					"showSolo", false,
+					"nameList", "",
+					"sortMethod", AugmentationFrameDB.SortBy == "NAME" and "NAME" or "NAMELIST",
+					"initial-width", AugmentationFrameDB.Width,
+					"initial-height", AugmentationFrameDB.Height,
+					"oUF-initialConfigFunction", ("self:SetWidth(%s); self:SetHeight(%s)"):format(AugmentationFrameDB.Width, AugmentationFrameDB.Height),
+					"unitsPerColumn", UUF.MAX_RAID_FRAMES_PER_GROUP,
+					"maxColumns", UUF.MAX_RAID_GROUPS
+				)
+				UUF.AUGMENTATION_RAID_HEADER:SetParent(UUF.AUGMENTATION_RAID_CONTAINER)
+				UUF.AUGMENTATION_RAID_HEADER:SetVisibility("raid")
+			end
+			UUF:CreateMover("augmentation")
+		end
 		UUF:CreateMover(groupType)
 		UUF.RAID_CONTAINER:Show()
 		for _, header in ipairs(UUF.RAID_HEADERS) do header:Show() end
+		UUF:UpdateAugmentationRaidFrames()
 	end
 	UUF:LayoutGroupFrames(groupType)
 end
@@ -142,6 +268,7 @@ function UUF:UpdateGroupFrame(groupType)
 				raidFrame.UUFGroupUnit = nil
 			end, true, UUF.RAID_TEST_MODE)
 		end
+		if groupType == "raid" then UUF:UpdateAugmentationRaidFrames() end
 		return
 	end
 	if groupType == "party" then
@@ -181,6 +308,7 @@ function UUF:UpdateGroupFrame(groupType)
 				raidFrame.UUFGroupUnit = nil
 			end
 		end, true, UUF.RAID_TEST_MODE)
+		UUF:UpdateAugmentationRaidFrames()
 	end
 	UUF:LayoutGroupFrames(groupType)
 	if groupType == "party" and UUF.PARTY_TEST_MODE or groupType == "raid" and UUF.RAID_TEST_MODE then UUF:UpdateTestEnvironment(groupType, "all") end
@@ -333,30 +461,32 @@ function UUF:LayoutGroupFrames(groupType)
 	end
 end
 
-local PartyRosterEventFrame = CreateFrame("Frame")
-PartyRosterEventFrame:RegisterEvent("ADDON_LOADED")
-PartyRosterEventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-PartyRosterEventFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
-PartyRosterEventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-PartyRosterEventFrame:RegisterEvent("PLAYER_DIFFICULTY_CHANGED")
-PartyRosterEventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-PartyRosterEventFrame:SetScript("OnEvent", function(_, event, addonName)
+GroupRosterEventFrame:RegisterEvent("ADDON_LOADED")
+GroupRosterEventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+GroupRosterEventFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
+GroupRosterEventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+GroupRosterEventFrame:RegisterEvent("PLAYER_DIFFICULTY_CHANGED")
+GroupRosterEventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+GroupRosterEventFrame:SetScript("OnEvent", function(_, event, addonName)
 	if not UUF.db then return end
 	local RaidDB = UUF.db.profile.Units.raid
 	if event == "ADDON_LOADED" then
 		if addonName == "Blizzard_CompactRaidFrames" and RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		return
 	end
-	if InCombatLockdown() then PartyRosterEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") return end
-	if event == "PLAYER_REGEN_ENABLED" then PartyRosterEventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED") end
+	if InCombatLockdown() then GroupRosterEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") return end
+	if event == "PLAYER_REGEN_ENABLED" then GroupRosterEventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED") end
 	if event == "GROUP_ROSTER_UPDATE" then
 		if RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		UUF:UpdateGroupIndicators("party")
+		UUF:UpdateAugmentationRaidFrames()
 	elseif event == "PLAYER_ROLES_ASSIGNED" then
 		UUF:UpdateGroupIndicators("party", true)
 		UUF:UpdateGroupIndicators("raid", true)
+		UUF:UpdateAugmentationRaidFrames()
 	elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED_NEW_AREA" then
 		if RaidDB and RaidDB.Frame.AutoAdjustGroups then UUF:LayoutGroupFrames("raid") end
+		UUF:UpdateAugmentationRaidFrames()
 		if event == "PLAYER_ENTERING_WORLD" then
 			UUF:UpdateGroupIndicators("party", true)
 			UUF:UpdateGroupIndicators("raid", true)
@@ -365,5 +495,6 @@ PartyRosterEventFrame:SetScript("OnEvent", function(_, event, addonName)
 		if RaidDB and RaidDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 		UUF:UpdateGroupIndicators("party")
 		UUF:UpdateGroupIndicators("raid")
+		UUF:UpdateAugmentationRaidFrames()
 	end
 end)

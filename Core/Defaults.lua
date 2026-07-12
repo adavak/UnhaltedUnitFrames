@@ -2203,5 +2203,12 @@ local Defaults = {
     },
 }
 
+Defaults.profile.Units.augmentation = CopyTable(Defaults.profile.Units.raid)
+Defaults.profile.Units.augmentation.Enabled = false
+Defaults.profile.Units.augmentation.ForceHideBlizzard = nil
+Defaults.profile.Units.augmentation.Names = ""
+Defaults.profile.Units.augmentation.Frame.Layout = {"CENTER", "CENTER", 300, 0, -1}
+Defaults.profile.Units.augmentation.Frame.SortBy = "NAMELIST"
+
 ---@return table Defaults Returns the Default Table.
 function UUF:GetDefaultDB() return Defaults end

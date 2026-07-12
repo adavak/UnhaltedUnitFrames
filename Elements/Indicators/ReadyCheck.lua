@@ -1,7 +1,7 @@
 local _, UUF = ...
 
 function UUF:CreateUnitReadyCheckIndicator(unitFrame, unit)
-	local ReadyCheckDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.ReadyCheckIndicator
+	local ReadyCheckDB = UUF:GetUnitDB(unitFrame, unit).Indicators.ReadyCheckIndicator
 	if not ReadyCheckDB then return end
 
 	local ReadyCheckIndicator = unitFrame.HighLevelContainer:CreateTexture(UUF:FetchFrameName(unit) .. "_ReadyCheckIndicator", "OVERLAY")
@@ -21,7 +21,7 @@ function UUF:CreateUnitReadyCheckIndicator(unitFrame, unit)
 end
 
 function UUF:UpdateUnitReadyCheckIndicator(unitFrame, unit)
-	local ReadyCheckDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.ReadyCheckIndicator
+	local ReadyCheckDB = UUF:GetUnitDB(unitFrame, unit).Indicators.ReadyCheckIndicator
 	if not ReadyCheckDB then return end
 
 	if ReadyCheckDB.Enabled then

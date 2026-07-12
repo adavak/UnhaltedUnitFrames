@@ -1,7 +1,7 @@
 local _, UUF = ...
 
 function UUF:CreateUnitSummonIndicator(unitFrame, unit)
-	local SummonDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Summon
+	local SummonDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Summon
 	if not SummonDB then return end
 
 	local SummonIndicator = unitFrame.HighLevelContainer:CreateTexture(UUF:FetchFrameName(unit) .. "_SummonIndicator", "OVERLAY")
@@ -18,7 +18,7 @@ function UUF:CreateUnitSummonIndicator(unitFrame, unit)
 end
 
 function UUF:UpdateUnitSummonIndicator(unitFrame, unit)
-	local SummonDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Summon
+	local SummonDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Summon
 	if not SummonDB then return end
 
 	if SummonDB.Enabled then

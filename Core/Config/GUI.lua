@@ -30,6 +30,8 @@ local function UpdateUnitSettings(unit, updateCallback, element)
 		UUF:UpdateGroupFrame("party")
 	elseif unit == "raid" then
 		UUF:UpdateGroupFrame("raid")
+	elseif unit == "augmentation" then
+		UUF:UpdateAugmentationRaidFrames()
 	elseif updateCallback then
 		updateCallback()
 	end
@@ -49,6 +51,7 @@ local UnitDBToUnitPrettyName = {
     boss = "Boss",
     party = "Party",
     raid = "Raid",
+	augmentation = "Augmentation",
 }
 
 
@@ -175,7 +178,11 @@ local RoleTextures = {
 
 local function EnableAurasTestMode(unit)
 	UUF.AURA_TEST_MODE = true
-	if unit == "party" or unit == "raid" or unit == "boss" then
+	if unit == "augmentation" then
+		UUF:ForEachRaidFrame(function(unitFrame, frameUnit)
+			if unitFrame.isAugmentationRaidFrame and frameUnit then UUF:CreateTestAuras(unitFrame, frameUnit) end
+		end, true, false)
+	elseif unit == "party" or unit == "raid" or unit == "boss" then
 		UUF:UpdateTestEnvironment(unit, "Auras")
 	else
 		UUF:CreateTestAuras(UUF[unit:upper()], unit)
@@ -184,7 +191,11 @@ end
 
 local function DisableAurasTestMode(unit)
 	UUF.AURA_TEST_MODE = false
-	if unit == "party" or unit == "raid" or unit == "boss" then
+	if unit == "augmentation" then
+		UUF:ForEachRaidFrame(function(unitFrame, frameUnit)
+			if unitFrame.isAugmentationRaidFrame and frameUnit then UUF:CreateTestAuras(unitFrame, frameUnit) end
+		end, true, false)
+	elseif unit == "party" or unit == "raid" or unit == "boss" then
 		UUF:UpdateTestEnvironment(unit, "Auras")
 	else
 		UUF:CreateTestAuras(UUF[unit:upper()], unit)
@@ -245,7 +256,7 @@ local function DisableAllTestModes()
 	UUF.RAID_TEST_MODE = false
 	UUF.MOVERS_UNLOCKED = false
 	for unit, _ in pairs(UUF.db.profile.Units) do
-		if unit == "party" or unit == "raid" then
+		if unit == "party" or unit == "raid" or unit == "augmentation" then
 			DisableAurasTestMode(unit)
 		elseif UUF[unit:upper()] then
 			UUF:CreateTestAuras(UUF[unit:upper()], unit)
@@ -284,6 +295,7 @@ local function BuildMainNavigationTree()
         { text = "Focus Target", value = "FocusTarget" },
         { text = "Party", value = "Party" },
         { text = "Raid", value = "Raid" },
+		{ text = "Augmentation", value = "Augmentation" },
         { text = "Boss", value = "Boss" },
         { text = "Tags", value = "Tags" },
         { text = "Profiles", value = "Profiles" },
@@ -725,7 +737,7 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     AnchorFromDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
     AnchorFromDropdown:SetLabel("Anchor From")
     AnchorFromDropdown:SetValue(FrameDB.Layout[1])
-    AnchorFromDropdown:SetRelativeWidth(unit == "raid" and 0.5 or ((unitHasParent or unit == "boss") and 0.33 or (unit == "party" and 0.25 or 0.5)))
+	AnchorFromDropdown:SetRelativeWidth((unit == "raid" or unit == "augmentation") and 0.5 or ((unitHasParent or unit == "boss") and 0.33 or (unit == "party" and 0.25 or 0.5)))
     AnchorFromDropdown:SetCallback("OnValueChanged", function(_, _, value) FrameDB.Layout[1] = value updateCallback("Frame") end)
     LayoutContainer:AddChild(AnchorFromDropdown)
 
@@ -743,13 +755,13 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     AnchorToDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
     AnchorToDropdown:SetLabel("Anchor To")
     AnchorToDropdown:SetValue(FrameDB.Layout[2])
-    AnchorToDropdown:SetRelativeWidth(unit == "raid" and 0.5 or ((unitHasParent or unit == "boss") and 0.33 or (unit == "party" and 0.25 or 0.5)))
+	AnchorToDropdown:SetRelativeWidth((unit == "raid" or unit == "augmentation") and 0.5 or ((unitHasParent or unit == "boss") and 0.33 or (unit == "party" and 0.25 or 0.5)))
     AnchorToDropdown:SetCallback("OnValueChanged", function(_, _, value) FrameDB.Layout[2] = value updateCallback("Frame") end)
     LayoutContainer:AddChild(AnchorToDropdown)
 
-    if unit == "boss" or unit == "party" or unit == "raid" then
+	if unit == "boss" or unit == "party" or unit == "raid" or unit == "augmentation" then
         local GrowthDirectionDropdown = AG:Create("Dropdown")
-        if unit == "raid" then
+		if unit == "raid" or unit == "augmentation" then
             GrowthDirectionDropdown:SetList(RaidGrowthDirectionList[1], RaidGrowthDirectionList[2])
         elseif unit == "party" then
             GrowthDirectionDropdown:SetList({["UP"] = "Up", ["DOWN"] = "Down", ["LEFT"] = "Left", ["RIGHT"] = "Right"}, {"UP", "DOWN", "LEFT", "RIGHT"})
@@ -758,21 +770,23 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
         end
         GrowthDirectionDropdown:SetLabel("Growth Direction")
         GrowthDirectionDropdown:SetValue(FrameDB.GrowthDirection)
-        GrowthDirectionDropdown:SetRelativeWidth(unit == "raid" and 0.33 or (unit == "party" and 0.25 or 0.33))
+		GrowthDirectionDropdown:SetRelativeWidth((unit == "raid" and 0.33) or (unit == "party" and 0.25) or (unit == "augmentation" and 0.5) or 0.33)
         GrowthDirectionDropdown:SetCallback("OnValueChanged", function(_, _, value) FrameDB.GrowthDirection = value updateCallback("Frame") end)
         LayoutContainer:AddChild(GrowthDirectionDropdown)
     end
 
-    if unit == "party" or unit == "raid" then
+    if unit == "party" or unit == "raid" or unit == "augmentation" then
         local SortByDropdown = AG:Create("Dropdown")
         if unit == "raid" then
             SortByDropdown:SetList({["GROUP"] = "Group", ["INDEX"] = "Index"}, {"GROUP", "INDEX"})
+		elseif unit == "augmentation" then
+			SortByDropdown:SetList({["NAMELIST"] = "Player List", ["NAME"] = "Name"}, {"NAMELIST", "NAME"})
         else
             SortByDropdown:SetList({["ROLE"] = "Role", ["INDEX"] = "Index", ["NAME"] = "Name"}, {"ROLE", "INDEX", "NAME"})
         end
         SortByDropdown:SetLabel("Sort By")
-        SortByDropdown:SetValue(FrameDB.SortBy)
-        SortByDropdown:SetRelativeWidth(unit == "raid" and 0.33 or 0.25)
+		SortByDropdown:SetValue(unit == "augmentation" and FrameDB.SortBy ~= "NAME" and "NAMELIST" or FrameDB.SortBy)
+		SortByDropdown:SetRelativeWidth((unit == "raid" and 0.33) or (unit == "augmentation" and 0.5) or 0.25)
         SortByDropdown:SetCallback("OnValueChanged", function(_, _, value) FrameDB.SortBy = value updateCallback("Frame") RefreshSortOrders() end)
         LayoutContainer:AddChild(SortByDropdown)
     end
@@ -826,7 +840,7 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     XPosSlider:SetLabel("X Position")
     XPosSlider:SetValue(FrameDB.Layout[3])
     XPosSlider:SetSliderValues(-3000, 3000, 0.1)
-    XPosSlider:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid") and 0.25 or 0.33)
+	XPosSlider:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid" or unit == "augmentation") and 0.25 or 0.33)
     XPosSlider:SetCallback("OnValueChanged", function(_, _, value) FrameDB.Layout[3] = value updateCallback("Frame") end)
     LayoutContainer:AddChild(XPosSlider)
 
@@ -834,11 +848,11 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     YPosSlider:SetLabel("Y Position")
     YPosSlider:SetValue(FrameDB.Layout[4])
     YPosSlider:SetSliderValues(-3000, 3000, 0.1)
-    YPosSlider:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid") and 0.25 or 0.33)
+	YPosSlider:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid" or unit == "augmentation") and 0.25 or 0.33)
     YPosSlider:SetCallback("OnValueChanged", function(_, _, value) FrameDB.Layout[4] = value updateCallback("Frame") end)
     LayoutContainer:AddChild(YPosSlider)
 
-    if unit == "boss" or unit == "party" or unit == "raid" then
+	if unit == "boss" or unit == "party" or unit == "raid" or unit == "augmentation" then
         local SpacingSlider = AG:Create("Slider")
         SpacingSlider:SetLabel("Frame Spacing")
         SpacingSlider:SetValue(FrameDB.Layout[5])
@@ -852,14 +866,14 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     FrameStrataDropdown:SetList(FrameStrataList[1], FrameStrataList[2])
     FrameStrataDropdown:SetLabel("Frame Strata")
     FrameStrataDropdown:SetValue(FrameDB.FrameStrata)
-    FrameStrataDropdown:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid") and 0.25 or 0.33)
+	FrameStrataDropdown:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid" or unit == "augmentation") and 0.25 or 0.33)
     FrameStrataDropdown:SetCallback("OnValueChanged", function(_, _, value) FrameDB.FrameStrata = value updateCallback("Frame") end)
     LayoutContainer:AddChild(FrameStrataDropdown)
 
     local ColourContainer = GUIWidgets.CreateInlineGroup(containerParent, "Colours & Toggles")
     local healthToggleWidth = (unit == "player" or unit == "target") and 0.25 or 0.33
-    local primaryToggleWidth = (unit == "party" or unit == "raid") and 0.33 or healthToggleWidth
-    local secondaryToggleWidth = unit == "raid" and 0.33 or primaryToggleWidth
+	local primaryToggleWidth = (unit == "party" or unit == "raid" or unit == "augmentation") and 0.33 or healthToggleWidth
+	local secondaryToggleWidth = (unit == "raid" or unit == "augmentation") and 0.33 or primaryToggleWidth
 
     if unit == "party" then
         local ShowPlayerToggle = AG:Create("CheckBox")
@@ -904,7 +918,7 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     ColourWhenDisconnectedToggle:SetRelativeWidth(secondaryToggleWidth)
     ColourContainer:AddChild(ColourWhenDisconnectedToggle)
 
-    if unit == "party" or unit == "raid" then
+	if unit == "party" or unit == "raid" or unit == "augmentation" then
         local ColourBackdropWhenDeadToggle = AG:Create("CheckBox")
         ColourBackdropWhenDeadToggle:SetLabel("Colour Backdrop When Dead")
         ColourBackdropWhenDeadToggle:SetValue(HealthBarDB.ColourBackdropWhenDead)
@@ -1021,7 +1035,7 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
     BackgroundOpacitySlider:SetIsPercent(true)
     ColourContainer:AddChild(BackgroundOpacitySlider)
 
-    if unit == "player" or unit == "target" or unit == "focus" or unit == "party" or unit == "raid" then
+	if unit == "player" or unit == "target" or unit == "focus" or unit == "party" or unit == "raid" or unit == "augmentation" then
         local DispelHighlightContainer = GUIWidgets.CreateInlineGroup(containerParent, "Dispel Highlighting")
 
         local EnableDispelHighlightingToggle = AG:Create("CheckBox")
@@ -1039,6 +1053,20 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
         DispelHighlightStyleDropdown:SetCallback("OnValueChanged", function(_, _, value) HealthBarDB.DispelHighlight.Style = value updateCallback("HealthBar") end)
         DispelHighlightContainer:AddChild(DispelHighlightStyleDropdown)
     end
+end
+
+local function CreateAugmentationFrameSettings(containerParent)
+	local AugmentationDB = UUF.db.profile.Units.augmentation
+	local GeneralContainer = GUIWidgets.CreateInlineGroup(containerParent, "Player Filter")
+	GUIWidgets.CreateInformationTag(GeneralContainer, "|cFF8080FFListed|r Raid Members are the only players that will be shown.")
+
+	local NamesEditBox = AG:Create("MultiLineEditBox")
+	NamesEditBox:SetLabel("Player Names (Comma Delimited)")
+	NamesEditBox:SetText(AugmentationDB.Names or "")
+	NamesEditBox:SetNumLines(8)
+	NamesEditBox:SetFullWidth(true)
+	NamesEditBox:SetCallback("OnEnterPressed", function(_, _, value) AugmentationDB.Names = value UUF:UpdateAugmentationRaidFrames() end)
+	GeneralContainer:AddChild(NamesEditBox)
 end
 
 local function CreateHealPredictionSettings(containerParent, unit, updateCallback)
@@ -3144,7 +3172,7 @@ local function CreateIndicatorSettings(containerParent, unit)
             { text = "Classification", value = "Classification" },
             { text = "Quest", value = "Quest" },
         })
-    elseif unit == "party" or unit == "raid" then
+	elseif unit == "party" or unit == "raid" or unit == "augmentation" then
         IndicatorContainerTabGroup:SetTabs({
             { text = "Raid Target Marker", value = "RaidTargetMarker" },
             { text = "Leader & Assistant", value = "LeaderAssistant" },
@@ -3902,6 +3930,7 @@ local function CreateCooldownTextSettings(containerParent)
                     { text = "Pet", value = "pet" },
                     { text = "Party", value = "party" },
                     { text = "Raid", value = "raid" },
+					{ text = "Augmentation Raid", value = "augmentation" },
                     { text = "Boss", value = "boss" },
                 })
                 AuraUnitTabs:SetCallback("OnGroupSelected", SelectAuraUnit)
@@ -4096,33 +4125,35 @@ local function CreateUnitSettings(containerParent, unit)
         }
         StaticPopup_Show("UUF_RELOAD_UI")
     end)
-	EnableUnitFrameToggle:SetRelativeWidth(0.33)
+	EnableUnitFrameToggle:SetRelativeWidth(unit == "augmentation" and 0.5 or 0.33)
     containerParent:AddChild(EnableUnitFrameToggle)
 
-    local HideBlizzardToggle = AG:Create("CheckBox")
-    HideBlizzardToggle:SetLabel("Hide Blizzard |cFF8080FF"..(UnitDBToUnitPrettyName[unit] or unit) .."|r")
-    HideBlizzardToggle:SetValue(UUF.db.profile.Units[unit].ForceHideBlizzard)
-    HideBlizzardToggle:SetCallback("OnValueChanged", function(_, _, value)
-            StaticPopupDialogs["UUF_RELOAD_UI"] = {
-            text = "You must reload to apply this change, do you want to reload now?",
-            button1 = "Reload Now",
-            button2 = "Later",
-            showAlert = true,
-            OnAccept = function() UUF.db.profile.Units[unit].ForceHideBlizzard = value C_UI.Reload() end,
-            OnCancel = function() HideBlizzardToggle:SetValue(UUF.db.profile.Units[unit].ForceHideBlizzard) containerParent:DoLayout() end,
-            timeout = 0,
-            whileDead = true,
-            hideOnEscape = true,
-        }
-        StaticPopup_Show("UUF_RELOAD_UI")
-    end)
-	HideBlizzardToggle:SetRelativeWidth(0.33)
-    HideBlizzardToggle:SetDisabled(UUF.db.profile.Units[unit].Enabled)
-    containerParent:AddChild(HideBlizzardToggle)
+	if unit ~= "augmentation" then
+		local HideBlizzardToggle = AG:Create("CheckBox")
+		HideBlizzardToggle:SetLabel("Hide Blizzard |cFF8080FF"..(UnitDBToUnitPrettyName[unit] or unit) .."|r")
+		HideBlizzardToggle:SetValue(UUF.db.profile.Units[unit].ForceHideBlizzard)
+		HideBlizzardToggle:SetCallback("OnValueChanged", function(_, _, value)
+				StaticPopupDialogs["UUF_RELOAD_UI"] = {
+				text = "You must reload to apply this change, do you want to reload now?",
+				button1 = "Reload Now",
+				button2 = "Later",
+				showAlert = true,
+				OnAccept = function() UUF.db.profile.Units[unit].ForceHideBlizzard = value C_UI.Reload() end,
+				OnCancel = function() HideBlizzardToggle:SetValue(UUF.db.profile.Units[unit].ForceHideBlizzard) containerParent:DoLayout() end,
+				timeout = 0,
+				whileDead = true,
+				hideOnEscape = true,
+			}
+			StaticPopup_Show("UUF_RELOAD_UI")
+		end)
+		HideBlizzardToggle:SetRelativeWidth(0.33)
+		HideBlizzardToggle:SetDisabled(UUF.db.profile.Units[unit].Enabled)
+		containerParent:AddChild(HideBlizzardToggle)
+	end
 
 	local ToggleMoversButton = AG:Create("Button")
 	ToggleMoversButton:SetText(UUF.MOVERS_UNLOCKED and "Lock Movers" or "Unlock Movers")
-	ToggleMoversButton:SetRelativeWidth(0.33)
+	ToggleMoversButton:SetRelativeWidth(unit == "augmentation" and 0.5 or 0.33)
 	ToggleMoversButton:SetCallback("OnClick", function() ToggleMoversButton:SetText(UUF:ToggleMovers() and "Lock Movers" or "Unlock Movers") end)
 	containerParent:AddChild(ToggleMoversButton)
 
@@ -4140,6 +4171,8 @@ local function CreateUnitSettings(containerParent, unit)
         SubContainer:ReleaseChildren()
         if UnitTab == "Frame" then
             CreateFrameSettings(SubContainer, unit, UUF.db.profile.Units[unit].Frame.AnchorParent and true or false, function(element) UpdateUnitSettings(unit, function() UUF:UpdateUnitFrame(UUF[unit:upper()], unit) end, element) end)
+		elseif UnitTab == "Players" and unit == "augmentation" then
+			CreateAugmentationFrameSettings(SubContainer)
         elseif UnitTab == "HealPrediction" then
             CreateHealPredictionSettings(SubContainer, unit, function() UpdateUnitSettings(unit, function() UUF:UpdateUnitHealPrediction(UUF[unit:upper()], unit) end, "HealPrediction") end)
         elseif UnitTab == "Auras" then
@@ -4190,7 +4223,7 @@ local function CreateUnitSettings(containerParent, unit)
         end
 
         SubContainerTabGroup:SetTabs(playerTabs)
-    elseif unit == "party" or unit == "raid" then
+    elseif unit == "party" then
         SubContainerTabGroup:SetTabs({
             { text = "Frame", value = "Frame"},
             { text = "Heal Prediction", value = "HealPrediction"},
@@ -4199,6 +4232,17 @@ local function CreateUnitSettings(containerParent, unit)
             { text = "Indicators", value = "Indicators"},
             { text = "Tags", value = "Tags"},
         })
+	elseif unit == "raid" or unit == "augmentation" then
+		local raidTabs = {
+			{ text = "Frame", value = "Frame"},
+			{ text = "Heal Prediction", value = "HealPrediction"},
+			{ text = "Auras", value = "Auras"},
+			{ text = "Power Bar", value = "PowerBar"},
+			{ text = "Indicators", value = "Indicators"},
+			{ text = "Tags", value = "Tags"},
+		}
+		if unit == "augmentation" then table.insert(raidTabs, { text = "Players", value = "Players"}) end
+		SubContainerTabGroup:SetTabs(raidTabs)
     elseif unit ~= "targettarget" and unit ~= "focustarget" then
         SubContainerTabGroup:SetTabs({
             { text = "Frame", value = "Frame"},
@@ -4221,7 +4265,7 @@ local function CreateUnitSettings(containerParent, unit)
         })
     end
     SubContainerTabGroup:SetCallback("OnGroupSelected", SelectUnitTab)
-    local selectedTab = GetSavedMainTab(unit, "Frame")
+	local selectedTab = GetSavedMainTab(unit, "Frame")
     if selectedTab == "SecondaryPowerBar" and not playerHasSecondaryPower then selectedTab = "Frame" end
     SubContainerTabGroup:SelectTab(selectedTab)
     SettingsContainer:AddChild(SubContainerTabGroup)
@@ -4625,6 +4669,12 @@ function UUF:CreateGUI()
             CreateUnitSettings(ScrollFrame, "raid")
 
             ScrollFrame:DoLayout()
+		elseif MainTab == "Augmentation" then
+			local ScrollFrame = GUIWidgets.CreateScrollFrame(Wrapper)
+
+			CreateUnitSettings(ScrollFrame, "augmentation")
+
+			ScrollFrame:DoLayout()
         elseif MainTab == "Boss" then
             local ScrollFrame = GUIWidgets.CreateScrollFrame(Wrapper)
 
@@ -4676,10 +4726,10 @@ end
 
 function UUF:OpenGUIToUnit(unit)
     if InCombatLockdown() then return end
-    if not lastSelectedUnitTabs[unit] then lastSelectedUnitTabs[unit] = {} end
-    lastSelectedUnitTabs[unit].mainTab = "Frame"
+	if not lastSelectedUnitTabs[unit] then lastSelectedUnitTabs[unit] = {} end
+	lastSelectedUnitTabs[unit].mainTab = "Frame"
     UUF:CreateGUI()
-    if UUFGUI.MainNavigation then UUFGUI.MainNavigation:SelectByValue(unit == "targettarget" and "TargetTarget" or unit == "focustarget" and "FocusTarget" or unit:gsub("^%l", string.upper)) end
+	if UUFGUI.MainNavigation then UUFGUI.MainNavigation:SelectByValue(unit == "targettarget" and "TargetTarget" or unit == "focustarget" and "FocusTarget" or unit:gsub("^%l", string.upper)) end
 end
 
 function UUFG:OpenUUFGUI()

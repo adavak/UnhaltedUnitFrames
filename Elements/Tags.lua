@@ -2,7 +2,7 @@ local _, UUF = ...
 
 local function CreateUnitTag(unitFrame, unit, tagDB)
 	local GeneralDB = UUF.db.profile.General
-	local TagDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Tags[tagDB]
+	local TagDB = UUF:GetUnitDB(unitFrame, unit).Tags[tagDB]
 
 	if not unitFrame.Tags[tagDB] then
 		unitFrame.Tags[tagDB] = unitFrame.HighLevelContainer:CreateFontString(UUF:FetchFrameName(unit) .. "_" .. tagDB, "ARTWORK", "GameFontNormal")
@@ -36,7 +36,7 @@ end
 
 function UUF:UpdateUnitTag(unitFrame, unit, tagDB)
 	local GeneralDB = UUF.db.profile.General
-	local TagDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Tags[tagDB]
+	local TagDB = UUF:GetUnitDB(unitFrame, unit).Tags[tagDB]
 
 	if not unitFrame.Tags[tagDB] then CreateUnitTag(unitFrame, unit, tagDB) end
 	if not unitFrame.Tags[tagDB] then return end
@@ -75,14 +75,14 @@ end
 
 function UUF:CreateUnitTags(unitFrame, unit)
     unitFrame.Tags = unitFrame.Tags or {}
-    for tagName, _ in pairs(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Tags) do
+    for tagName, _ in pairs(UUF:GetUnitDB(unitFrame, unit).Tags) do
         CreateUnitTag(unitFrame, unit, tagName)
     end
 end
 
 function UUF:UpdateUnitTags(unit, tagName)
 	if not unit then return end
-	local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+	local UnitDB = UUF:GetUnitDB(nil, unit)
 	if not UnitDB or not UnitDB.Tags then return end
 	UUF.SEPARATOR = UUF.db.profile.General.Separator or "||"
 	UUF.TOT_SEPARATOR = UUF.db.profile.General.ToTSeparator or "»"
@@ -103,6 +103,10 @@ function UUF:UpdateUnitTags(unit, tagName)
 		UpdateFrameTags(UUF.PARTYPLAYER, "partyplayer")
 	elseif unit == "raid" then
 		UUF:ForEachRaidFrame(UpdateFrameTags, true, UUF.RAID_TEST_MODE)
+	elseif unit == "augmentation" then
+		UUF:ForEachRaidFrame(function(unitFrame, frameUnit)
+			if unitFrame.isAugmentationRaidFrame then UpdateFrameTags(unitFrame, frameUnit) end
+		end, true, false)
 	else
 		UpdateFrameTags(UUF[unit:upper()], unit)
 	end

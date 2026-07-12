@@ -114,7 +114,7 @@ local function ApplyTestGroupFrame(unitFrame, unit, index, displayName, element)
 	if not unitFrame or not unit then return end
 	if InCombatLockdown() then return end
 	local updateAll = not element or element == "all"
-	local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+	local UnitDB = UUF:GetUnitDB(unitFrame, unit)
 	local FrameDB = UnitDB.Frame
 	local HealthBarDB = UnitDB.HealthBar
 	local HealPredictionDB = UnitDB.HealPrediction
@@ -404,6 +404,7 @@ function UUF:EnableTestGroupFrames(unit)
 		if not UUF.RAID_CONTAINER then UUF:SpawnGroupFrame("raid") end
 		UUF:CreateRaidTestFrames()
 		for _, header in ipairs(UUF.RAID_HEADERS) do header:Hide() end
+		if UUF.AUGMENTATION_RAID_CONTAINER then UUF.AUGMENTATION_RAID_CONTAINER:Hide() end
 		UUF:UpdateTestEnvironment("raid", "all")
 		UUF.RAID_CONTAINER:Show()
 	end

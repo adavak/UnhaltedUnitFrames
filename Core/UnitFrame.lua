@@ -11,7 +11,8 @@ end
 
 function UUF:CreateUnitFrame(unitFrame, unit)
     if not unit or not unitFrame then return end
-    local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+	if unitFrame:GetParent() == UUF.AUGMENTATION_RAID_HEADER then unitFrame.isAugmentationRaidFrame = true end
+    local UnitDB = UUF:GetUnitDB(unitFrame, unit)
     local isPlayer = unit == "player"
     local isTarget = unit == "target"
     local isFocus = unit == "focus"
@@ -58,7 +59,7 @@ function UUF:CreateUnitFrame(unitFrame, unit)
 				frame.UUFGroupUnit = nil
 				return
 			end
-			local RaidDB = UUF.db.profile.Units.raid
+			local RaidDB = UUF:GetUnitDB(frame, value)
 			if not RaidDB or not RaidDB.Enabled then return end
 			if frame.DispelHighlightUnit and frame.DispelHighlightUnit ~= value then UUF:UnregisterDispelHighlightEvents(frame) end
 			UUF:RegisterRangeFrame(frame, value)
@@ -173,7 +174,7 @@ function UUF:SpawnUnitFrame(unit)
 end
 
 function UUF:UpdateUnitFrame(unitFrame, unit)
-    local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+    local UnitDB = UUF:GetUnitDB(unitFrame, unit)
     local isPlayer = unit == "player"
     local isTarget = unit == "target"
     local isFocus = unit == "focus"

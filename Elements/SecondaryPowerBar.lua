@@ -38,7 +38,7 @@ local function DisableSecondaryPowerElement(unitFrame, elementName, secondaryPow
 end
 
 function UUF:CreateUnitSecondaryPowerBar(unitFrame, unit)
-    local unitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+    local unitDB = UUF:GetUnitDB(unitFrame, unit)
     local secondaryPowerDB = unitDB.SecondaryPowerBar
     if not secondaryPowerDB.Enabled then return end
 
@@ -111,7 +111,7 @@ end
 function UUF:UpdateUnitSecondaryPowerBar(unitFrame, unit)
     if not unitFrame then return end
 
-    local unitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+    local unitDB = UUF:GetUnitDB(unitFrame, unit)
     local frameDB = unitDB.Frame
     local secondaryPowerDB = unitDB.SecondaryPowerBar
     local powerType = UUF:GetSecondaryPowerType()
@@ -151,7 +151,7 @@ function UUF:UpdateUnitSecondaryPowerBar(unitFrame, unit)
 
     local totalWidth = frameDB.Width - 2
     local segmentWidth = totalWidth / maxPower
-    local position = UUF:GetConfiguredSecondaryPowerBarPosition(unit)
+	local position = UUF:GetConfiguredSecondaryPowerBarPosition(unit, unitFrame)
     local stackOffset = UUF:GetSecondaryPowerBarStackOffset(unitFrame, unit)
     local anchorPoint = position == "TOP" and "TOPLEFT" or "BOTTOMLEFT"
     local anchorY = position == "TOP" and (-1 - stackOffset) or (1 + stackOffset)

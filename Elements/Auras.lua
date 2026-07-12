@@ -18,7 +18,8 @@ end
 
 local function StyleAuras(_, button, unit, auraType, restyle, auraDB)
 	if not button or not unit or not auraType then return end
-	local AurasDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras
+	local unitFrame = button:GetParent() and button:GetParent():GetParent()
+	local AurasDB = UUF:GetUnitDB(unitFrame, unit).Auras
 	if not AurasDB then return end
 	local AuraDB = auraDB and AurasDB[auraDB] or auraType == "HELPFUL" and AurasDB.Buffs or AurasDB.Debuffs
 	if not AuraDB then return end
@@ -34,7 +35,7 @@ local function StyleAuras(_, button, unit, auraType, restyle, auraDB)
 	if button.Cooldown then
 		button.Cooldown:SetDrawEdge(false)
 		button.Cooldown:SetReverse(true)
-		UUF:ApplyCooldownText(button.Cooldown, nil, unit)
+		UUF:ApplyCooldownText(button.Cooldown, nil, unit, unitFrame)
 	end
 	if button.Count then
 		if AuraDB.Count.HideStacks then
@@ -110,7 +111,7 @@ end
 
 function UUF:UpdateUnitAuras(unitFrame, unit)
     if not unit or not unitFrame then return end
-    local AurasDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras
+    local AurasDB = UUF:GetUnitDB(unitFrame, unit).Auras
     if not AurasDB then return end
     local BuffsDB = AurasDB.Buffs
     local DebuffsDB = AurasDB.Debuffs
@@ -173,7 +174,7 @@ function UUF:UpdateUnitAuras(unitFrame, unit)
         unitFrame.BuffContainer:ClearAllPoints()
         unitFrame.BuffContainer:SetSize(buffContainerWidth, buffContainerHeight)
         unitFrame.BuffContainer:SetPoint(BuffsDB.Layout[1], BuffAnchorParent, BuffsDB.Layout[2], BuffsDB.Layout[3], BuffsDB.Layout[4])
-        unitFrame.BuffContainer:SetFrameStrata(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras.FrameStrata)
+        unitFrame.BuffContainer:SetFrameStrata(UUF:GetUnitDB(unitFrame, unit).Auras.FrameStrata)
         unitFrame.BuffContainer.size = BuffsDB.Size
         unitFrame.BuffContainer.spacing = BuffsDB.Layout[5]
         unitFrame.BuffContainer.num = BuffsDB.Num
@@ -203,7 +204,7 @@ function UUF:UpdateUnitAuras(unitFrame, unit)
         local debuffContainerHeight = (DebuffsDB.Size + DebuffsDB.Layout[5]) * debuffRows - DebuffsDB.Layout[5]
         unitFrame.DebuffContainer:ClearAllPoints()
         unitFrame.DebuffContainer:SetSize(debuffContainerWidth, debuffContainerHeight)
-        unitFrame.DebuffContainer:SetFrameStrata(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras.FrameStrata)
+        unitFrame.DebuffContainer:SetFrameStrata(UUF:GetUnitDB(unitFrame, unit).Auras.FrameStrata)
         unitFrame.DebuffContainer:SetPoint(DebuffsDB.Layout[1], DebuffAnchorParent, DebuffsDB.Layout[2], DebuffsDB.Layout[3], DebuffsDB.Layout[4])
         unitFrame.DebuffContainer.size = DebuffsDB.Size
         unitFrame.DebuffContainer.spacing = DebuffsDB.Layout[5]
@@ -297,7 +298,7 @@ function UUF:UpdateUnitAuras(unitFrame, unit)
 end
 
 function UUF:CreateUnitAuras(unitFrame, unit)
-	local AurasDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras
+	local AurasDB = UUF:GetUnitDB(unitFrame, unit).Auras
 	local BuffsDB = AurasDB.Buffs
 	local DebuffsDB = AurasDB.Debuffs
 	local CustomDB = AurasDB.Custom
@@ -495,6 +496,17 @@ function UUF:UpdateUnitAurasStrata(unit)
         if UUF.PARTYPLAYER and unitDB.Auras.PrivateAuras and UUF.PARTYPLAYER.PrivateAuraContainer then UUF.PARTYPLAYER.PrivateAuraContainer:SetFrameStrata(unitDB.Auras.PrivateAuras.FrameStrata) end
         return
     end
+	if unit == "augmentation" then
+		UUF:ForEachRaidFrame(function(raidFrame, frameUnit)
+			if not raidFrame.isAugmentationRaidFrame then return end
+			local augmentationDB = UUF:GetUnitDB(raidFrame, frameUnit)
+			if raidFrame.BuffContainer then raidFrame.BuffContainer:SetFrameStrata(augmentationDB.Auras.FrameStrata) end
+			if raidFrame.DebuffContainer then raidFrame.DebuffContainer:SetFrameStrata(augmentationDB.Auras.FrameStrata) end
+			if raidFrame.CustomAuraContainer then raidFrame.CustomAuraContainer:SetFrameStrata(augmentationDB.Auras.FrameStrata) end
+			if raidFrame.PrivateAuraContainer and augmentationDB.Auras.PrivateAuras then raidFrame.PrivateAuraContainer:SetFrameStrata(augmentationDB.Auras.PrivateAuras.FrameStrata) end
+		end, true, false)
+		return
+	end
     if not unitFrame or not unitDB or not unitDB.Auras then return end
     if unitFrame.BuffContainer then unitFrame.BuffContainer:SetFrameStrata(unitDB.Auras.FrameStrata) end
     if unitFrame.DebuffContainer then unitFrame.DebuffContainer:SetFrameStrata(unitDB.Auras.FrameStrata) end
@@ -506,7 +518,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
     if not unit then return end
     if not unitFrame then return end
     local General = UUF.db.profile.General
-    local AurasDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras
+    local AurasDB = UUF:GetUnitDB(unitFrame, unit).Auras
     local BuffsDB = AurasDB.Buffs
     local DebuffsDB = AurasDB.Debuffs
     local CustomDB = AurasDB.Custom
@@ -579,7 +591,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
             if BuffsDB.Enabled then
                 unitFrame.BuffContainer:ClearAllPoints()
                 unitFrame.BuffContainer:SetPoint(BuffsDB.Layout[1], BuffAnchorParent, BuffsDB.Layout[2], BuffsDB.Layout[3], BuffsDB.Layout[4])
-                unitFrame.BuffContainer:SetFrameStrata(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras.FrameStrata)
+                unitFrame.BuffContainer:SetFrameStrata(UUF:GetUnitDB(unitFrame, unit).Auras.FrameStrata)
                 unitFrame.BuffContainer:Show()
                 for _, button in ipairs(unitFrame.BuffContainer) do
                     if button then button:Hide() end
@@ -592,7 +604,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
                         button:SetBackdrop(UUF.BACKDROP)
                         button:SetBackdropColor(0, 0, 0, 0)
                         button:SetBackdropBorderColor(0, 0, 0, 1)
-                        button:SetFrameStrata(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras.FrameStrata)
+                        button:SetFrameStrata(UUF:GetUnitDB(unitFrame, unit).Auras.FrameStrata)
 
                         button.Icon = button:CreateTexture(nil, "BORDER")
                         button.Icon:SetAllPoints()
@@ -631,7 +643,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
                     button.Count:SetText(j)
                     if BuffsDB.Count.HideStacks then button.Count:Hide() else button.Count:Show() end
                     button.Duration = button.Duration or button:CreateFontString(nil, "OVERLAY")
-                    UUF:ApplyCooldownText(button, button.Duration, unit)
+					UUF:ApplyCooldownText(button, button.Duration, unit, unitFrame)
                     button.Duration:SetText("10m")
                     button:Show()
                 end
@@ -651,7 +663,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
             if DebuffsDB.Enabled then
                 unitFrame.DebuffContainer:ClearAllPoints()
                 unitFrame.DebuffContainer:SetPoint(DebuffsDB.Layout[1], DebuffAnchorParent, DebuffsDB.Layout[2], DebuffsDB.Layout[3], DebuffsDB.Layout[4])
-                unitFrame.DebuffContainer:SetFrameStrata(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras.FrameStrata)
+                unitFrame.DebuffContainer:SetFrameStrata(UUF:GetUnitDB(unitFrame, unit).Auras.FrameStrata)
                 unitFrame.DebuffContainer:Show()
                 for _, button in ipairs(unitFrame.DebuffContainer) do
                     if button then button:Hide() end
@@ -664,7 +676,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
                         button:SetBackdrop(UUF.BACKDROP)
                         button:SetBackdropColor(0, 0, 0, 0)
                         button:SetBackdropBorderColor(0, 0, 0, 1)
-                        button:SetFrameStrata(UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Auras.FrameStrata)
+                        button:SetFrameStrata(UUF:GetUnitDB(unitFrame, unit).Auras.FrameStrata)
                         button.Icon = button:CreateTexture(nil, "BORDER")
                         button.Icon:SetAllPoints()
 
@@ -701,7 +713,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
                     button.Count:SetText(j)
                     if DebuffsDB.Count.HideStacks then button.Count:Hide() else button.Count:Show() end
                     button.Duration = button.Duration or button:CreateFontString(nil, "OVERLAY")
-                    UUF:ApplyCooldownText(button, button.Duration, unit)
+						UUF:ApplyCooldownText(button, button.Duration, unit, unitFrame)
                     button.Duration:SetText("10m")
                     button:Show()
                 end
@@ -771,7 +783,7 @@ function UUF:CreateTestAuras(unitFrame, unit)
                     button.Count:SetText(j)
                     if CustomDB.Count.HideStacks then button.Count:Hide() else button.Count:Show() end
                     button.Duration = button.Duration or button:CreateFontString(nil, "OVERLAY")
-                    UUF:ApplyCooldownText(button, button.Duration, unit)
+						UUF:ApplyCooldownText(button, button.Duration, unit, unitFrame)
                     button.Duration:SetText("10m")
                     button:Show()
                 end

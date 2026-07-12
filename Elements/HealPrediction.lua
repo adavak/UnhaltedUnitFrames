@@ -1,7 +1,7 @@
 local _, UUF = ...
 
 local function CreateIncomingHeal(unitFrame, unit)
-    local IncomingHealDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.IncomingHeal
+    local IncomingHealDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.IncomingHeal
     if not unitFrame.Health then return end
 
     local IncomingHealBar = CreateFrame("StatusBar", UUF:FetchFrameName(unit) .. "_IncomingHealBar", unitFrame.Health)
@@ -50,7 +50,7 @@ local function CreateIncomingHeal(unitFrame, unit)
 end
 
 local function CreateUnitAbsorbs(unitFrame, unit)
-    local AbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.Absorbs
+    local AbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.Absorbs
     if not unitFrame.Health then return end
 
     local AbsorbBar = CreateFrame("StatusBar", UUF:FetchFrameName(unit) .. "_AbsorbBar", unitFrame.Health)
@@ -101,7 +101,7 @@ local function CreateUnitAbsorbs(unitFrame, unit)
 end
 
 local function ConfigureUnitOverAbsorbs(OverAbsorbBar, unitFrame, unit)
-    local AbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.Absorbs
+    local AbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.Absorbs
     local OverAbsorbClip = OverAbsorbBar.Clip
     if AbsorbDB.UseStripedTexture then OverAbsorbBar:SetStatusBarTexture("Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\ThinStripes.png") else OverAbsorbBar:SetStatusBarTexture(UUF.Media.Foreground) end
     OverAbsorbBar:SetStatusBarColor(AbsorbDB.Colour[1], AbsorbDB.Colour[2], AbsorbDB.Colour[3], AbsorbDB.Colour[4])
@@ -144,7 +144,7 @@ local function CreateUnitOverAbsorbs(unitFrame, unit)
 end
 
 local function CreateUnitHealAbsorbs(unitFrame, unit)
-    local HealAbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.HealAbsorbs
+    local HealAbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.HealAbsorbs
     if not unitFrame.Health then return end
 
     local HealAbsorbBar = CreateFrame("StatusBar", UUF:FetchFrameName(unit) .. "_HealAbsorbBar", unitFrame.Health)
@@ -195,7 +195,7 @@ local function CreateUnitHealAbsorbs(unitFrame, unit)
 end
 
 local function UpdateUnitOverAbsorbs(unitFrame, unit)
-    local AbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.Absorbs
+    local AbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.Absorbs
     if not unitFrame.HealthPrediction or not unitFrame.HealthPrediction.damageAbsorb then return end
 
     if not AbsorbDB.Enabled or not AbsorbDB.ShowOverAbsorb or AbsorbDB.Position ~= "ATTACH" then
@@ -219,9 +219,9 @@ local function UpdateUnitOverAbsorbs(unitFrame, unit)
 end
 
 function UUF:CreateUnitHealPrediction(unitFrame, unit)
-    local IncomingHealDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.IncomingHeal
-    local AbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.Absorbs
-    local HealAbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.HealAbsorbs
+    local IncomingHealDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.IncomingHeal
+    local AbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.Absorbs
+    local HealAbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.HealAbsorbs
 
     unitFrame.HealthPrediction = {
         healingPlayer = IncomingHealDB.Enabled and CreateIncomingHeal(unitFrame, unit),
@@ -236,9 +236,9 @@ function UUF:CreateUnitHealPrediction(unitFrame, unit)
 end
 
 function UUF:UpdateUnitHealPrediction(unitFrame, unit)
-    local IncomingHealDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.IncomingHeal
-    local AbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.Absorbs
-    local HealAbsorbDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealPrediction.HealAbsorbs
+    local IncomingHealDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.IncomingHeal
+    local AbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.Absorbs
+    local HealAbsorbDB = UUF:GetUnitDB(unitFrame, unit).HealPrediction.HealAbsorbs
 
     if unitFrame.HealthPrediction then
         if IncomingHealDB.Enabled then
