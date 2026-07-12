@@ -443,6 +443,7 @@ local function UpdateRaidTestEnvironment(element)
 		end
 		for _, header in ipairs(UUF.RAID_HEADERS) do header:Show() end
 		UUF:UpdateGroupFrame("raid")
+		UUF:UpdateAugmentationRaidFrames()
 		UUF:UpdateUnitTags("raid")
 		return
 	end

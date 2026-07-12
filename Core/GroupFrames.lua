@@ -20,7 +20,8 @@ end
 function UUF:RegisterRaidFrame(unitFrame)
 	if not unitFrame or unitFrame.isUUFUnitFrame then return end
 	unitFrame.isUUFUnitFrame = true
-	UUF.RAID_FRAMES[#UUF.RAID_FRAMES + 1] = unitFrame
+	local raidFrames = unitFrame.isAugmentationRaidFrame and UUF.AUGMENTATION_RAID_FRAMES or UUF.RAID_FRAMES
+	raidFrames[#raidFrames + 1] = unitFrame
 end
 
 function UUF:ForEachRaidFrame(callback, includeInactive, includeTestFrames, ...)
@@ -28,6 +29,16 @@ function UUF:ForEachRaidFrame(callback, includeInactive, includeTestFrames, ...)
 		if raidFrame and (not raidFrame.isTestFrame or includeTestFrames) then
 			local assignedUnit = raidFrame:GetAttribute("unit")
 			local unit = assignedUnit or includeInactive and (raidFrame.isTestFrame and "raid" .. raidFrame.testIndex or raidFrame.UUFConfiguredUnit)
+			callback(raidFrame, unit, assignedUnit, ...)
+		end
+	end
+end
+
+function UUF:ForEachAugmentationRaidFrame(callback, includeInactive, ...)
+	for _, raidFrame in ipairs(UUF.AUGMENTATION_RAID_FRAMES) do
+		if raidFrame then
+			local assignedUnit = raidFrame:GetAttribute("unit")
+			local unit = assignedUnit or includeInactive and raidFrame.UUFConfiguredUnit
 			callback(raidFrame, unit, assignedUnit, ...)
 		end
 	end
@@ -91,43 +102,99 @@ function UUF:UpdateAugmentationRaidFrames()
 	end
 
 	local AugmentationDB = UUF.db.profile.Units.augmentation
-	local names, seen = {}, {}
-	for configuredName in (AugmentationDB and AugmentationDB.Names or ""):gmatch("[^,;\n]+") do
-		local strippedName = strtrim(configuredName)
-		if strippedName ~= "" then
-			local configuredNameLower = strippedName:lower()
-			for raidIndex = 1, GetNumGroupMembers() do
-				local rosterName = GetRaidRosterInfo(raidIndex)
-				if rosterName and not seen[rosterName] and (rosterName:lower() == configuredNameLower or Ambiguate(rosterName, "short"):lower() == configuredNameLower) then
+	local specializationIndex = C_SpecializationInfo.GetSpecialization()
+	local eligible = AugmentationDB and AugmentationDB.Enabled and UnitClassBase("player") == "EVOKER" and specializationIndex and C_SpecializationInfo.GetSpecializationInfo(specializationIndex) == 1473 and not UUF.RAID_TEST_MODE
+	local names = {}
+	if eligible then
+		local seen, rosterByFullName, rosterByShortName = {}, {}, {}
+		for raidIndex = 1, GetNumGroupMembers() do
+			local rosterName = GetRaidRosterInfo(raidIndex)
+			if rosterName then
+				rosterByFullName[rosterName:lower()] = rosterName
+				local shortName = Ambiguate(rosterName, "short"):lower()
+				local shortNames = rosterByShortName[shortName]
+				if not shortNames then
+					rosterByShortName[shortName] = rosterName
+				elseif type(shortNames) == "string" then
+					rosterByShortName[shortName] = {shortNames, rosterName}
+				else
+					shortNames[#shortNames + 1] = rosterName
+				end
+			end
+		end
+
+		for configuredName in (AugmentationDB.Names or ""):gmatch("[^,;\n]+") do
+			local configuredNameLower = strtrim(configuredName):lower()
+			if configuredNameLower ~= "" then
+				local rosterName = rosterByFullName[configuredNameLower]
+				local shortNames = not rosterName and rosterByShortName[configuredNameLower]
+				if type(shortNames) == "string" then
+					rosterName = shortNames
+				elseif shortNames then
+					for _, shortName in ipairs(shortNames) do
+						if not seen[shortName] then rosterName = shortName break end
+					end
+				end
+				if rosterName and not seen[rosterName] then
 					seen[rosterName] = true
 					names[#names + 1] = rosterName
-					break
 				end
 			end
 		end
 	end
-	local specializationIndex = C_SpecializationInfo.GetSpecialization()
-	local active = AugmentationDB and AugmentationDB.Enabled and UnitClassBase("player") == "EVOKER" and specializationIndex and C_SpecializationInfo.GetSpecializationInfo(specializationIndex) == 1473 and not UUF.RAID_TEST_MODE and #names > 0
+	local active = eligible and #names > 0
 	UUF.AUGMENTATION_RAID_FRAME_COUNT = #names
 	local nameList = table.concat(names, ",")
 	local activeNameList = active and nameList or ""
 	local sortMethod = AugmentationDB.Frame.SortBy == "NAME" and "NAME" or "NAMELIST"
 	if UUF.AUGMENTATION_RAID_HEADER:GetAttribute("sortMethod") ~= sortMethod then UUF.AUGMENTATION_RAID_HEADER:SetAttribute("sortMethod", sortMethod) end
 	if UUF.AUGMENTATION_RAID_HEADER:GetAttribute("nameList") ~= activeNameList then UUF.AUGMENTATION_RAID_HEADER:SetAttribute("nameList", activeNameList) end
-	UUF:ForEachRaidFrame(function(raidFrame, unit, assignedUnit)
-		if not raidFrame.isAugmentationRaidFrame or not unit then return end
-		raidFrame:SetSize(AugmentationDB.Frame.Width, AugmentationDB.Frame.Height)
-		raidFrame:SetFrameStrata(AugmentationDB.Frame.FrameStrata)
-		UUF:UpdateUnitFrame(raidFrame, unit)
+	UUF:ForEachAugmentationRaidFrame(function(raidFrame, unit, assignedUnit)
 		if not assignedUnit then
 			UUF:UnregisterRangeFrame(raidFrame)
 			UUF:UnregisterTargetGlowIndicatorFrame(raidFrame)
 			if raidFrame.DispelHighlightUnit then UUF:UnregisterDispelHighlightEvents(raidFrame) end
 			raidFrame.UUFGroupUnit = nil
+			return
 		end
-	end, true, false)
+		raidFrame:SetSize(AugmentationDB.Frame.Width, AugmentationDB.Frame.Height)
+		raidFrame:SetFrameStrata(AugmentationDB.Frame.FrameStrata)
+		UUF:UpdateUnitFrame(raidFrame, unit)
+		raidFrame.UUFGroupUnit = assignedUnit
+	end, true)
 	UUF:LayoutAugmentationRaidFrames()
 	UUF.AUGMENTATION_RAID_CONTAINER:SetShown(active)
+end
+
+function UUF:SpawnAugmentationRaidFrames()
+	local AugmentationDB = UUF.db.profile.Units.augmentation
+	if not AugmentationDB or not AugmentationDB.Enabled or UnitClassBase("player") ~= "EVOKER" then return end
+	if not UUF.AUGMENTATION_RAID_CONTAINER then
+		UUF.AUGMENTATION_RAID_CONTAINER = CreateFrame("Frame", "UUF_AugmentationRaidContainer", UIParent, "BackdropTemplate")
+		UUF.AUGMENTATION_RAID_CONTAINER:SetBackdrop(UUF.BACKDROP)
+		UUF.AUGMENTATION_RAID_CONTAINER:SetBackdropColor(0, 0, 0, 0)
+		UUF.AUGMENTATION_RAID_CONTAINER:SetBackdropBorderColor(0, 0, 0, 0)
+	end
+	if not UUF.AUGMENTATION_RAID_HEADER then
+		local FrameDB = AugmentationDB.Frame
+		UUF.AUGMENTATION_RAID_HEADER = oUF:SpawnHeader("UUF_AugmentationRaidHeader", nil,
+			"showRaid", true,
+			"showParty", false,
+			"showPlayer", true,
+			"showSolo", false,
+			"nameList", "",
+			"sortMethod", FrameDB.SortBy == "NAME" and "NAME" or "NAMELIST",
+			"initial-width", FrameDB.Width,
+			"initial-height", FrameDB.Height,
+			"oUF-initialConfigFunction", ("self:SetWidth(%s); self:SetHeight(%s)"):format(FrameDB.Width, FrameDB.Height),
+			"unitsPerColumn", UUF.MAX_RAID_FRAMES_PER_GROUP,
+			"maxColumns", UUF.MAX_RAID_GROUPS
+		)
+		UUF.AUGMENTATION_RAID_HEADER:SetParent(UUF.AUGMENTATION_RAID_CONTAINER)
+		UUF.AUGMENTATION_RAID_HEADER:SetVisibility("raid")
+	end
+	UUF:CreateMover("augmentation")
+	UUF:UpdateAugmentationRaidFrames()
 end
 
 function UUF:SpawnGroupFrame(groupType)
@@ -213,37 +280,9 @@ function UUF:SpawnGroupFrame(groupType)
 			header:SetAttribute("startingIndex", 1)
 			UUF.RAID_HEADERS[groupIndex] = header
 		end
-		if UnitClassBase("player") == "EVOKER" then
-			local AugmentationFrameDB = UUF.db.profile.Units.augmentation.Frame
-			if not UUF.AUGMENTATION_RAID_CONTAINER then
-				UUF.AUGMENTATION_RAID_CONTAINER = CreateFrame("Frame", "UUF_AugmentationRaidContainer", UIParent, "BackdropTemplate")
-				UUF.AUGMENTATION_RAID_CONTAINER:SetBackdrop(UUF.BACKDROP)
-				UUF.AUGMENTATION_RAID_CONTAINER:SetBackdropColor(0, 0, 0, 0)
-				UUF.AUGMENTATION_RAID_CONTAINER:SetBackdropBorderColor(0, 0, 0, 0)
-			end
-			if not UUF.AUGMENTATION_RAID_HEADER then
-				UUF.AUGMENTATION_RAID_HEADER = oUF:SpawnHeader("UUF_AugmentationRaidHeader", nil,
-					"showRaid", true,
-					"showParty", false,
-					"showPlayer", true,
-					"showSolo", false,
-					"nameList", "",
-					"sortMethod", AugmentationFrameDB.SortBy == "NAME" and "NAME" or "NAMELIST",
-					"initial-width", AugmentationFrameDB.Width,
-					"initial-height", AugmentationFrameDB.Height,
-					"oUF-initialConfigFunction", ("self:SetWidth(%s); self:SetHeight(%s)"):format(AugmentationFrameDB.Width, AugmentationFrameDB.Height),
-					"unitsPerColumn", UUF.MAX_RAID_FRAMES_PER_GROUP,
-					"maxColumns", UUF.MAX_RAID_GROUPS
-				)
-				UUF.AUGMENTATION_RAID_HEADER:SetParent(UUF.AUGMENTATION_RAID_CONTAINER)
-				UUF.AUGMENTATION_RAID_HEADER:SetVisibility("raid")
-			end
-			UUF:CreateMover("augmentation")
-		end
 		UUF:CreateMover(groupType)
 		UUF.RAID_CONTAINER:Show()
 		for _, header in ipairs(UUF.RAID_HEADERS) do header:Show() end
-		UUF:UpdateAugmentationRaidFrames()
 	end
 	UUF:LayoutGroupFrames(groupType)
 end
@@ -268,7 +307,6 @@ function UUF:UpdateGroupFrame(groupType)
 				raidFrame.UUFGroupUnit = nil
 			end, true, UUF.RAID_TEST_MODE)
 		end
-		if groupType == "raid" then UUF:UpdateAugmentationRaidFrames() end
 		return
 	end
 	if groupType == "party" then
@@ -308,7 +346,6 @@ function UUF:UpdateGroupFrame(groupType)
 				raidFrame.UUFGroupUnit = nil
 			end
 		end, true, UUF.RAID_TEST_MODE)
-		UUF:UpdateAugmentationRaidFrames()
 	end
 	UUF:LayoutGroupFrames(groupType)
 	if groupType == "party" and UUF.PARTY_TEST_MODE or groupType == "raid" and UUF.RAID_TEST_MODE then UUF:UpdateTestEnvironment(groupType, "all") end

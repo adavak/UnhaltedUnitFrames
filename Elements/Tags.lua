@@ -104,9 +104,7 @@ function UUF:UpdateUnitTags(unit, tagName)
 	elseif unit == "raid" then
 		UUF:ForEachRaidFrame(UpdateFrameTags, true, UUF.RAID_TEST_MODE)
 	elseif unit == "augmentation" then
-		UUF:ForEachRaidFrame(function(unitFrame, frameUnit)
-			if unitFrame.isAugmentationRaidFrame then UpdateFrameTags(unitFrame, frameUnit) end
-		end, true, false)
+		UUF:ForEachAugmentationRaidFrame(UpdateFrameTags, false)
 	else
 		UpdateFrameTags(UUF[unit:upper()], unit)
 	end

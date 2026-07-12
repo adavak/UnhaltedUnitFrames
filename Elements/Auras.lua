@@ -495,16 +495,15 @@ function UUF:UpdateUnitAurasStrata(unit)
         end
         if UUF.PARTYPLAYER and unitDB.Auras.PrivateAuras and UUF.PARTYPLAYER.PrivateAuraContainer then UUF.PARTYPLAYER.PrivateAuraContainer:SetFrameStrata(unitDB.Auras.PrivateAuras.FrameStrata) end
         return
-    end
+	end
 	if unit == "augmentation" then
-		UUF:ForEachRaidFrame(function(raidFrame, frameUnit)
-			if not raidFrame.isAugmentationRaidFrame then return end
+		UUF:ForEachAugmentationRaidFrame(function(raidFrame, frameUnit)
 			local augmentationDB = UUF:GetUnitDB(raidFrame, frameUnit)
 			if raidFrame.BuffContainer then raidFrame.BuffContainer:SetFrameStrata(augmentationDB.Auras.FrameStrata) end
 			if raidFrame.DebuffContainer then raidFrame.DebuffContainer:SetFrameStrata(augmentationDB.Auras.FrameStrata) end
 			if raidFrame.CustomAuraContainer then raidFrame.CustomAuraContainer:SetFrameStrata(augmentationDB.Auras.FrameStrata) end
 			if raidFrame.PrivateAuraContainer and augmentationDB.Auras.PrivateAuras then raidFrame.PrivateAuraContainer:SetFrameStrata(augmentationDB.Auras.PrivateAuras.FrameStrata) end
-		end, true, false)
+		end, false)
 		return
 	end
     if not unitFrame or not unitDB or not unitDB.Auras then return end

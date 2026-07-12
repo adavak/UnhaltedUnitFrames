@@ -98,7 +98,8 @@ end
 
 function UUF:SpawnUnitFrame(unit)
     local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
-    if not UnitDB or not UnitDB.Enabled then
+	local augmentationEnabled = unit == "raid" and UUF.db.profile.Units.augmentation.Enabled and UnitClassBase("player") == "EVOKER"
+	if not UnitDB or (not UnitDB.Enabled and not augmentationEnabled) then
         if UnitDB and UnitDB.ForceHideBlizzard then
 			if unit == "raid" then UUF:HideBlizzardRaidFrames() else oUF:DisableBlizzard(unit) end
 		end
@@ -117,7 +118,13 @@ function UUF:SpawnUnitFrame(unit)
         oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame) UUF:CreateUnitFrame(unitFrame, unit) end)
     end
     oUF:SetActiveStyle(UUF:FetchFrameName(unit))
-	if unit == "party" or unit == "raid" then return UUF:SpawnGroupFrame(unit) end
+	if unit == "raid" then
+		if UnitDB.Enabled then UUF:SpawnGroupFrame("raid") end
+		if augmentationEnabled then UUF:SpawnAugmentationRaidFrames() end
+		return
+	elseif unit == "party" then
+		return UUF:SpawnGroupFrame(unit)
+	end
 
     if unit == "boss" then
         for i = 1, UUF.MAX_BOSS_FRAMES do
@@ -227,4 +234,5 @@ function UUF:UpdateAllUnitFrames()
 	UUF:UpdateBossFrames()
 	UUF:UpdateGroupFrame("party")
 	UUF:UpdateGroupFrame("raid")
+	UUF:UpdateAugmentationRaidFrames()
 end

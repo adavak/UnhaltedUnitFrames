@@ -179,9 +179,9 @@ local RoleTextures = {
 local function EnableAurasTestMode(unit)
 	UUF.AURA_TEST_MODE = true
 	if unit == "augmentation" then
-		UUF:ForEachRaidFrame(function(unitFrame, frameUnit)
-			if unitFrame.isAugmentationRaidFrame and frameUnit then UUF:CreateTestAuras(unitFrame, frameUnit) end
-		end, true, false)
+		UUF:ForEachAugmentationRaidFrame(function(unitFrame, frameUnit)
+			if frameUnit then UUF:CreateTestAuras(unitFrame, frameUnit) end
+		end, false)
 	elseif unit == "party" or unit == "raid" or unit == "boss" then
 		UUF:UpdateTestEnvironment(unit, "Auras")
 	else
@@ -192,9 +192,9 @@ end
 local function DisableAurasTestMode(unit)
 	UUF.AURA_TEST_MODE = false
 	if unit == "augmentation" then
-		UUF:ForEachRaidFrame(function(unitFrame, frameUnit)
-			if unitFrame.isAugmentationRaidFrame and frameUnit then UUF:CreateTestAuras(unitFrame, frameUnit) end
-		end, true, false)
+		UUF:ForEachAugmentationRaidFrame(function(unitFrame, frameUnit)
+			if frameUnit then UUF:CreateTestAuras(unitFrame, frameUnit) end
+		end, false)
 	elseif unit == "party" or unit == "raid" or unit == "boss" then
 		UUF:UpdateTestEnvironment(unit, "Auras")
 	else
