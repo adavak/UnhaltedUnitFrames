@@ -58,7 +58,7 @@ function UUF:CreateMover(unit)
 	frameMover.Text = frameMover:CreateFontString(nil, "OVERLAY")
 	frameMover.Text:SetPoint("CENTER")
 	frameMover.Text:SetFont(UUF.Media.Font, 12, "OUTLINE, SLUG")
-	frameMover.Text:SetText(unit == "targettarget" and "Target of Target" or unit == "focustarget" and "Focus Target" or unit == "augmentation" and "Augmentation Raid" or unit:gsub("^%l", string.upper))
+	frameMover.Text:SetText(unit == "targettarget" and "Target of Target" or unit == "focustarget" and "Focus Target" or unit == "augmentation" and "Augmentation" or unit:gsub("^%l", string.upper))
 	frameMover.Text:SetTextColor(255/255, 255/255, 255/255, 1)
 
 	UUF.MOVERS[unit] = frameMover
