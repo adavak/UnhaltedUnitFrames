@@ -469,6 +469,12 @@ function UUF:GetUnitDB(unitFrame, unit)
 	return UUF.db.profile.Units[unitFrame and unitFrame.isAugmentationRaidFrame and "augmentation" or UUF:GetNormalizedUnit(unit)]
 end
 
+function UUF:IsAugmentationEvoker()
+	if UnitClassBase("player") ~= "EVOKER" then return false end
+	local specializationIndex = C_SpecializationInfo.GetSpecialization()
+	return specializationIndex and C_SpecializationInfo.GetSpecializationInfo(specializationIndex) == 1473 or false
+end
+
 function UUF:RequiresAlternativePowerBar()
     local SpecsNeedingAltPower = {
         PRIEST = { 258 },           -- Shadow

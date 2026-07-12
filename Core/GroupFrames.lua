@@ -102,8 +102,7 @@ function UUF:UpdateAugmentationRaidFrames()
 	end
 
 	local AugmentationDB = UUF.db.profile.Units.augmentation
-	local specializationIndex = C_SpecializationInfo.GetSpecialization()
-	local eligible = AugmentationDB and AugmentationDB.Enabled and UnitClassBase("player") == "EVOKER" and specializationIndex and C_SpecializationInfo.GetSpecializationInfo(specializationIndex) == 1473 and not UUF.RAID_TEST_MODE
+	local eligible = AugmentationDB and AugmentationDB.Enabled and UUF:IsAugmentationEvoker() and not UUF.RAID_TEST_MODE
 	local names = {}
 	if eligible then
 		local seen, rosterByFullName, rosterByShortName = {}, {}, {}
@@ -164,6 +163,7 @@ function UUF:UpdateAugmentationRaidFrames()
 	end, true)
 	UUF:LayoutAugmentationRaidFrames()
 	UUF.AUGMENTATION_RAID_CONTAINER:SetShown(active)
+	if UUF.MOVERS and UUF.MOVERS.augmentation then UUF.MOVERS.augmentation:SetShown(eligible and UUF.MOVERS_UNLOCKED) end
 end
 
 function UUF:SpawnAugmentationRaidFrames()

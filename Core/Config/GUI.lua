@@ -283,7 +283,7 @@ local function GenerateSupportText(parentFrame)
 end
 
 local function BuildMainNavigationTree()
-    return {
+	local navigationTree = {
         { text = "General", value = "General" },
         { text = "Global", value = "Global" },
         { text = "Cooldown Text", value = "CooldownText" },
@@ -295,11 +295,12 @@ local function BuildMainNavigationTree()
         { text = "Focus Target", value = "FocusTarget" },
         { text = "Party", value = "Party" },
         { text = "Raid", value = "Raid" },
-		{ text = "Augmentation", value = "Augmentation" },
-        { text = "Boss", value = "Boss" },
-        { text = "Tags", value = "Tags" },
-        { text = "Profiles", value = "Profiles" },
     }
+	if UUF:IsAugmentationEvoker() then navigationTree[#navigationTree + 1] = { text = "Augmentation", value = "Augmentation" } end
+	navigationTree[#navigationTree + 1] = { text = "Boss", value = "Boss" }
+	navigationTree[#navigationTree + 1] = { text = "Tags", value = "Tags" }
+	navigationTree[#navigationTree + 1] = { text = "Profiles", value = "Profiles" }
+	return navigationTree
 end
 
 local function CreateUIScaleSettings(containerParent)
@@ -3921,7 +3922,7 @@ local function CreateCooldownTextSettings(containerParent)
                 local AuraUnitTabs = AG:Create("TabGroup")
                 AuraUnitTabs:SetLayout("Flow")
                 AuraUnitTabs:SetFullWidth(true)
-                AuraUnitTabs:SetTabs({
+				local auraUnitTabs = {
                     { text = "Player", value = "player" },
                     { text = "Target", value = "target" },
                     { text = "Target of Target", value = "targettarget" },
@@ -3930,9 +3931,10 @@ local function CreateCooldownTextSettings(containerParent)
                     { text = "Pet", value = "pet" },
                     { text = "Party", value = "party" },
                     { text = "Raid", value = "raid" },
-					{ text = "Augmentation Raid", value = "augmentation" },
-                    { text = "Boss", value = "boss" },
-                })
+				}
+				if UUF:IsAugmentationEvoker() then auraUnitTabs[#auraUnitTabs + 1] = { text = "Augmentation Raid", value = "augmentation" } end
+				auraUnitTabs[#auraUnitTabs + 1] = { text = "Boss", value = "boss" }
+				AuraUnitTabs:SetTabs(auraUnitTabs)
                 AuraUnitTabs:SetCallback("OnGroupSelected", SelectAuraUnit)
                 AuraUnitTabs:SelectTab("player")
                 CooldownTextTabContainer:AddChild(AuraUnitTabs)
@@ -4669,7 +4671,7 @@ function UUF:CreateGUI()
             CreateUnitSettings(ScrollFrame, "raid")
 
             ScrollFrame:DoLayout()
-		elseif MainTab == "Augmentation" then
+		elseif MainTab == "Augmentation" and UUF:IsAugmentationEvoker() then
 			local ScrollFrame = GUIWidgets.CreateScrollFrame(Wrapper)
 
 			CreateUnitSettings(ScrollFrame, "augmentation")
@@ -4726,6 +4728,7 @@ end
 
 function UUF:OpenGUIToUnit(unit)
     if InCombatLockdown() then return end
+	if unit == "augmentation" and not UUF:IsAugmentationEvoker() then return end
 	if not lastSelectedUnitTabs[unit] then lastSelectedUnitTabs[unit] = {} end
 	lastSelectedUnitTabs[unit].mainTab = "Frame"
     UUF:CreateGUI()

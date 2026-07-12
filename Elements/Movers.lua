@@ -68,6 +68,6 @@ end
 function UUF:ToggleMovers()
 	if InCombatLockdown() then UUF:PrettyPrint("Movers cannot be toggled while in combat.") return UUF.MOVERS_UNLOCKED end
 	UUF.MOVERS_UNLOCKED = not UUF.MOVERS_UNLOCKED
-	for _, mover in pairs(UUF.MOVERS or {}) do mover:SetShown(UUF.MOVERS_UNLOCKED) end
+	for _, mover in pairs(UUF.MOVERS or {}) do mover:SetShown(UUF.MOVERS_UNLOCKED and (mover.unit ~= "augmentation" or UUF:IsAugmentationEvoker())) end
 	return UUF.MOVERS_UNLOCKED
 end
