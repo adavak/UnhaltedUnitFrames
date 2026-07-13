@@ -283,6 +283,8 @@ local function GenerateSupportText(parentFrame)
 end
 
 local function BuildMainNavigationTree()
+	local raidNavigation = { text = "Raid", value = "Raid" }
+	if UUF:IsAugmentationEvoker() then raidNavigation.children = {{ text = "Augmentation", value = "Augmentation" }} end
 	local navigationTree = {
         { text = "General", value = "General" },
         { text = "Global", value = "Global" },
@@ -294,9 +296,8 @@ local function BuildMainNavigationTree()
         { text = "Focus", value = "Focus" },
         { text = "Focus Target", value = "FocusTarget" },
         { text = "Party", value = "Party" },
-        { text = "Raid", value = "Raid" },
+		raidNavigation,
     }
-	if UUF:IsAugmentationEvoker() then navigationTree[#navigationTree + 1] = { text = "Augmentation", value = "Augmentation" } end
 	navigationTree[#navigationTree + 1] = { text = "Boss", value = "Boss" }
 	navigationTree[#navigationTree + 1] = { text = "Tags", value = "Tags" }
 	navigationTree[#navigationTree + 1] = { text = "Profiles", value = "Profiles" }
@@ -4559,6 +4560,7 @@ function UUF:CreateGUI()
     Container:SetCallback("OnClose", function(widget) AG:Release(widget) isGUIOpen = false DisableAllTestModes() end)
 
     local function SelectTab(GUIContainer, _, MainTab)
+		MainTab = MainTab:match("[^\001]+$")
 		GUIContainer:ReleaseChildren()
 		for unit, _ in pairs(UUF.db.profile.Units) do DisableAurasTestMode(unit) end
 
@@ -4704,6 +4706,7 @@ function UUF:CreateGUI()
     local mainNavigationValues = {}
     for _, entry in ipairs(mainNavigationTree) do
         mainNavigationValues[entry.value] = true
+		for _, child in ipairs(entry.children or {}) do mainNavigationValues[entry.value .. "\001" .. child.value] = true end
     end
 
     UUFGUI.MainNavigationStatus = UUFGUI.MainNavigationStatus or {}
@@ -4732,7 +4735,7 @@ function UUF:OpenGUIToUnit(unit)
 	if not lastSelectedUnitTabs[unit] then lastSelectedUnitTabs[unit] = {} end
 	lastSelectedUnitTabs[unit].mainTab = "Frame"
     UUF:CreateGUI()
-	if UUFGUI.MainNavigation then UUFGUI.MainNavigation:SelectByValue(unit == "targettarget" and "TargetTarget" or unit == "focustarget" and "FocusTarget" or unit:gsub("^%l", string.upper)) end
+	if UUFGUI.MainNavigation then UUFGUI.MainNavigation:SelectByValue(unit == "augmentation" and "Raid\001Augmentation" or unit == "targettarget" and "TargetTarget" or unit == "focustarget" and "FocusTarget" or unit:gsub("^%l", string.upper)) end
 end
 
 function UUFG:OpenUUFGUI()
