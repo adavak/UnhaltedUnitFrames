@@ -139,6 +139,11 @@ UUF.ReadyCheckTextures = {
 		["NOTREADY"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\ReadyCheck\\White\\NotReady.png",
 		["WAITING"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\ReadyCheck\\White\\Pending.png",
 	},
+    ["HiRes"] = {
+		["READY"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\ReadyCheck\\HiRes\\Ready.png",
+		["NOTREADY"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\ReadyCheck\\HiRes\\NotReady.png",
+		["WAITING"] = "Interface\\AddOns\\UnhaltedUnitFrames\\Media\\Textures\\ReadyCheck\\HiRes\\Pending.png",
+	},
 }
 
 UUF.InterruptSpellIDs = {
