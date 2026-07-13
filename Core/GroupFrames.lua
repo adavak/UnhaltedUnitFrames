@@ -46,7 +46,7 @@ end
 
 function UUF:LayoutAugmentationRaidFrames()
 	if not UUF.AUGMENTATION_RAID_CONTAINER or not UUF.AUGMENTATION_RAID_HEADER then return end
-	local FrameDB = UUF.db.profile.Units.augmentation.Frame
+	local FrameDB = UUF.db.profile.Units.raid.augmentation.Frame
 	local unitGrowth, groupGrowth = (FrameDB.GrowthDirection or "RIGHT_DOWN"):match("^(%a+)_(%a+)$")
 	unitGrowth = unitGrowth or "RIGHT"
 	groupGrowth = groupGrowth or "DOWN"
@@ -95,53 +95,70 @@ function UUF:LayoutAugmentationRaidFrames()
 end
 
 function UUF:UpdateAugmentationRaidFrames()
-	if not UUF.AUGMENTATION_RAID_HEADER then return end
+	local AugmentationDB = UUF.db.profile.Units.raid.augmentation
+	local isAugmentation = AugmentationDB.Enabled and UUF:IsAugmentationEvoker() and not UUF.RAID_TEST_MODE
+	if not UUF.AUGMENTATION_RAID_HEADER then
+		if isAugmentation then UUF:SpawnUnitFrame("raid") end
+		return
+	end
 	if InCombatLockdown() then
 		GroupRosterEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 		return
 	end
 
-	local AugmentationDB = UUF.db.profile.Units.augmentation
-	local eligible = AugmentationDB and AugmentationDB.Enabled and UUF:IsAugmentationEvoker() and not UUF.RAID_TEST_MODE
-	local names = {}
-	if eligible then
-		local seen, rosterByFullName, rosterByShortName = {}, {}, {}
-		for raidIndex = 1, GetNumGroupMembers() do
-			local rosterName = GetRaidRosterInfo(raidIndex)
-			if rosterName then
-				rosterByFullName[rosterName:lower()] = rosterName
-				local shortName = Ambiguate(rosterName, "short"):lower()
-				local shortNames = rosterByShortName[shortName]
-				if not shortNames then
-					rosterByShortName[shortName] = rosterName
-				elseif type(shortNames) == "string" then
-					rosterByShortName[shortName] = {shortNames, rosterName}
-				else
-					shortNames[#shortNames + 1] = rosterName
-				end
-			end
+	if not isAugmentation then
+		UUF.AUGMENTATION_RAID_FRAME_COUNT = 0
+		if UUF.AUGMENTATION_RAID_HEADER:GetAttribute("nameList") ~= "" then
+			UUF.AUGMENTATION_RAID_HEADER:SetAttribute("nameList", "")
+			UUF:ForEachAugmentationRaidFrame(function(raidFrame)
+				UUF:UnregisterRangeFrame(raidFrame)
+				UUF:UnregisterTargetGlowIndicatorFrame(raidFrame)
+				if raidFrame.DispelHighlightUnit then UUF:UnregisterDispelHighlightEvents(raidFrame) end
+				raidFrame.UUFGroupUnit = nil
+			end, true)
 		end
+		if UUF.AUGMENTATION_RAID_CONTAINER:IsShown() then UUF.AUGMENTATION_RAID_CONTAINER:Hide() end
+		if UUF.MOVERS and UUF.MOVERS.augmentation and UUF.MOVERS.augmentation:IsShown() then UUF.MOVERS.augmentation:Hide() end
+		return
+	end
 
-		for configuredName in (AugmentationDB.Names or ""):gmatch("[^,;\n]+") do
-			local configuredNameLower = strtrim(configuredName):lower()
-			if configuredNameLower ~= "" then
-				local rosterName = rosterByFullName[configuredNameLower]
-				local shortNames = not rosterName and rosterByShortName[configuredNameLower]
-				if type(shortNames) == "string" then
-					rosterName = shortNames
-				elseif shortNames then
-					for _, shortName in ipairs(shortNames) do
-						if not seen[shortName] then rosterName = shortName break end
-					end
-				end
-				if rosterName and not seen[rosterName] then
-					seen[rosterName] = true
-					names[#names + 1] = rosterName
-				end
+	local names = {}
+	local seen, rosterByFullName, rosterByShortName = {}, {}, {}
+	for raidIndex = 1, GetNumGroupMembers() do
+		local rosterName = GetRaidRosterInfo(raidIndex)
+		if rosterName then
+			rosterByFullName[rosterName:lower()] = rosterName
+			local shortName = Ambiguate(rosterName, "short"):lower()
+			local shortNames = rosterByShortName[shortName]
+			if not shortNames then
+				rosterByShortName[shortName] = rosterName
+			elseif type(shortNames) == "string" then
+				rosterByShortName[shortName] = {shortNames, rosterName}
+			else
+				shortNames[#shortNames + 1] = rosterName
 			end
 		end
 	end
-	local active = eligible and #names > 0
+
+	for configuredName in (AugmentationDB.Names or ""):gmatch("[^,;\n]+") do
+		local configuredNameLower = strtrim(configuredName):lower()
+		if configuredNameLower ~= "" then
+			local rosterName = rosterByFullName[configuredNameLower]
+			local shortNames = not rosterName and rosterByShortName[configuredNameLower]
+			if type(shortNames) == "string" then
+				rosterName = shortNames
+			elseif shortNames then
+				for _, shortName in ipairs(shortNames) do
+					if not seen[shortName] then rosterName = shortName break end
+				end
+			end
+			if rosterName and not seen[rosterName] then
+				seen[rosterName] = true
+				names[#names + 1] = rosterName
+			end
+		end
+	end
+	local active = #names > 0
 	UUF.AUGMENTATION_RAID_FRAME_COUNT = #names
 	local nameList = table.concat(names, ",")
 	local activeNameList = active and nameList or ""
@@ -163,12 +180,12 @@ function UUF:UpdateAugmentationRaidFrames()
 	end, true)
 	UUF:LayoutAugmentationRaidFrames()
 	UUF.AUGMENTATION_RAID_CONTAINER:SetShown(active)
-	if UUF.MOVERS and UUF.MOVERS.augmentation then UUF.MOVERS.augmentation:SetShown(eligible and UUF.MOVERS_UNLOCKED) end
+	if UUF.MOVERS and UUF.MOVERS.augmentation then UUF.MOVERS.augmentation:SetShown(isAugmentation and UUF.MOVERS_UNLOCKED) end
 end
 
 function UUF:SpawnAugmentationRaidFrames()
-	local AugmentationDB = UUF.db.profile.Units.augmentation
-	if not AugmentationDB or not AugmentationDB.Enabled or UnitClassBase("player") ~= "EVOKER" then return end
+	local AugmentationDB = UUF.db.profile.Units.raid.augmentation
+	if not AugmentationDB or not AugmentationDB.Enabled or not UUF:IsAugmentationEvoker() then return end
 	if not UUF.AUGMENTATION_RAID_CONTAINER then
 		UUF.AUGMENTATION_RAID_CONTAINER = CreateFrame("Frame", "UUF_AugmentationRaidContainer", UIParent, "BackdropTemplate")
 		UUF.AUGMENTATION_RAID_CONTAINER:SetBackdrop(UUF.BACKDROP)

@@ -1,6 +1,13 @@
 local _, UUF = ...
 local UnhaltedUnitFrames = LibStub("AceAddon-3.0"):NewAddon("UnhaltedUnitFrames")
 
+function UUF:RefreshProfiles()
+	UUF:ResolveLSM()
+	UUF:LoadCustomColours()
+	UUF:UpdateAllUnitFrames()
+	UUF:ForEachUnitDB(function(_, unit) UUF:UpdateUnitTags(unit) end)
+end
+
 function UnhaltedUnitFrames:OnInitialize()
     UUF.db = LibStub("AceDB-3.0"):New("UUFDB", UUF:GetDefaultDB(), true)
     UUF.LDS:EnhanceDatabase(UUF.db, "UnhaltedUnitFrames")
@@ -9,16 +16,15 @@ function UnhaltedUnitFrames:OnInitialize()
     UUF.TOT_SEPARATOR = UUF.db.profile.General.ToTSeparator or "»"
     if UUF.db.global.UseGlobalProfile then
         local globalProfile = UUF.db.global.GlobalProfile or UUF.db.global.GlobalProfileName or "Default"
-        UUF.db:SetProfile(globalProfile)
-    end
-
-	UUF.db.RegisterCallback(UUF, "OnProfileChanged", function() UUF:ResolveLSM() UUF:LoadCustomColours() UUF:UpdateAllUnitFrames() for unit in pairs(UUF.db.profile.Units) do UUF:UpdateUnitTags(unit) end end)
-	UUF.db.RegisterCallback(UUF, "OnProfileCopied", function() UUF:ResolveLSM() UUF:LoadCustomColours() UUF:UpdateAllUnitFrames() for unit in pairs(UUF.db.profile.Units) do UUF:UpdateUnitTags(unit) end end)
-	UUF.db.RegisterCallback(UUF, "OnProfileReset", function() UUF:ResolveLSM() UUF:LoadCustomColours() UUF:UpdateAllUnitFrames() for unit in pairs(UUF.db.profile.Units) do UUF:UpdateUnitTags(unit) end end)
+		UUF.db:SetProfile(globalProfile)
+	end
+	UUF.db.RegisterCallback(UUF, "OnProfileChanged", UUF.RefreshProfiles)
+	UUF.db.RegisterCallback(UUF, "OnProfileCopied", UUF.RefreshProfiles)
+	UUF.db.RegisterCallback(UUF, "OnProfileReset", UUF.RefreshProfiles)
 
     local playerSpecializationChangedEventFrame = CreateFrame("Frame")
     playerSpecializationChangedEventFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-	playerSpecializationChangedEventFrame:SetScript("OnEvent", function(_, event, ...) if InCombatLockdown() then return end if event ~= "PLAYER_SPECIALIZATION_CHANGED" then return end local unit = ... if unit == "player" then C_Timer.After(0.1, function() UUF:ResolveLSM() UUF:LoadCustomColours() UUF:UpdateAllUnitFrames() for configuredUnit in pairs(UUF.db.profile.Units) do UUF:UpdateUnitTags(configuredUnit) end end) end end)
+	playerSpecializationChangedEventFrame:SetScript("OnEvent", function(_, event, ...) if InCombatLockdown() then return end if event ~= "PLAYER_SPECIALIZATION_CHANGED" then return end local unit = ... if unit == "player" then C_Timer.After(0.1, UUF.RefreshProfiles) end end)
 end
 
 function UnhaltedUnitFrames:OnEnable()

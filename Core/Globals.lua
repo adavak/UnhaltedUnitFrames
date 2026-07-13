@@ -470,8 +470,15 @@ function UUF:GetNormalizedUnit(unit)
     return normalizedUnit
 end
 
-function UUF:GetUnitDB(unitFrame, unit)
-	return UUF.db.profile.Units[unitFrame and unitFrame.isAugmentationRaidFrame and "augmentation" or UUF:GetNormalizedUnit(unit)]
+function UUF:GetUnitDB(unitFrame, unit, units)
+	units = units or UUF.db.profile.Units
+	local normalizedUnit = unitFrame and unitFrame.isAugmentationRaidFrame and "augmentation" or UUF:GetNormalizedUnit(unit)
+	return normalizedUnit == "augmentation" and units.raid.augmentation or units[normalizedUnit]
+end
+
+function UUF:ForEachUnitDB(callback)
+	for unit, unitDB in pairs(UUF.db.profile.Units) do callback(unitDB, unit) end
+	callback(UUF.db.profile.Units.raid.augmentation, "augmentation")
 end
 
 function UUF:IsAugmentationEvoker()

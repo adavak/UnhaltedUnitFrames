@@ -1,5 +1,7 @@
 local _, UUF = ...
 local oUF = UUF.oUF
+local raidFrameIndex = 0
+local raidStyleRegistered = false
 
 local function ApplyScripts(unitFrame)
     unitFrame:RegisterForClicks("AnyUp")
@@ -98,7 +100,7 @@ end
 
 function UUF:SpawnUnitFrame(unit)
     local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
-	local augmentationEnabled = unit == "raid" and UUF.db.profile.Units.augmentation.Enabled and UnitClassBase("player") == "EVOKER"
+	local augmentationEnabled = unit == "raid" and UUF.db.profile.Units.raid.augmentation.Enabled and UUF:IsAugmentationEvoker()
 	if not UnitDB or (not UnitDB.Enabled and not augmentationEnabled) then
         if UnitDB and UnitDB.ForceHideBlizzard then
 			if unit == "raid" then UUF:HideBlizzardRaidFrames() else oUF:DisableBlizzard(unit) end
@@ -108,18 +110,20 @@ function UUF:SpawnUnitFrame(unit)
     local FrameDB = UnitDB.Frame
     if unit == "raid" and UnitDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 
-    if unit == "raid" then
-        local raidFrameIndex = 0
-        oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame)
-            raidFrameIndex = raidFrameIndex + 1
-            UUF:CreateUnitFrame(unitFrame, "raid" .. raidFrameIndex)
-        end)
-    else
-        oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame) UUF:CreateUnitFrame(unitFrame, unit) end)
-    end
+	if unit == "raid" then
+		if not raidStyleRegistered then
+			oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame)
+				raidFrameIndex = raidFrameIndex + 1
+				UUF:CreateUnitFrame(unitFrame, "raid" .. raidFrameIndex)
+			end)
+			raidStyleRegistered = true
+		end
+	else
+		oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame) UUF:CreateUnitFrame(unitFrame, unit) end)
+	end
     oUF:SetActiveStyle(UUF:FetchFrameName(unit))
 	if unit == "raid" then
-		if UnitDB.Enabled then UUF:SpawnGroupFrame("raid") end
+		if UnitDB.Enabled and not UUF.RAID_CONTAINER then UUF:SpawnGroupFrame("raid") end
 		if augmentationEnabled then UUF:SpawnAugmentationRaidFrames() end
 		return
 	elseif unit == "party" then

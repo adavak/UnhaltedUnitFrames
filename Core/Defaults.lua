@@ -2197,18 +2197,259 @@ local Defaults = {
                         Colour = {1, 1, 1},
                         Tag = "",
                     },
-                }
+                },
+				augmentation = {
+					Enabled = false,
+					Names = "",
+					Frame = {
+						Width = 90,
+						Height = 52,
+						Layout = {"CENTER", "CENTER", 300, 0, -1},
+						GrowthDirection = "LEFT_DOWN",
+						SortBy = "NAMELIST",
+						AutoAdjustGroups = false,
+						Groups = {[1] = true, [2] = true, [3] = true, [4] = true, [5] = true, [6] = true, [7] = false, [8] = false},
+						FrameStrata = "LOW",
+					},
+					HealthBar = {
+						ColourByClass = false,
+						ColourBackgroundByClass = false,
+						ColourByReaction = true,
+						ColourWhenTapped = true,
+						ColourWhenDisconnected = true,
+						ColourBackdropWhenDead = true,
+						Inverse = false,
+						Smooth = false,
+						Foreground = {0.10196079313755, 0.10196079313755, 0.10196079313755},
+						ForegroundOpacity = 1,
+						Background = {0.80000007152557, 0.80000007152557, 0.80000007152557},
+						BackgroundOpacity = 1,
+						DispelHighlight = {
+							Enabled = true,
+							Style = "HEALTHBAR",
+						},
+					},
+					HealPrediction = {
+						IncomingHeal = {
+							Enabled = false,
+							UseStripedTexture = false,
+							MatchParentHeight = true,
+							Colour = {0.25098039215686, 1, 0.25098039215686, 1},
+							Position = "RIGHT",
+							Height = 40,
+						},
+						Absorbs = {
+							Enabled = true,
+							ShowOverAbsorb = true,
+							UseStripedTexture = false,
+							MatchParentHeight = true,
+							Colour = {1, 0.8, 0, 1},
+							Position = "ATTACH",
+							Height = 40,
+						},
+						HealAbsorbs = {
+							Enabled = true,
+							UseStripedTexture = false,
+							MatchParentHeight = true,
+							Colour = {0.50196078431373, 0.25098039215686, 1, 1},
+							Position = "ATTACH",
+							Height = 40,
+						},
+					},
+					PowerBar = {
+						Enabled = true,
+						OnlyShowHealers = true,
+						Height = 1,
+						Foreground = {0.031372549019608, 0.031372549019608, 0.031372549019608},
+						Background = {0.50196078431373, 0.50196078431373, 0.50196078431373},
+						ColourByType = true,
+						ColourBackgroundByType = true,
+						ColourByClass = false,
+						Smooth = true,
+						Inverse = false,
+						BackgroundMultiplier = 0.25,
+					},
+					Indicators = {
+						RaidTargetMarker = {
+							Enabled = true,
+							Size = 24,
+							Layout = {"CENTER", "CENTER", 0, 0},
+						},
+						Mouseover = {
+							Enabled = true,
+							Colour = {1, 1, 1},
+							HighlightOpacity = 0.25,
+							Style = "OVERLAY"
+						},
+						Target = {
+							Enabled = false,
+							Style = "Glow",
+							Colour = {1, 1, 1},
+						},
+						Threat = {
+							Enabled = false,
+						},
+						Role = {
+							Enabled = true,
+							ShowTank = true,
+							ShowHealer = true,
+							ShowDamager = false,
+							Texture = "White",
+							Size = 12,
+							Layout = {"TOPRIGHT", "TOPRIGHT", -3, -3},
+						},
+						Phase = {
+							Enabled = false,
+							Size = 12,
+							Layout = {"CENTER", "CENTER", 0, 0},
+						},
+						Summon = {
+							Enabled = true,
+							Size = 24,
+							Layout = {"CENTER", "CENTER", 0, 0},
+						},
+						ReadyCheckIndicator = {
+							Enabled = true,
+							Texture = "Default",
+							Size = 24,
+							Layout = {"CENTER", "CENTER", 0, 0},
+						},
+						ResurrectIndicator = {
+							Enabled = true,
+							Size = 18,
+							Layout = {"CENTER", "CENTER", 0, 0},
+						},
+						LeaderAssistantIndicator = {
+							Enabled = true,
+							Size = 14,
+							Layout = {"TOPRIGHT", "TOPRIGHT", -3, -3},
+						}
+					},
+					Auras = {
+						FrameStrata = "MEDIUM",
+						AuraDuration = {
+							Layout = {"CENTER", "CENTER", 0, 0},
+							FontSize = 12,
+							ScaleByIconSize = false,
+						},
+						PrivateAuras = {
+							AnchorParent = "Frame",
+							Enabled = true,
+							Layout = {"CENTER", "CENTER", 0, 0},
+							FrameStrata = "HIGH",
+							Size = 32,
+							Spacing = 1,
+							GrowthX = "LEFT",
+							GrowthY = "UP",
+							InitialAnchor = "CENTER",
+							Num = 1,
+							BorderScale = -1,
+							DisableCooldown = false,
+							DisableCooldownText = false,
+						},
+						Buffs = {
+							AnchorParent = "Frame",
+							Enabled = true,
+							OnlyShowPlayer = false,
+							Size = 28,
+							Layout = {"BOTTOMLEFT", "BOTTOMLEFT", 2, 0, -1},
+							Num = 1,
+							Wrap = 1,
+							GrowthDirection = "RIGHT",
+							WrapDirection = "UP",
+							ShowType = false,
+							Blacklist = false,
+							Filter = "HELPFUL",
+							Sorting = "BLIZZARD",
+							Count = {
+								HideStacks = false,
+								Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
+								FontSize = 12,
+								Colour = {1, 1, 1, 1}
+							}
+						},
+						Debuffs = {
+							AnchorParent = "Frame",
+							Enabled = true,
+							OnlyShowPlayer = false,
+							Size = 31,
+							Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 0, -1},
+							Num = 2,
+							Wrap = 2,
+							GrowthDirection = "LEFT",
+							WrapDirection = "UP",
+							ShowType = false,
+							Blacklist = true,
+							Filter = "HARMFUL",
+							Sorting = "BLIZZARD",
+							Count = {
+								HideStacks = false,
+								Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
+								FontSize = 12,
+								Colour = {1, 1, 1, 1}
+							}
+						},
+						Custom = {
+							AnchorParent = "Frame",
+							Enabled = false,
+							Type = "Buffs",
+							OnlyShowPlayer = false,
+							Size = 42,
+							Layout = {"RIGHT", "LEFT", -1, 0, 1},
+							Num = 3,
+							Wrap = 3,
+							GrowthDirection = "LEFT",
+							WrapDirection = "UP",
+							ShowType = false,
+							Blacklist = false,
+							Filter = "HELPFUL",
+							Sorting = "BLIZZARD",
+							Count = {
+								HideStacks = false,
+								Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
+								FontSize = 12,
+								Colour = {1, 1, 1, 1}
+							}
+						},
+					},
+					Tags = {
+						TagOne = {
+							FontSize = 12,
+							Layout = {"TOPLEFT", "TOPLEFT", 3, -3},
+							Colour = {1, 1, 1},
+							Tag = "[name:colour]",
+						},
+						TagTwo = {
+							FontSize = 12,
+							Layout = {"CENTER", "CENTER", 0, 0},
+							Colour = {1, 1, 1},
+							Tag = "[status]",
+						},
+						TagThree = {
+							FontSize = 12,
+							Layout = {"CENTER", "CENTER", 0, 0},
+							Colour = {1, 1, 1},
+							Tag = "",
+						},
+						TagFour = {
+							FontSize = 12,
+							Layout = {"CENTER", "CENTER", 0, 0},
+							Colour = {1, 1, 1},
+							Tag = "",
+						},
+						TagFive = {
+							FontSize = 12,
+							Layout = {"CENTER", "CENTER", 0, 0},
+							Colour = {1, 1, 1},
+							Tag = "",
+						},
+					}
+				},
             },
         }
     },
 }
 
-Defaults.profile.Units.augmentation = CopyTable(Defaults.profile.Units.raid)
-Defaults.profile.Units.augmentation.Enabled = false
-Defaults.profile.Units.augmentation.ForceHideBlizzard = nil
-Defaults.profile.Units.augmentation.Names = ""
-Defaults.profile.Units.augmentation.Frame.Layout = {"CENTER", "CENTER", 300, 0, -1}
-Defaults.profile.Units.augmentation.Frame.SortBy = "NAMELIST"
 
 ---@return table Defaults Returns the Default Table.
 function UUF:GetDefaultDB() return Defaults end
