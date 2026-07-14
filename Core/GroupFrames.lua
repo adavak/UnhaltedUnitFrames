@@ -52,7 +52,7 @@ function UUF:LayoutAugmentationRaidFrames()
 	groupGrowth = groupGrowth or "DOWN"
 	local spacing = FrameDB.Layout[5] or 0
 	local frameCount = math.max(UUF.AUGMENTATION_RAID_FRAME_COUNT, 1)
-	local unitsPerColumn = UUF.MAX_RAID_FRAMES_PER_GROUP
+	local unitsPerColumn = FrameDB.UnitsPerColumn or UUF.MAX_RAID_FRAMES_PER_GROUP
 	local columns = math.ceil(frameCount / unitsPerColumn)
 	local rows = math.min(frameCount, unitsPerColumn)
 	local point = unitGrowth == "RIGHT" and "RIGHT" or unitGrowth == "UP" and "TOP" or unitGrowth == "DOWN" and "BOTTOM" or "LEFT"
@@ -83,7 +83,7 @@ function UUF:LayoutAugmentationRaidFrames()
 	header:SetAttribute("initial-height", FrameDB.Height)
 	header:SetAttribute("oUF-initialConfigFunction", ("self:SetWidth(%s); self:SetHeight(%s)"):format(FrameDB.Width, FrameDB.Height))
 	header:SetAttribute("unitsPerColumn", unitsPerColumn)
-	header:SetAttribute("maxColumns", UUF.MAX_RAID_GROUPS)
+	header:SetAttribute("maxColumns", math.ceil(UUF.MAX_RAID_FRAMES / unitsPerColumn))
 	header:SetAttribute("columnSpacing", spacing)
 	header:SetAttribute("columnAnchorPoint", columnAnchorPoint)
 	header:SetFrameStrata(FrameDB.FrameStrata)
@@ -204,8 +204,8 @@ function UUF:SpawnAugmentationRaidFrames()
 			"initial-width", FrameDB.Width,
 			"initial-height", FrameDB.Height,
 			"oUF-initialConfigFunction", ("self:SetWidth(%s); self:SetHeight(%s)"):format(FrameDB.Width, FrameDB.Height),
-			"unitsPerColumn", UUF.MAX_RAID_FRAMES_PER_GROUP,
-			"maxColumns", UUF.MAX_RAID_GROUPS
+			"unitsPerColumn", FrameDB.UnitsPerColumn or UUF.MAX_RAID_FRAMES_PER_GROUP,
+			"maxColumns", math.ceil(UUF.MAX_RAID_FRAMES / (FrameDB.UnitsPerColumn or UUF.MAX_RAID_FRAMES_PER_GROUP))
 		)
 		UUF.AUGMENTATION_RAID_HEADER:SetParent(UUF.AUGMENTATION_RAID_CONTAINER)
 		UUF.AUGMENTATION_RAID_HEADER:SetVisibility("raid")

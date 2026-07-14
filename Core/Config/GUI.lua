@@ -868,11 +868,21 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
         LayoutContainer:AddChild(SpacingSlider)
     end
 
+    if unit == "augmentation" then
+		local UnitsPerColumnSlider = AG:Create("Slider")
+		UnitsPerColumnSlider:SetLabel("Units Per Row / Column")
+		UnitsPerColumnSlider:SetValue(FrameDB.UnitsPerColumn or UUF.MAX_RAID_FRAMES_PER_GROUP)
+		UnitsPerColumnSlider:SetSliderValues(1, UUF.MAX_RAID_FRAMES, 1)
+		UnitsPerColumnSlider:SetRelativeWidth(0.25)
+		UnitsPerColumnSlider:SetCallback("OnValueChanged", function(_, _, value) FrameDB.UnitsPerColumn = value updateCallback("Frame") end)
+		LayoutContainer:AddChild(UnitsPerColumnSlider)
+	end
+
     local FrameStrataDropdown = AG:Create("Dropdown")
     FrameStrataDropdown:SetList(FrameStrataList[1], FrameStrataList[2])
     FrameStrataDropdown:SetLabel("Frame Strata")
     FrameStrataDropdown:SetValue(FrameDB.FrameStrata)
-	FrameStrataDropdown:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid" or unit == "augmentation") and 0.25 or 0.33)
+	FrameStrataDropdown:SetRelativeWidth((unit == "boss" or unit == "party" or unit == "raid") and 0.25 or (unit == "augmentation" and 1) or 0.33)
     FrameStrataDropdown:SetCallback("OnValueChanged", function(_, _, value) FrameDB.FrameStrata = value updateCallback("Frame") end)
     LayoutContainer:AddChild(FrameStrataDropdown)
 

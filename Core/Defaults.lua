@@ -2206,6 +2206,7 @@ local Defaults = {
 						Height = 52,
 						Layout = {"CENTER", "CENTER", 0, 0, 1},
 						GrowthDirection = "LEFT_DOWN",
+						UnitsPerColumn = 5,
 						SortBy = "NAMELIST",
 						FrameStrata = "LOW",
 					},
