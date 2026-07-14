@@ -39,5 +39,5 @@ function UnhaltedUnitFrames:OnEnable()
     UUF:SpawnUnitFrame("boss")
     UUF:SpawnUnitFrame("party")
     UUF:SpawnUnitFrame("raid")
-    if SCMAPI then SCMAPI.RegisterAnchorParents("UnhaltedUnitFrames", UUF.SCMAnchors) end
+	if SCMAPI and SCMAPI.RegisterAnchorParents then SCMAPI.RegisterAnchorParents("UnhaltedUnitFrames", UUF.SCMAnchors) end
 end
