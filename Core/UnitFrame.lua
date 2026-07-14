@@ -1,5 +1,7 @@
 local _, UUF = ...
 local oUF = UUF.oUF
+local raidFrameIndex = 0
+local raidStyleRegistered = false
 
 local function ApplyScripts(unitFrame)
     unitFrame:RegisterForClicks("AnyUp")
@@ -11,7 +13,8 @@ end
 
 function UUF:CreateUnitFrame(unitFrame, unit)
     if not unit or not unitFrame then return end
-    local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+	if unitFrame:GetParent() == UUF.AUGMENTATION_RAID_HEADER then unitFrame.isAugmentationRaidFrame = true end
+    local UnitDB = UUF:GetUnitDB(unitFrame, unit)
     local isPlayer = unit == "player"
     local isTarget = unit == "target"
     local isFocus = unit == "focus"
@@ -58,7 +61,7 @@ function UUF:CreateUnitFrame(unitFrame, unit)
 				frame.UUFGroupUnit = nil
 				return
 			end
-			local RaidDB = UUF.db.profile.Units.raid
+			local RaidDB = UUF:GetUnitDB(frame, value)
 			if not RaidDB or not RaidDB.Enabled then return end
 			if frame.DispelHighlightUnit and frame.DispelHighlightUnit ~= value then UUF:UnregisterDispelHighlightEvents(frame) end
 			UUF:RegisterRangeFrame(frame, value)
@@ -97,7 +100,8 @@ end
 
 function UUF:SpawnUnitFrame(unit)
     local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
-    if not UnitDB or not UnitDB.Enabled then
+	local augmentationEnabled = unit == "raid" and UUF.db.profile.Units.raid.augmentation.Enabled and UUF:IsAugmentationEvoker()
+	if not UnitDB or (not UnitDB.Enabled and not augmentationEnabled) then
         if UnitDB and UnitDB.ForceHideBlizzard then
 			if unit == "raid" then UUF:HideBlizzardRaidFrames() else oUF:DisableBlizzard(unit) end
 		end
@@ -106,17 +110,25 @@ function UUF:SpawnUnitFrame(unit)
     local FrameDB = UnitDB.Frame
     if unit == "raid" and UnitDB.ForceHideBlizzard then UUF:HideBlizzardRaidFrames() end
 
-    if unit == "raid" then
-        local raidFrameIndex = 0
-        oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame)
-            raidFrameIndex = raidFrameIndex + 1
-            UUF:CreateUnitFrame(unitFrame, "raid" .. raidFrameIndex)
-        end)
-    else
-        oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame) UUF:CreateUnitFrame(unitFrame, unit) end)
-    end
+	if unit == "raid" then
+		if not raidStyleRegistered then
+			oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame)
+				raidFrameIndex = raidFrameIndex + 1
+				UUF:CreateUnitFrame(unitFrame, "raid" .. raidFrameIndex)
+			end)
+			raidStyleRegistered = true
+		end
+	else
+		oUF:RegisterStyle(UUF:FetchFrameName(unit), function(unitFrame) UUF:CreateUnitFrame(unitFrame, unit) end)
+	end
     oUF:SetActiveStyle(UUF:FetchFrameName(unit))
-	if unit == "party" or unit == "raid" then return UUF:SpawnGroupFrame(unit) end
+	if unit == "raid" then
+		if UnitDB.Enabled and not UUF.RAID_CONTAINER then UUF:SpawnGroupFrame("raid") end
+		if augmentationEnabled then UUF:SpawnAugmentationRaidFrames() end
+		return
+	elseif unit == "party" then
+		return UUF:SpawnGroupFrame(unit)
+	end
 
     if unit == "boss" then
         for i = 1, UUF.MAX_BOSS_FRAMES do
@@ -173,7 +185,7 @@ function UUF:SpawnUnitFrame(unit)
 end
 
 function UUF:UpdateUnitFrame(unitFrame, unit)
-    local UnitDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)]
+    local UnitDB = UUF:GetUnitDB(unitFrame, unit)
     local isPlayer = unit == "player"
     local isTarget = unit == "target"
     local isFocus = unit == "focus"
@@ -226,4 +238,5 @@ function UUF:UpdateAllUnitFrames()
 	UUF:UpdateBossFrames()
 	UUF:UpdateGroupFrame("party")
 	UUF:UpdateGroupFrame("raid")
+	UUF:UpdateAugmentationRaidFrames()
 end

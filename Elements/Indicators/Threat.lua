@@ -22,21 +22,8 @@ function UUF:CreateThreatIndicatorOverlay(unitFrame, unit)
 	return ThreatIndicator
 end
 
-local function GetThreatDB(unit)
-	local normalizedUnit = UUF:GetNormalizedUnit(unit)
-	local UnitDB = UUF.db.profile.Units[normalizedUnit]
-	local DefaultThreatDB = UUF:GetDefaultDB().profile.Units[normalizedUnit].Indicators.Threat
-	if not DefaultThreatDB then return end
-
-	UnitDB.Indicators.Threat = UnitDB.Indicators.Threat or {}
-	for key, value in pairs(DefaultThreatDB) do
-		if UnitDB.Indicators.Threat[key] == nil then UnitDB.Indicators.Threat[key] = type(value) == "table" and {unpack(value)} or value end
-	end
-	return UnitDB.Indicators.Threat
-end
-
 function UUF:CreateUnitThreatIndicator(unitFrame, unit)
-	local ThreatDB = GetThreatDB(unit)
+	local ThreatDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Threat
 	if not ThreatDB then return end
 
 	local ThreatIndicator = UUF:CreateThreatIndicatorOverlay(unitFrame, unit)
@@ -50,7 +37,7 @@ function UUF:CreateUnitThreatIndicator(unitFrame, unit)
 end
 
 function UUF:UpdateUnitThreatIndicator(unitFrame, unit)
-	local ThreatDB = GetThreatDB(unit)
+	local ThreatDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Threat
 	if not ThreatDB then return end
 
 	if ThreatDB.Enabled then

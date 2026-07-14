@@ -31,8 +31,8 @@ local function SetHealthBackgroundColour(unitFrame, unit, HealthBarDB, forceUpda
 end
 
 function UUF:CreateUnitHealthBar(unitFrame, unit)
-    local FrameDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Frame
-    local HealthBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealthBar
+    local FrameDB = UUF:GetUnitDB(unitFrame, unit).Frame
+    local HealthBarDB = UUF:GetUnitDB(unitFrame, unit).HealthBar
     local unitContainer = unitFrame.Container
 
     if not unitFrame.HealthBar then
@@ -59,7 +59,7 @@ function UUF:CreateUnitHealthBar(unitFrame, unit)
         HealthBar.smoothing = HealthBarDB.Smooth ~= false and StatusBarInterpolation.ExponentialEaseOut or StatusBarInterpolation.Immediate
 		HealthBar.PostUpdateColor = function(healthBar, unit, colour)
 			if colour and colour ~= oUF.colors.health then return end
-			local currentHealthBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealthBar
+			local currentHealthBarDB = UUF:GetUnitDB(unitFrame, unit).HealthBar
 			if unit == "pet" and currentHealthBarDB.ColourByClass then
 				local unitColour = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 				if unitColour then healthBar:SetStatusBarColor(unitColour.r, unitColour.g, unitColour.b, currentHealthBarDB.ForegroundOpacity) return end
@@ -96,19 +96,19 @@ function UUF:CreateUnitHealthBar(unitFrame, unit)
 end
 
 function UUF:UpdateUnitHealthBar(unitFrame, unit)
-    local FrameDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Frame
-    local HealthBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealthBar
-    local DispelHighlightDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealthBar.DispelHighlight
+    local FrameDB = UUF:GetUnitDB(unitFrame, unit).Frame
+    local HealthBarDB = UUF:GetUnitDB(unitFrame, unit).HealthBar
+    local DispelHighlightDB = UUF:GetUnitDB(unitFrame, unit).HealthBar.DispelHighlight
 
     if unitFrame then
         unitFrame:ClearAllPoints()
         unitFrame:SetSize(FrameDB.Width, FrameDB.Height)
         if unit == "player" or unit == "target" then
-            local parentFrame = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].HealthBar.AnchorToCooldownViewer and _G["UUF_CDMAnchor"] or UIParent
+            local parentFrame = UUF:GetUnitDB(unitFrame, unit).HealthBar.AnchorToCooldownViewer and _G["UUF_CDMAnchor"] or UIParent
             UUF[unit:upper()]:SetPoint(FrameDB.Layout[1], parentFrame, FrameDB.Layout[2], FrameDB.Layout[3], FrameDB.Layout[4])
             UUF[unit:upper()]:SetSize(FrameDB.Width, FrameDB.Height)
         elseif unit == "targettarget" or unit == "focus" or unit == "focustarget" or unit == "pet" then
-            local parentFrame = _G[UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Frame.AnchorParent] or UIParent
+            local parentFrame = _G[UUF:GetUnitDB(unitFrame, unit).Frame.AnchorParent] or UIParent
             UUF[unit:upper()]:SetPoint(FrameDB.Layout[1], parentFrame, FrameDB.Layout[2], FrameDB.Layout[3], FrameDB.Layout[4])
             UUF[unit:upper()]:SetSize(FrameDB.Width, FrameDB.Height)
         end

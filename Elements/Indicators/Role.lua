@@ -1,7 +1,7 @@
 local _, UUF = ...
 
 function UUF:CreateUnitRoleIndicator(unitFrame, unit)
-	local RoleDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Role
+	local RoleDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Role
 	if not RoleDB then return end
 
 	local RoleIndicator = unitFrame.HighLevelContainer:CreateTexture(UUF:FetchFrameName(unit) .. "_RoleIndicator", "OVERLAY")
@@ -28,7 +28,7 @@ function UUF:CreateUnitRoleIndicator(unitFrame, unit)
 end
 
 function UUF:UpdateUnitRoleIndicator(unitFrame, unit)
-	local RoleDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.Role
+	local RoleDB = UUF:GetUnitDB(unitFrame, unit).Indicators.Role
 	if not RoleDB then return end
 
 	if RoleDB.Enabled then

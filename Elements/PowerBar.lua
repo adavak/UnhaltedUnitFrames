@@ -11,7 +11,7 @@ end
 
 local function CreatePowerBarPostUpdateColor(unitFrame, unit)
     return function(element, _, color, altR, altG, altB)
-        local PowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].PowerBar
+        local PowerBarDB = UUF:GetUnitDB(unitFrame, unit).PowerBar
         if not PowerBarDB.ColourBackgroundByType then return end
         if not element.Background then return end
 
@@ -33,12 +33,12 @@ local function CreatePowerBarPostUpdateColor(unitFrame, unit)
 end
 
 local function LayoutUnitPowerBar(unitFrame, unit, width)
-    local PowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].PowerBar
+    local PowerBarDB = UUF:GetUnitDB(unitFrame, unit).PowerBar
     local powerBar = unitFrame.Power
     if not powerBar then return end
 
-    width = width and width > 0 and width or UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Frame.Width
-    local position = UUF:GetConfiguredPowerBarPosition(unit)
+    width = width and width > 0 and width or UUF:GetUnitDB(unitFrame, unit).Frame.Width
+	local position = UUF:GetConfiguredPowerBarPosition(unit, unitFrame)
     local isTopAnchored = position == "TOP"
     local anchorPoint = isTopAnchored and "TOPLEFT" or "BOTTOMLEFT"
     local anchorY = isTopAnchored and -1 or 1
@@ -66,8 +66,8 @@ local function LayoutUnitPowerBar(unitFrame, unit, width)
 end
 
 function UUF:CreateUnitPowerBar(unitFrame, unit)
-    local FrameDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Frame
-    local PowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].PowerBar
+    local FrameDB = UUF:GetUnitDB(unitFrame, unit).Frame
+    local PowerBarDB = UUF:GetUnitDB(unitFrame, unit).PowerBar
     local unitContainer = unitFrame.Container
 
     local PowerBar = CreateFrame("StatusBar", UUF:FetchFrameName(unit) .. "_PowerBar", unitContainer)
@@ -122,8 +122,8 @@ function UUF:CreateUnitPowerBar(unitFrame, unit)
 end
 
 function UUF:UpdateUnitPowerBar(unitFrame, unit)
-    local FrameDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Frame
-    local PowerBarDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].PowerBar
+    local FrameDB = UUF:GetUnitDB(unitFrame, unit).Frame
+    local PowerBarDB = UUF:GetUnitDB(unitFrame, unit).PowerBar
 
     if ShouldShowUnitPowerBar(unitFrame, unit, PowerBarDB) then
 		unitFrame.Power = unitFrame.Power or unitFrame.PowerBar or UUF:CreateUnitPowerBar(unitFrame, unit)

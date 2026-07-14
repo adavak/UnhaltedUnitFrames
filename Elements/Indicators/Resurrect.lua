@@ -1,7 +1,7 @@
 local _, UUF = ...
 
 function UUF:CreateUnitResurrectIndicator(unitFrame, unit)
-	local ResurrectDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.ResurrectIndicator
+	local ResurrectDB = UUF:GetUnitDB(unitFrame, unit).Indicators.ResurrectIndicator
 	if not ResurrectDB then return end
 
 	local ResurrectIndicator = unitFrame.HighLevelContainer:CreateTexture(UUF:FetchFrameName(unit) .. "_ResurrectIndicator", "OVERLAY")
@@ -19,7 +19,7 @@ function UUF:CreateUnitResurrectIndicator(unitFrame, unit)
 end
 
 function UUF:UpdateUnitResurrectIndicator(unitFrame, unit)
-	local ResurrectDB = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].Indicators.ResurrectIndicator
+	local ResurrectDB = UUF:GetUnitDB(unitFrame, unit).Indicators.ResurrectIndicator
 	if not ResurrectDB then return end
 
 	if ResurrectDB.Enabled then

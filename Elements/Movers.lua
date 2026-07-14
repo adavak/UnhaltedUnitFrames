@@ -1,10 +1,10 @@
 local _, UUF = ...
 
 local function RefreshMover(frameMover)
-	local unitFrame = frameMover.unit == "boss" and UUF.BOSS1 or frameMover.unit == "party" and UUF.PARTY_CONTAINER or frameMover.unit == "raid" and UUF.RAID_CONTAINER or UUF[frameMover.unit:upper()]
+	local unitFrame = frameMover.unit == "boss" and UUF.BOSS1 or frameMover.unit == "party" and UUF.PARTY_CONTAINER or frameMover.unit == "raid" and UUF.RAID_CONTAINER or frameMover.unit == "augmentation" and UUF.AUGMENTATION_RAID_CONTAINER or UUF[frameMover.unit:upper()]
 	if not unitFrame then return end
 	frameMover:ClearAllPoints()
-	if frameMover.unit == "party" or frameMover.unit == "raid" then
+	if frameMover.unit == "party" or frameMover.unit == "raid" or frameMover.unit == "augmentation" then
 		frameMover:SetPoint("TOPLEFT", unitFrame, "TOPLEFT")
 		frameMover:SetPoint("BOTTOMRIGHT", unitFrame, "BOTTOMRIGHT")
 	elseif frameMover.unit == "boss" then
@@ -24,7 +24,7 @@ end
 local function StopMoving(frameMover)
 	frameMover:StopMovingOrSizing()
 
-	local unitFrame = frameMover.unit == "boss" and UUF.BOSS1 or frameMover.unit == "party" and UUF.PARTY_CONTAINER or frameMover.unit == "raid" and UUF.RAID_CONTAINER or UUF[frameMover.unit:upper()]
+	local unitFrame = frameMover.unit == "boss" and UUF.BOSS1 or frameMover.unit == "party" and UUF.PARTY_CONTAINER or frameMover.unit == "raid" and UUF.RAID_CONTAINER or frameMover.unit == "augmentation" and UUF.AUGMENTATION_RAID_CONTAINER or UUF[frameMover.unit:upper()]
 	if not unitFrame then return end
 
 	local moverX, moverY = frameMover:GetCenter()
@@ -32,7 +32,7 @@ local function StopMoving(frameMover)
 	FrameDB.Layout[3] = FrameDB.Layout[3] + moverX - frameMover.startX
 	FrameDB.Layout[4] = FrameDB.Layout[4] + moverY - frameMover.startY
 
-	if frameMover.unit == "boss" then UUF:LayoutBossFrames() elseif frameMover.unit == "party" or frameMover.unit == "raid" then UUF:LayoutGroupFrames(frameMover.unit) else UUF:UpdateUnitFrame(unitFrame, frameMover.unit) end
+	if frameMover.unit == "boss" then UUF:LayoutBossFrames() elseif frameMover.unit == "augmentation" then UUF:LayoutAugmentationRaidFrames() elseif frameMover.unit == "party" or frameMover.unit == "raid" then UUF:LayoutGroupFrames(frameMover.unit) else UUF:UpdateUnitFrame(unitFrame, frameMover.unit) end
 	RefreshMover(frameMover)
 end
 
@@ -58,7 +58,7 @@ function UUF:CreateMover(unit)
 	frameMover.Text = frameMover:CreateFontString(nil, "OVERLAY")
 	frameMover.Text:SetPoint("CENTER")
 	frameMover.Text:SetFont(UUF.Media.Font, 12, "OUTLINE, SLUG")
-	frameMover.Text:SetText(unit == "targettarget" and "Target of Target" or unit == "focustarget" and "Focus Target" or unit:gsub("^%l", string.upper))
+	frameMover.Text:SetText(unit == "targettarget" and "Target of Target" or unit == "focustarget" and "Focus Target" or unit == "augmentation" and "Augmentation" or unit:gsub("^%l", string.upper))
 	frameMover.Text:SetTextColor(255/255, 255/255, 255/255, 1)
 
 	UUF.MOVERS[unit] = frameMover
@@ -68,6 +68,6 @@ end
 function UUF:ToggleMovers()
 	if InCombatLockdown() then UUF:PrettyPrint("Movers cannot be toggled while in combat.") return UUF.MOVERS_UNLOCKED end
 	UUF.MOVERS_UNLOCKED = not UUF.MOVERS_UNLOCKED
-	for _, mover in pairs(UUF.MOVERS or {}) do mover:SetShown(UUF.MOVERS_UNLOCKED) end
+	for _, mover in pairs(UUF.MOVERS or {}) do mover:SetShown(UUF.MOVERS_UNLOCKED and (mover.unit ~= "augmentation" or UUF:IsAugmentationEvoker())) end
 	return UUF.MOVERS_UNLOCKED
 end
