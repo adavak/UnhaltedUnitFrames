@@ -122,17 +122,19 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
         unitFrame.Castbar:HookScript("OnHide", function() CastBarContainer:Hide() end)
 
         unitFrame.Castbar.PostCastStart = function(frameCastBar)
-            SetCastBarColour(frameCastBar, unit, CastBarDB)
+			local currentCastBarDB = UUF:GetUnitDB(unitFrame, unit).CastBar
+			local currentSpellNameDB = currentCastBarDB.Text.SpellName
+			SetCastBarColour(frameCastBar, unit, currentCastBarDB)
 
             local spellInfo = C_Spell.GetSpellInfo(frameCastBar.spellID)
             local spellName = spellInfo and spellInfo.name
             if spellName then
                 if not UUF:IsSecretValue(spellName) then
-                    if SpellNameDB.MaxChars and SpellNameDB.MaxChars > 0 then spellName = string.format("%." .. SpellNameDB.MaxChars .. "s", spellName) end
+					if currentSpellNameDB.MaxChars and currentSpellNameDB.MaxChars > 0 then spellName = string.format("%." .. currentSpellNameDB.MaxChars .. "s", spellName) end
                     spellName = UUF:CleanTruncateUTF8String(spellName)
                 end
-                local targetName = CastBarDB.ShowTarget and not UnitSpellTargetName and UnitName(unit .. "target")
-                if CastBarDB.ShowTarget and UnitSpellTargetName and (frameCastBar.casting or (frameCastBar.channeling or frameCastBar.empowering) and UnitShouldDisplaySpellTargetName(unit)) then targetName = UnitSpellTargetName(unit) end
+				local targetName = currentCastBarDB.ShowTarget and not UnitSpellTargetName and UnitName(unit .. "target")
+				if currentCastBarDB.ShowTarget and UnitSpellTargetName and (frameCastBar.casting or (frameCastBar.channeling or frameCastBar.empowering) and UnitShouldDisplaySpellTargetName(unit)) then targetName = UnitSpellTargetName(unit) end
                 if UUF:IsSecretValue(targetName) or targetName then frameCastBar.Text:SetFormattedText("%s » %s", spellName, targetName) else frameCastBar.Text:SetText(spellName) end
             else
                 frameCastBar.Text:SetText("")
@@ -144,10 +146,10 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
 
         unitFrame.Castbar.PostCastInterruptible = function(frameCastBar)
             if frameCastBar.NotInterruptibleOverlay and frameCastBar.notInterruptible ~= nil then frameCastBar.NotInterruptibleOverlay:SetAlphaFromBoolean(frameCastBar.notInterruptible, 1, 0) end
-            SetCastBarColour(frameCastBar, unit, CastBarDB)
+			SetCastBarColour(frameCastBar, unit, UUF:GetUnitDB(unitFrame, unit).CastBar)
         end
         unitFrame.Castbar.PostCastFail = function(frameCastBar)
-            frameCastBar:SetStatusBarColor(unpack(CastBarDB.InterruptedFailedColour))
+			frameCastBar:SetStatusBarColor(unpack(UUF:GetUnitDB(unitFrame, unit).CastBar.InterruptedFailedColour))
             if frameCastBar.NotInterruptibleOverlay then frameCastBar.NotInterruptibleOverlay:SetAlpha(0) end
         end
         unitFrame.Castbar.PostCastInterrupted = unitFrame.Castbar.PostCastFail

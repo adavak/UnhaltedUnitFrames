@@ -248,7 +248,7 @@ function UUF:UpdateUnitAuras(unitFrame, unit)
             unitFrame.CustomAuraContainer.filter = CustomAuraFilter
             UUF:ConfigureAuraSorting(unitFrame.CustomAuraContainer, CustomDB.Sorting)
             unitFrame.CustomAuraContainer.FilterAura = function(_, filterUnit, aura, auraType)
-                return FilterAura(CustomDB, filterUnit, aura, auraType)
+				return FilterAura(UUF:GetUnitDB(unitFrame, unit).Auras.Custom, filterUnit, aura, auraType)
             end
             unitFrame.CustomAuraContainer.createdButtons = unitFrame.CustomAuras.createdButtons or 0
             unitFrame.CustomAuraContainer.anchoredButtons = unitFrame.CustomAuras.anchoredButtons or 0
@@ -332,7 +332,7 @@ function UUF:CreateUnitAuras(unitFrame, unit)
 		unitFrame.BuffContainer.filter = "HELPFUL"
 		UUF:ConfigureAuraSorting(unitFrame.BuffContainer, BuffsDB.Sorting)
 		unitFrame.BuffContainer.FilterAura = function(_, filterUnit, aura)
-			return FilterAura(BuffsDB, filterUnit, aura, "HELPFUL")
+			return FilterAura(UUF:GetUnitDB(unitFrame, unit).Auras.Buffs, filterUnit, aura, "HELPFUL")
 		end
 		unitFrame.BuffContainer.PostCreateButton = function(_, button) StyleAuras(_, button, unit, "HELPFUL") end
 		unitFrame.BuffContainer.PostUpdateButton = function(_, button) StyleAuras(_, button, unit, "HELPFUL", true) end
@@ -376,7 +376,7 @@ function UUF:CreateUnitAuras(unitFrame, unit)
 		unitFrame.DebuffContainer.filter = "HARMFUL"
 		UUF:ConfigureAuraSorting(unitFrame.DebuffContainer, DebuffsDB.Sorting)
 		unitFrame.DebuffContainer.FilterAura = function(_, filterUnit, aura)
-			return FilterAura(DebuffsDB, filterUnit, aura, "HARMFUL")
+			return FilterAura(UUF:GetUnitDB(unitFrame, unit).Auras.Debuffs, filterUnit, aura, "HARMFUL")
 		end
 
 		unitFrame.DebuffContainer.anchoredButtons = 0
@@ -423,7 +423,7 @@ function UUF:CreateUnitAuras(unitFrame, unit)
 		unitFrame.CustomAuraContainer.filter = CustomAuraFilter
 		UUF:ConfigureAuraSorting(unitFrame.CustomAuraContainer, CustomDB.Sorting)
 		unitFrame.CustomAuraContainer.FilterAura = function(_, filterUnit, aura, auraType)
-			return FilterAura(CustomDB, filterUnit, aura, auraType)
+			return FilterAura(UUF:GetUnitDB(unitFrame, unit).Auras.Custom, filterUnit, aura, auraType)
 		end
 		unitFrame.CustomAuraContainer.anchoredButtons = 0
 		unitFrame.CustomAuraContainer.createdButtons = 0
