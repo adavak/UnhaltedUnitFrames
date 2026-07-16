@@ -1,13 +1,6 @@
 local _, UUF = ...
 local UnhaltedUnitFrames = LibStub("AceAddon-3.0"):NewAddon("UnhaltedUnitFrames")
 
-function UUF:RefreshProfiles()
-	UUF:ResolveLSM()
-	UUF:LoadCustomColours()
-	UUF:UpdateAllUnitFrames()
-	UUF:ForEachUnitDB(function(_, unit) UUF:UpdateUnitTags(unit) end)
-end
-
 function UnhaltedUnitFrames:OnInitialize()
     UUF.db = LibStub("AceDB-3.0"):New("UUFDB", UUF:GetDefaultDB(), true)
     UUF.LDS:EnhanceDatabase(UUF.db, "UnhaltedUnitFrames")
