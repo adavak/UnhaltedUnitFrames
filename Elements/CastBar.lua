@@ -79,7 +79,7 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
         CastBar:SetPoint("BOTTOMRIGHT", CastBarContainer, "BOTTOMRIGHT", -1, 1)
     end
 
-    local SpellNameText = CastBar:CreateFontString(UUF:FetchFrameName(unit) .. "_CastBarSpellNameText", "OVERLAY")
+    local SpellNameText = CastBar:CreateFontString(UUF:FetchFrameName(unit) .. "_CastBarSpellNameText", "OVERLAY", "GameFontNormal")
     SpellNameText:ClearAllPoints()
     SpellNameText:SetPoint(SpellNameDB.Layout[1], CastBar, SpellNameDB.Layout[2], SpellNameDB.Layout[3], SpellNameDB.Layout[4])
     SpellNameText:SetFont(UUF.Media.Font, SpellNameDB.FontSize, GeneralDB.Fonts.FontFlag)
@@ -93,7 +93,7 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
     end
     SpellNameText:SetJustifyH(UUF:SetJustification(SpellNameDB.Layout[1]))
 
-    local DurationText = CastBar:CreateFontString(UUF:FetchFrameName(unit) .. "_CastBarDurationText", "OVERLAY")
+    local DurationText = CastBar:CreateFontString(UUF:FetchFrameName(unit) .. "_CastBarDurationText", "OVERLAY", "GameFontNormal")
     DurationText:ClearAllPoints()
     DurationText:SetPoint(DurationDB.Layout[1], CastBar, DurationDB.Layout[2], DurationDB.Layout[3], DurationDB.Layout[4])
     DurationText:SetFont(UUF.Media.Font, DurationDB.FontSize, GeneralDB.Fonts.FontFlag)
