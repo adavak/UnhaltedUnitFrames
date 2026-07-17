@@ -223,7 +223,14 @@ end
 oUF.Tags.Methods["perhp"] = function(unit)
     if not unit or not UnitExists(unit) then return "" end
     local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
-    local unitStatus = UnitIsDead(unit) and DEAD or UnitIsGhost(unit) and L["Ghost"] or not UnitIsConnected(unit) and (PLAYER_OFFLINE or "Offline")
+    local deadText = DEAD or "Dead"
+    local offlineText = PLAYER_OFFLINE or "Offline"
+    local isDead, isGhost, isConnected = UnitIsDead(unit), UnitIsGhost(unit), UnitIsConnected(unit)
+    local unitStatus
+    if not UUF:IsSecretValue(isDead) and isDead then unitStatus = deadText
+    elseif not UUF:IsSecretValue(isGhost) and isGhost then unitStatus = L["Ghost"]
+    elseif not UUF:IsSecretValue(isConnected) and not isConnected then unitStatus = offlineText
+    end
     if unitStatus then
         return unitStatus
     else
@@ -234,7 +241,14 @@ end
 oUF.Tags.Methods["perhp-with-sign"] = function(unit)
     if not unit or not UnitExists(unit) then return "" end
     local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
-    local unitStatus = UnitIsDead(unit) and DEAD or UnitIsGhost(unit) and L["Ghost"] or not UnitIsConnected(unit) and (PLAYER_OFFLINE or "Offline")
+    local deadText = DEAD or "Dead"
+    local offlineText = PLAYER_OFFLINE or "Offline"
+    local isDead, isGhost, isConnected = UnitIsDead(unit), UnitIsGhost(unit), UnitIsConnected(unit)
+    local unitStatus
+    if not UUF:IsSecretValue(isDead) and isDead then unitStatus = deadText
+    elseif not UUF:IsSecretValue(isGhost) and isGhost then unitStatus = L["Ghost"]
+    elseif not UUF:IsSecretValue(isConnected) and not isConnected then unitStatus = offlineText
+    end
     if unitStatus then
         return unitStatus
     else
@@ -254,7 +268,14 @@ end
 oUF.Tags.Methods["curhp:abbr"] = function(unit)
     if not unit or not UnitExists(unit) then return "" end
     local unitHealth = UnitHealth(unit)
-    local unitStatus = UnitIsDead(unit) and DEAD or UnitIsGhost(unit) and L["Ghost"] or not UnitIsConnected(unit) and (PLAYER_OFFLINE or "Offline")
+    local deadText = DEAD or "Dead"
+    local offlineText = PLAYER_OFFLINE or "Offline"
+    local isDead, isGhost, isConnected = UnitIsDead(unit), UnitIsGhost(unit), UnitIsConnected(unit)
+    local unitStatus
+    if not UUF:IsSecretValue(isDead) and isDead then unitStatus = deadText
+    elseif not UUF:IsSecretValue(isGhost) and isGhost then unitStatus = L["Ghost"]
+    elseif not UUF:IsSecretValue(isConnected) and not isConnected then unitStatus = offlineText
+    end
     if unitStatus then
         return unitStatus
     else
@@ -267,7 +288,14 @@ oUF.Tags.Methods["curhpperhp"] = function(unit)
     local unitHealth = UnitHealth(unit)
     local unitMaxHealth = UnitHealthMax(unit)
     local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
-    local unitStatus = UnitIsDead(unit) and DEAD or UnitIsGhost(unit) and L["Ghost"] or not UnitIsConnected(unit) and (PLAYER_OFFLINE or "Offline")
+    local deadText = DEAD or "Dead"
+    local offlineText = PLAYER_OFFLINE or "Offline"
+    local isDead, isGhost, isConnected = UnitIsDead(unit), UnitIsGhost(unit), UnitIsConnected(unit)
+    local unitStatus
+    if not UUF:IsSecretValue(isDead) and isDead then unitStatus = deadText
+    elseif not UUF:IsSecretValue(isGhost) and isGhost then unitStatus = L["Ghost"]
+    elseif not UUF:IsSecretValue(isConnected) and not isConnected then unitStatus = offlineText
+    end
     if unitStatus then
         return unitStatus
     else
@@ -288,7 +316,14 @@ oUF.Tags.Methods["curhpperhp:abbr"] = function(unit)
     local unitHealth = UnitHealth(unit)
     local unitMaxHealth = UnitHealthMax(unit)
     local unitHealthPercent = UnitHealthPercent(unit, false, CurveConstants.ScaleTo100)
-    local unitStatus = UnitIsDead(unit) and DEAD or UnitIsGhost(unit) and L["Ghost"] or not UnitIsConnected(unit) and (PLAYER_OFFLINE or "Offline")
+    local deadText = DEAD or "Dead"
+    local offlineText = PLAYER_OFFLINE or "Offline"
+    local isDead, isGhost, isConnected = UnitIsDead(unit), UnitIsGhost(unit), UnitIsConnected(unit)
+    local unitStatus
+    if not UUF:IsSecretValue(isDead) and isDead then unitStatus = deadText
+    elseif not UUF:IsSecretValue(isGhost) and isGhost then unitStatus = L["Ghost"]
+    elseif not UUF:IsSecretValue(isConnected) and not isConnected then unitStatus = offlineText
+    end
     if unitStatus then
         return unitStatus
     else
