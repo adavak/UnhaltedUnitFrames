@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("UnhaltedUnitFrames", "zhCN")
+﻿local L = LibStub("AceLocale-3.0"):NewLocale("UnhaltedUnitFrames", "zhCN")
 if not L then return end
 
 
@@ -347,7 +347,6 @@ L["None"] = "无"
 L["Not Cancelable"] = "不可取消"
 L["Not Interruptible"] = "不可打断"
 L["Not Interruptible Colour"] = "不可打断颜色"
-L["Offline"] = "离线"
 L["Offset X"] = "X 偏移"
 L["Offset Y"] = "Y 偏移"
 L["Only auras cast by the player, their pet, or their vehicle."] = "仅显示由玩家、其宠物或其载具施放的光环。"
