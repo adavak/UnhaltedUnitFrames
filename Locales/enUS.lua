@@ -1,4 +1,4 @@
-﻿local L = LibStub("AceLocale-3.0"):NewLocale("UnhaltedUnitFrames", "enUS", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("UnhaltedUnitFrames", "enUS", true)
 if not L then return end
 
 
@@ -242,6 +242,7 @@ L["Fullscreen Dialog"] = "Fullscreen Dialog"
 L["Fury"] = "Fury"
 L["G%s"] = "G%s"
 L["General"] = "General"
+L["Ghost"] = "Ghost"
 L["Global"] = "Global"
 L["Global Profile Settings"] = "Global Profile Settings"
 L["Global Profile..."] = "Global Profile..."
@@ -346,6 +347,7 @@ L["None"] = "None"
 L["Not Cancelable"] = "Not Cancelable"
 L["Not Interruptible"] = "Not Interruptible"
 L["Not Interruptible Colour"] = "Not Interruptible Colour"
+L["Offline"] = "Offline"
 L["Offset X"] = "Offset X"
 L["Offset Y"] = "Offset Y"
 L["Only auras cast by the player, their pet, or their vehicle."] = "Only auras cast by the player, their pet, or their vehicle."
