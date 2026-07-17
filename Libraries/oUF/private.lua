@@ -90,7 +90,47 @@ end
 local availableAuraContainers = {}
 local function createContainer(parent, index)
 	local containerName = '$parentAuraContainer' .. index
-	return CreateFrame('AuraContainer', containerName, parent, 'CustomAuraContainerTemplate')
+	-- WoW 12.0.x supports AuraContainer widget; 12.1+ removed it
+	local success, container = pcall(CreateFrame, 'AuraContainer', containerName, parent)
+	if success and container then
+		return container
+	end
+	-- Fallback: Frame stub for WoW 12.1+ (AuraContainer removed)
+	container = CreateFrame('Frame', containerName, parent)
+	container.AddGroup = function() return '' end
+	container.AddSlot = function() return '' end
+	container.UpdateAllAuras = function() end
+	container.SetUnit = function() end
+	container.GetUnit = function() return nil end
+	container.SetAuraLayoutRowWidth = function() end
+	container.SetAuraLayoutAnchorPoint = function() end
+	container.SetAuraLayoutGrowthDirection = function() end
+	container.SetAuraLayoutPadding = function() end
+	container.SetAuraProcessingPolicy = function() end
+	container.SetAuraGroupMaxFrameCount = function() end
+	container.SetAuraGroupCandidateFilters = function() end
+	container.SetAuraGroupLayout = function() end
+	container.SetAuraGroupSortMethod = function() end
+	container.SetAuraSlotCandidateFilters = function() end
+	container.SetAuraGroupAnchor = function() end
+	container.SetAuraSlotSlot = function() end
+	container.SetAuraSlotOffset = function() end
+	container.SetAuraSlotFrameLevel = function() end
+	container.SetAuraButtonShowStates = function() end
+	container.SetAuraButtonOccluded = function() end
+	container.SetAuraGroupWrap = function() end
+	container.SetAuraGroupGrowthDirection = function() end
+	container.ClearAuraSlots = function() end
+	container.SetAuraButtonFont = function() end
+	container.SetAuraButtonFontShadow = function() end
+	container.SetAuraButtonFontJustifyH = function() end
+	container.SetAuraButtonShowCooldownText = function() end
+	container.SetAuraButtonDurationFormat = function() end
+	container.SetAuraButtonBorderShown = function() end
+	container.SetAuraButtonBorderStyle = function() end
+	container.SetAuraButtonBorderColor = function() end
+	container.GetAuraLayoutRowWidth = function() return 120 end
+	return container
 end
 
 function Private.AllocateAuraContainers(frameNamePrefix, numFrames, numContainers)
@@ -140,3 +180,4 @@ function Private.GetOrCreateAuraContainer(frame)
 	availableAuraContainers[frameName][container] = false -- mark as unavailable
 	return container
 end
+

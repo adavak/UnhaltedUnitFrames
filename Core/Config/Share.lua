@@ -1,4 +1,5 @@
 local _, UUF = ...
+local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 local Serialize = LibStub:GetLibrary("AceSerializer-3.0")
 local Compress = LibStub:GetLibrary("LibDeflate")
 local UUF_IMPORT_PREFIX = "!UUF_"
@@ -123,7 +124,7 @@ end
 function UUF:ImportSavedVariables(encodedInfo, profileName)
     local data = ParseEncodedProfile(encodedInfo)
     if not data then
-        UUF:PrettyPrint("Invalid Import String.")
+        UUF:PrettyPrint(L["Invalid Import String."])
         return
     end
 
@@ -132,9 +133,9 @@ function UUF:ImportSavedVariables(encodedInfo, profileName)
         ApplyImportedProfileToCurrent(data.profile)
     else
         StaticPopupDialogs["UUF_IMPORT_NEW_PROFILE"] = {
-            text = UUF.ADDON_NAME.." - ".."Profile Name?",
-            button1 = "Import",
-            button2 = "Cancel",
+            text = UUF.ADDON_NAME.." - "..L["Profile Name?"],
+            button1 = L["Import"],
+            button2 = L["Cancel"],
             hasEditBox = true,
             timeout = 0,
             whileDead = true,
@@ -144,7 +145,7 @@ function UUF:ImportSavedVariables(encodedInfo, profileName)
                 local editBox = self.EditBox
                 local newProfileName = editBox:GetText() or string.format("Imported_%s-%s-%s", date("%d"), date("%m"), date("%Y"))
                 if not newProfileName or newProfileName == "" then
-                    UUF:PrettyPrint("Please enter a valid profile name.")
+                    UUF:PrettyPrint(L["Please enter a valid profile name."])
                     return
                 end
 
@@ -168,7 +169,7 @@ end
 function UUFG:ImportUUF(importString, profileKey)
     local profileData = ParseEncodedProfile(importString)
     if not profileData then
-        UUF:PrettyPrint("Invalid Import String.")
+        UUF:PrettyPrint(L["Invalid Import String."])
         return
     end
 

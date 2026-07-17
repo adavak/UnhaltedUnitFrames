@@ -13,6 +13,10 @@
 # Load Libraries
 Libraries/Init.xml
 
+# Load Locales
+Locales/enUS.lua
+Locales/zhCN.lua
+
 # Load Elements
 Elements/Init.xml
 

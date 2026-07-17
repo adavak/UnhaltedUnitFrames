@@ -1,4 +1,5 @@
 local _, UUF = ...
+local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 
 local function SetCastBarColour(castBar, unit, CastBarDB)
 	local r, g, b, a
@@ -135,7 +136,7 @@ function UUF:CreateUnitCastBar(unitFrame, unit)
                 end
 				local targetName = currentCastBarDB.ShowTarget and not UnitSpellTargetName and UnitName(unit .. "target")
 				if currentCastBarDB.ShowTarget and UnitSpellTargetName and (frameCastBar.casting or (frameCastBar.channeling or frameCastBar.empowering) and UnitShouldDisplaySpellTargetName(unit)) then targetName = UnitSpellTargetName(unit) end
-                if UUF:IsSecretValue(targetName) or targetName then frameCastBar.Text:SetFormattedText("%s » %s", spellName, targetName) else frameCastBar.Text:SetText(spellName) end
+				if UUF:IsSecretValue(targetName) or targetName then frameCastBar.Text:SetFormattedText(string.format(L["%s » %s"], spellName, targetName)) else frameCastBar.Text:SetText(spellName) end
             else
                 frameCastBar.Text:SetText("")
             end
@@ -301,11 +302,11 @@ function UUF:CreateTestCastBar(unitFrame, unit)
             CastBarContainer:SetFrameStrata(CastBarDB.FrameStrata)
             unitFrame.Castbar:Show()
             unitFrame.Castbar.Background:Show()
-            local spellName = "Ethereal Portal"
+            local spellName = L["Ethereal Portal"]
             local maxChars = UUF.db.profile.Units[UUF:GetNormalizedUnit(unit)].CastBar.Text.SpellName.MaxChars
             if maxChars and maxChars > 0 then spellName = string.format("%." .. maxChars .. "s", spellName) end
             spellName = UUF:CleanTruncateUTF8String(spellName)
-            if CastBarDB.ShowTarget then unitFrame.Castbar.Text:SetFormattedText("%s » %s", spellName, "Target") else unitFrame.Castbar.Text:SetText(spellName) end
+            if CastBarDB.ShowTarget then unitFrame.Castbar.Text:SetFormattedText(string.format(L["%s » %s"], spellName, L["Target"])) else unitFrame.Castbar.Text:SetText(spellName) end
             unitFrame.Castbar.Time:SetText("2.5")
             unitFrame.Castbar:SetMinMaxValues(0, 1000)
             unitFrame.Castbar:SetValue(500)

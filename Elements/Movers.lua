@@ -1,4 +1,5 @@
 local _, UUF = ...
+local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 
 local function RefreshMover(frameMover)
 	local unitFrame = frameMover.unit == "boss" and UUF.BOSS1 or frameMover.unit == "party" and UUF.PARTY_CONTAINER or frameMover.unit == "raid" and UUF.RAID_CONTAINER or frameMover.unit == "augmentation" and UUF.AUGMENTATION_RAID_CONTAINER or UUF[frameMover.unit:upper()]
@@ -58,7 +59,7 @@ function UUF:CreateMover(unit)
 	frameMover.Text = frameMover:CreateFontString(nil, "OVERLAY")
 	frameMover.Text:SetPoint("CENTER")
 	frameMover.Text:SetFont(UUF.Media.Font, 12, "OUTLINE, SLUG")
-	frameMover.Text:SetText(unit == "targettarget" and "Target of Target" or unit == "focustarget" and "Focus Target" or unit == "augmentation" and "Augmentation" or unit:gsub("^%l", string.upper))
+	frameMover.Text:SetText(unit == "targettarget" and L["Target of Target"] or unit == "focustarget" and L["Focus Target"] or unit == "augmentation" and L["Augmentation"] or unit:gsub("^%l", string.upper))
 	frameMover.Text:SetTextColor(255/255, 255/255, 255/255, 1)
 
 	UUF.MOVERS[unit] = frameMover
@@ -66,7 +67,7 @@ function UUF:CreateMover(unit)
 end
 
 function UUF:ToggleMovers()
-	if InCombatLockdown() then UUF:PrettyPrint("Movers cannot be toggled while in combat.") return UUF.MOVERS_UNLOCKED end
+	if InCombatLockdown() then UUF:PrettyPrint(L["Movers cannot be toggled while in combat."]) return UUF.MOVERS_UNLOCKED end
 	UUF.MOVERS_UNLOCKED = not UUF.MOVERS_UNLOCKED
 	for _, mover in pairs(UUF.MOVERS or {}) do mover:SetShown(UUF.MOVERS_UNLOCKED and (mover.unit ~= "augmentation" or UUF:IsAugmentationEvoker())) end
 	return UUF.MOVERS_UNLOCKED

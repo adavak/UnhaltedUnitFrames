@@ -1,4 +1,5 @@
 local _, UUF = ...
+local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 local oUF = UUF.oUF
 oUF.Tags = oUF.Tags or {}
 
@@ -92,13 +93,13 @@ end
 
 UUF.SEPARATOR_TAGS = {
 {
-    ["||"] = "|",
-    ["-"] = "-",
-    ["/"] = "/",
-    [" "] = "Space",
-    ["[]"] = "[]",
+    ["||"] = L["||"],
+    ["-"] = L["-"],
+    ["/"] = L["/"],
+    [" "] = L["Space"],
+    ["[]"] = L["[]"],
     ["()"] = "()",
-    ["•"] = "•",
+    ["•"] = L["•"],
 },
 {
     "||",
@@ -113,11 +114,11 @@ UUF.SEPARATOR_TAGS = {
 
 UUF.TOT_SEPARATOR_TAGS = {
     {
-        ["»"] = "»",
-        ["-"] = "-",
-        [">"] = ">",
-        [">>"] = ">>",
-        ["•"] = "•",
+        ["»"] = L["»"],
+        ["-"] = L["-"],
+        [">"] = L[">"],
+        [">>"] = L[">>"],
+        ["•"] = L["•"],
     },
     {
         "»",
@@ -674,19 +675,19 @@ end
 
 local HealthTags = {
     {
-        ["curhp"] = "Current Health",
-        ["curhp:abbr"] = "Current Health with Abbreviation",
-        ["perhp"] = "Percentage Health",
-        ["curhpperhp"] = "Current Health and Percentage",
-        ["curhpperhp:abbr"] = "Current Health and Percentage with Abbreviation",
-        ["maxhp:abbr"] = "Maximum Health with Abbreviation",
-        ["absorbs"] = "Total Absorbs",
-        ["absorbs:abbr"] = "Total Absorbs with Abbreviation",
-        ["absorbs:truncate"] = "Total Absorbs but will hide when at zero.",
-        ["missinghp"] = "Missing Health",
-        ["perhp:2"] = "Percentage Health with Decimal Precision (1 - 3)",
-        ["curhpperhp:2"] = "Current Health and Percentage with Decimal Precision (1 - 3)",
-        ["curhpperhp:abbr:2"] = "Current Health and Percentage with Abbreviation and Decimal Precision (1 - 3)",
+        ["curhp"] = L["Current Health"],
+        ["curhp:abbr"] = L["Current Health with Abbreviation"],
+        ["perhp"] = L["Percentage Health"],
+        ["curhpperhp"] = L["Current Health and Percentage"],
+        ["curhpperhp:abbr"] = L["Current Health and Percentage with Abbreviation"],
+        ["maxhp:abbr"] = L["Maximum Health with Abbreviation"],
+        ["absorbs"] = L["Total Absorbs"],
+        ["absorbs:abbr"] = L["Total Absorbs with Abbreviation"],
+        ["absorbs:truncate"] = L["Total Absorbs but will hide when at zero."],
+        ["missinghp"] = L["Missing Health"],
+        ["perhp:2"] = L["Percentage Health with Decimal Precision (1 - 3)"],
+        ["curhpperhp:2"] = L["Current Health and Percentage with Decimal Precision (1 - 3)"],
+        ["curhpperhp:abbr:2"] = L["Current Health and Percentage with Abbreviation and Decimal Precision (1 - 3)"],
     },
     {
         "curhp",
@@ -708,28 +709,29 @@ local HealthTags = {
 
 local PowerTags = {
     {
-        ["perpp"] = "Percentage Power",
-        ["curpp"] = "Current Power",
-        ["curpp:colour"] = "Current Power with Colour",
-        ["curpp:abbr"] = "Current Power with Abbreviation",
-        ["curpp:abbr:colour"] = "Current Power with Abbreviation and Colour",
-        ["maxpp"] = "Maximum Power",
-        ["maxpp:abbr"] = "Maximum Power with Abbreviation",
-        ["maxpp:colour"] = "Maximum Power with Colour",
-        ["maxpp:abbr:colour"] = "Maximum Power with Abbreviation and Colour",
-        ["missingpp"] = "Missing Power",
-		["curpp:manapercent"] = "Current Power but Mana as Percentage",
-		["curpp:manapercent:healer"] = "Mana Percentage for Healers",
-		["curpp:manapercent-with-sign:healer"] = "Mana Percentage for Healers with % Sign",
-		["curpp:manapercent-with-sign:healer:colour"] = "Mana Percentage for Healers with % Sign and Mana Colour",
-		["curpp:manapercent:abbr"] = "Current Power but Mana as Percentage with Abbreviation",
-        ["curpp:manapercent-with-sign"] = "Current Power but Mana as Percentage with % Sign",
-        ["curpp:manapercent-with-sign:abbr"] = "Current Power but Mana as Percentage with % Sign and Abbreviation",
-        ["perpp:2"] = "Percentage Power with Decimal Precision (1 - 3)",
-        ["curpp:manapercent:2"] = "Current Power but Mana as Percentage with Decimal Precision (1 - 3)",
-        ["curpp:manapercent:abbr:2"] = "Current Power but Mana as Percentage with Abbreviation and Decimal Precision (1 - 3)",
-        ["curpp:manapercent-with-sign:2"] = "Current Power but Mana as Percentage with % Sign and Decimal Precision (1 - 3)",
-        ["curpp:manapercent-with-sign:abbr:2"] = "Current Power but Mana as Percentage with % Sign, Abbreviation and Decimal Precision (1 - 3)",
+        ["perpp"] = L["Percentage Power"],
+        ["curpp"] = L["Current Power"],
+        ["curpp:colour"] = L["Current Power with Colour"],
+        ["curpp:abbr"] = L["Current Power with Abbreviation"],
+        ["curpp:abbr:colour"] = L["Current Power with Abbreviation and Colour"],
+        ["maxpp"] = L["Maximum Power"],
+        ["maxpp:abbr"] = L["Maximum Power with Abbreviation"],
+        ["maxpp:colour"] = L["Maximum Power with Colour"],
+        ["maxpp:abbr:colour"] = L["Maximum Power with Abbreviation and Colour"],
+        ["missingpp"] = L["Missing Power"],
+		["curpp:manapercent"] = L["Current Power but Mana as Percentage"],
+		["curpp:manapercent:healer"] = L["Mana Percentage for Healers"],
+		["curpp:manapercent:healer:colour"] = L["Mana Percentage for Healers with Mana Colour"],
+		["curpp:manapercent-with-sign:healer"] = L["Mana Percentage for Healers with % Sign"],
+		["curpp:manapercent-with-sign:healer:colour"] = L["Mana Percentage for Healers with % Sign and Mana Colour"],
+		["curpp:manapercent:abbr"] = L["Current Power but Mana as Percentage with Abbreviation"],
+        ["curpp:manapercent-with-sign"] = L["Current Power but Mana as Percentage with % Sign"],
+        ["curpp:manapercent-with-sign:abbr"] = L["Current Power but Mana as Percentage with % Sign and Abbreviation"],
+        ["perpp:2"] = L["Percentage Power with Decimal Precision (1 - 3)"],
+        ["curpp:manapercent:2"] = L["Current Power but Mana as Percentage with Decimal Precision (1 - 3)"],
+        ["curpp:manapercent:abbr:2"] = L["Current Power but Mana as Percentage with Abbreviation and Decimal Precision (1 - 3)"],
+        ["curpp:manapercent-with-sign:2"] = L["Current Power but Mana as Percentage with % Sign and Decimal Precision (1 - 3)"],
+        ["curpp:manapercent-with-sign:abbr:2"] = L["Current Power but Mana as Percentage with % Sign, Abbreviation and Decimal Precision (1 - 3)"],
     },
     {
         "perpp",
@@ -758,14 +760,14 @@ local PowerTags = {
 
 local NameTags = {
     {
-        ["name"] = "Unit Name",
-        ["name:colour"] = "Unit Name with Colour",
-        ["name:short:10"] = "Unit Name Shortened (1 - 25 Chars)",
-        ["name:short:10:colour"] = "Unit Name Shortened (1 - 25 Chars) with Colour",
-        ["name:target"] = "Target Unit Name",
-        ["name:target:colour"] = "Target Unit Name with Colour",
-        ["name:target:short:10"] = "Target Unit Name Shortened (1 - 25 Chars)",
-        ["name:target:short:10:colour"] = "Target Unit Name Shortened (1 - 25 Chars) with Colour",
+        ["name"] = L["Unit Name"],
+        ["name:colour"] = L["Unit Name with Colour"],
+        ["name:short:10"] = L["Unit Name Shortened (1 - 25 Chars)"],
+        ["name:short:10:colour"] = L["Unit Name Shortened (1 - 25 Chars) with Colour"],
+        ["name:target"] = L["Target Unit Name"],
+        ["name:target:colour"] = L["Target Unit Name with Colour"],
+        ["name:target:short:10"] = L["Target Unit Name Shortened (1 - 25 Chars)"],
+        ["name:target:short:10:colour"] = L["Target Unit Name Shortened (1 - 25 Chars) with Colour"],
     },
     {
         "name",
@@ -781,16 +783,16 @@ local NameTags = {
 
 local MiscTags = {
     {
-        ["classification"] = "Unit Classification",
-        ["shortclassification"] = "Unit Classification with Abbreviation",
-        ["creature"] = "Creature Type",
-        ["group"] = "Group Number",
-        ["level"] = "Unit Level",
-        ["powercolor"] = "Unit Power Colour - Prefix",
-        ["raidcolor"] = "Unit Class Colour - Prefix",
-        ["reactioncolour"] = "Unit Reaction Colour - Prefix",
-        ["class"] = "Unit Class",
-        ["resetcolor"] = "Resets Colour Prefix",
+        ["classification"] = L["Unit Classification"],
+        ["shortclassification"] = L["Unit Classification with Abbreviation"],
+        ["creature"] = L["Creature Type"],
+        ["group"] = L["Group Number"],
+        ["level"] = L["Unit Level"],
+        ["powercolor"] = L["Unit Power Colour - Prefix"],
+        ["raidcolor"] = L["Unit Class Colour - Prefix"],
+        ["reactioncolour"] = L["Unit Reaction Colour - Prefix"],
+        ["class"] = L["Unit Class"],
+        ["resetcolor"] = L["Resets Colour Prefix"],
     },
     {
         "classification",

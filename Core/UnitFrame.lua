@@ -26,7 +26,7 @@ function UUF:CreateUnitFrame(unitFrame, unit)
     UUF:CreateUnitContainer(unitFrame, unit)
     if UnitDB.CastBar and not isTargetTarget and not isFocusTarget then UUF:CreateUnitCastBar(unitFrame, unit) end
     UUF:CreateUnitHealthBar(unitFrame, unit)
-    if UnitDB.HealthBar.DispelHighlight and (isPlayer or isTarget or isFocus or isParty or isRaid) then UUF:CreateUnitDispelHighlight(unitFrame, unit) end
+    if UnitDB.HealthBar.DispelHighlight and (isPlayer or isTarget or isFocus or isParty or isRaid) then pcall(UUF.CreateUnitDispelHighlight, UUF, unitFrame, unit) end
     UUF:CreateUnitHealPrediction(unitFrame, unit)
     if UnitDB.Portrait and not isTargetTarget and not isFocusTarget then UUF:CreateUnitPortrait(unitFrame, unit) end
     UUF:CreateUnitPowerBar(unitFrame, unit)
@@ -48,7 +48,7 @@ function UUF:CreateUnitFrame(unitFrame, unit)
     UUF:CreateUnitMouseoverIndicator(unitFrame, unit)
     UUF:CreateUnitTargetGlowIndicator(unitFrame, unit)
     UUF:CreateUnitThreatIndicator(unitFrame, unit)
-    UUF:CreateUnitAuras(unitFrame, unit)
+    pcall(UUF.CreateUnitAuras, UUF, unitFrame, unit)
     UUF:CreateUnitTags(unitFrame, unit)
 	if isRaid then
 		unitFrame.UUFConfiguredUnit = unit
@@ -66,8 +66,8 @@ function UUF:CreateUnitFrame(unitFrame, unit)
 			UUF:RegisterTargetGlowIndicatorFrame(frame, value)
 			if frame.UUFGroupUnit ~= value then
 				frame.UUFGroupUnit = value
-				if frame.DispelHighlight then UUF:UpdateUnitDispelHighlight(frame, value) end
-				if frame.AuraContainers then UUF:UpdateUnitAuraEligibility(frame, value) end
+				if frame.DispelHighlight then pcall(UUF.UpdateUnitDispelHighlight, UUF, frame, value) end
+				if frame.AuraContainers then pcall(UUF.UpdateUnitAuraEligibility, UUF, frame, value) end
 			end
 			if frame.Health then frame.Health:ForceUpdate() end
 			if frame.Tags then for configuredTag in pairs(RaidDB.Tags) do UUF:UpdateUnitTag(frame, value, configuredTag) end elseif frame.UpdateTags then frame:UpdateTags() end
@@ -215,7 +215,7 @@ function UUF:UpdateUnitFrame(unitFrame, unit)
     UUF:UpdateUnitMouseoverIndicator(unitFrame, unit)
     UUF:UpdateUnitTargetGlowIndicator(unitFrame, unit)
     UUF:UpdateUnitThreatIndicator(unitFrame, unit)
-    UUF:UpdateUnitAuras(unitFrame, unit)
+    pcall(UUF.UpdateUnitAuras, UUF, unitFrame, unit)
 	if unit ~= "player" then UUF:RegisterRangeFrame(unitFrame, unit == "partyplayer" and "player" or unit) end
 	UUF:RegisterTargetGlowIndicatorFrame(unitFrame, unit)
     unitFrame:SetFrameStrata(UnitDB.Frame.FrameStrata)

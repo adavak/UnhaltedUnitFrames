@@ -1,4 +1,5 @@
 local _, UUF = ...
+local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 local TestData = {}
 local oUF = UUF.oUF
 
@@ -529,7 +530,7 @@ local function UpdateBossTestEnvironment(element)
 					CastBarContainer:Show()
 					BossFrame.Castbar:Show()
 					BossFrame.Castbar.Background:Show()
-					BossFrame.Castbar.Text:SetText(CastBarDB.ShowTarget and "Ethereal Portal » Target" or "Ethereal Portal")
+					BossFrame.Castbar.Text:SetText(CastBarDB.ShowTarget and string.format(L["%s » %s"], L["Ethereal Portal"], L["Target"]) or L["Ethereal Portal"])
 					BossFrame.Castbar.Time:SetText("2.5")
 					BossFrame.Castbar:SetMinMaxValues(0, 1000)
 					BossFrame.Castbar:SetValue(500)

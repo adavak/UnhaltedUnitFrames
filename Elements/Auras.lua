@@ -1,5 +1,12 @@
 local _, UUF = ...
 
+if not AuraButtonBorderStyle then AuraButtonBorderStyle = { Color = 0, None = 1, Overlay = 2 } end
+if not AuraContainerSortMethod then AuraContainerSortMethod = { Default = 0, ExpirationOnly = 1 } end
+if not AuraContainerSortDirection then AuraContainerSortDirection = { Normal = 0, Reverse = 1 } end
+
+-- Check if AuraContainer widget is available (removed in 12.1+)
+local auraContainerAvailable = pcall(CreateFrame, 'AuraContainer')
+
 local AuraContainerState = setmetatable({}, {__mode = "k"})
 local AuraUnitFrames = setmetatable({}, {__mode = "k"})
 local AuraEligibilityEventFrame = CreateFrame("Frame")
@@ -322,6 +329,7 @@ end
 
 function UUF:UpdateUnitAuras(unitFrame, unit)
 	if not unitFrame or not unit then return end
+	if not auraContainerAvailable then return end
 	local AurasDB = UUF:GetUnitDB(unitFrame, unit).Auras
 	if not AurasDB then return end
 	AuraUnitFrames[unitFrame] = unit
@@ -333,6 +341,7 @@ end
 
 function UUF:UpdateUnitAurasStrata(unit)
 	if not unit then return end
+	if not auraContainerAvailable then return end
 	if unit == "party" then
 		for index = 1, UUF.MAX_PARTY_FRAMES do UUF:UpdateUnitAurasStrata("party" .. index) end
 		if UUF.PARTYPLAYER then UUF:UpdateUnitAurasStrata("partyplayer") end

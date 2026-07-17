@@ -1,4 +1,5 @@
 local _, UUF = ...
+local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 local oUF = UUF.oUF
 UUFG = UUFG or {}
 UUF.AURA_TEST_MODE = false
@@ -297,7 +298,7 @@ local function SetupSlashCommands()
     SLASH_UUF2 = "/unhaltedunitframes"
     SLASH_UUF3 = "/uf"
     SlashCmdList["UUF"] = function() UUF:CreateGUI() end
-    if UUF.db.global.DisplayLoginMessage then UUF:PrettyPrint("'|cFF8080FF/uuf|r' for in-game configuration.") end
+    if UUF.db.global.DisplayLoginMessage then UUF:PrettyPrint(L["'|cFF8080FF/uuf|r' for in-game configuration."]) end
 
     -- RL command
     SLASH_UUFRELOAD1 = "/rl"
@@ -735,28 +736,28 @@ function UUF:GetAuraContainerKeys(AurasDB)
 end
 
 UUF.AURA_FILTERS = {
-	{Key = "Player", Source = "PLAYER", Group = "Player (You)", Title = "All", Desc = "Only auras cast by the player, their pet, or their vehicle."},
-	{Key = "RaidPlayer", Token = "RAID", Source = "PLAYER", Group = "Player (You)", Title = "Raid", Desc = "Helpful auras the player can apply and harmful auras the player can dispel."},
-	{Key = "RaidInCombatPlayer", Token = "RAID_IN_COMBAT", Source = "PLAYER", Group = "Player (You)", Title = "Raid in Combat", Desc = "Auras flagged to show on raid frames while in combat."},
-	{Key = "RaidPlayerDispellablePlayer", Token = "RAID_PLAYER_DISPELLABLE", Source = "PLAYER", Group = "Player (You)", Title = "Raid Dispellable", Desc = "Auras someone in the player's raid can dispel, including helpful enrages on enemies."},
-	{Key = "DispellablePlayer", Token = "DISPELLABLE", Source = "PLAYER", Group = "Player (You)", Title = "Dispellable", Desc = "Auras that are dispellable, whether or not the player's raid can dispel them."},
-	{Key = "ImportantPlayer", Token = "IMPORTANT", Source = "PLAYER", Group = "Player (You)", Title = "Important", Desc = "Auras flagged as important, including helpful auras shown on enemy nameplates even when they are not stealable."},
-	{Key = "CrowdControlPlayer", Token = "CROWD_CONTROL", Source = "PLAYER", Group = "Player (You)", Title = "Crowd Control", Desc = "Auras with a crowd-control effect, such as a stun or fear."},
-	{Key = "BigDefensivePlayer", Token = "BIG_DEFENSIVE", Source = "PLAYER", Group = "Player (You)", Title = "Big Defensive", TreeTitle = "Big Defensives", Desc = "Auras categorized as big defensives."},
-	{Key = "ExternalDefensivePlayer", Token = "EXTERNAL_DEFENSIVE", Source = "PLAYER", Group = "Player (You)", Title = "External Defensive", TreeTitle = "External Defensives", Desc = "Auras categorized as external defensives."},
-	{Key = "CancelablePlayer", Token = "CANCELABLE", Source = "PLAYER", Group = "Player (You)", Title = "Cancelable", Desc = "Auras the player can cancel."},
-	{Key = "NotCancelablePlayer", Token = "!CANCELABLE", Source = "PLAYER", Group = "Player (You)", Title = "Not Cancelable", Desc = "Auras the player cannot cancel."},
-	{Key = "Others", Source = "!PLAYER", Group = "Others (Not You)", Title = "All", Desc = "Only auras not cast by the player, their pet, or their vehicle."},
-	{Key = "Raid", Token = "RAID", Source = "!PLAYER", Group = "Others (Not You)", Title = "Raid", Desc = "Helpful auras the player can apply and harmful auras the player can dispel."},
-	{Key = "RaidInCombat", Token = "RAID_IN_COMBAT", Source = "!PLAYER", Group = "Others (Not You)", Title = "Raid in Combat", Desc = "Auras flagged to show on raid frames while in combat."},
-	{Key = "RaidPlayerDispellableOthers", Token = "RAID_PLAYER_DISPELLABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = "Raid Dispellable", Desc = "Auras someone in the player's raid can dispel, including helpful enrages on enemies."},
-	{Key = "Dispellable", Token = "DISPELLABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = "Dispellable", Desc = "Auras that are dispellable, whether or not the player's raid can dispel them."},
-	{Key = "Important", Token = "IMPORTANT", Source = "!PLAYER", Group = "Others (Not You)", Title = "Important", Desc = "Auras flagged as important, including helpful auras shown on enemy nameplates even when they are not stealable."},
-	{Key = "CrowdControl", Token = "CROWD_CONTROL", Source = "!PLAYER", Group = "Others (Not You)", Title = "Crowd Control", Desc = "Auras with a crowd-control effect, such as a stun or fear."},
-	{Key = "BigDefensive", Token = "BIG_DEFENSIVE", Source = "!PLAYER", Group = "Others (Not You)", Title = "Big Defensive", TreeTitle = "Big Defensives", Desc = "Auras categorized as big defensives."},
-	{Key = "ExternalDefensive", Token = "EXTERNAL_DEFENSIVE", Source = "!PLAYER", Group = "Others (Not You)", Title = "External Defensive", TreeTitle = "External Defensives", Desc = "Auras categorized as external defensives."},
-	{Key = "Cancelable", Token = "CANCELABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = "Cancelable", Desc = "Auras the player can cancel."},
-	{Key = "NotCancelable", Token = "!CANCELABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = "Not Cancelable", Desc = "Auras the player cannot cancel."},
+	{Key = "Player", Source = "PLAYER", Group = "Player (You)", Title = L["All"], Desc = L["Only auras cast by the player, their pet, or their vehicle."]},
+	{Key = "RaidPlayer", Token = "RAID", Source = "PLAYER", Group = "Player (You)", Title = L["Raid"], Desc = L["Helpful auras the player can apply and harmful auras the player can dispel."]},
+	{Key = "RaidInCombatPlayer", Token = "RAID_IN_COMBAT", Source = "PLAYER", Group = "Player (You)", Title = L["Raid in Combat"], Desc = L["Auras flagged to show on raid frames while in combat."]},
+	{Key = "RaidPlayerDispellablePlayer", Token = "RAID_PLAYER_DISPELLABLE", Source = "PLAYER", Group = "Player (You)", Title = L["Raid Dispellable"], Desc = L["Auras someone in the player's raid can dispel, including helpful enrages on enemies."]},
+	{Key = "DispellablePlayer", Token = "DISPELLABLE", Source = "PLAYER", Group = "Player (You)", Title = L["Dispellable"], Desc = L["Auras that are dispellable, whether or not the player's raid can dispel them."]},
+	{Key = "ImportantPlayer", Token = "IMPORTANT", Source = "PLAYER", Group = "Player (You)", Title = L["Important"], Desc = L["Auras flagged as important, including helpful auras shown on enemy nameplates even when they are not stealable."]},
+	{Key = "CrowdControlPlayer", Token = "CROWD_CONTROL", Source = "PLAYER", Group = "Player (You)", Title = L["Crowd Control"], Desc = L["Auras with a crowd-control effect, such as a stun or fear."]},
+	{Key = "BigDefensivePlayer", Token = "BIG_DEFENSIVE", Source = "PLAYER", Group = "Player (You)", Title = L["Big Defensive"], TreeTitle = L["Big Defensives"], Desc = L["Auras categorized as big defensives."]},
+	{Key = "ExternalDefensivePlayer", Token = "EXTERNAL_DEFENSIVE", Source = "PLAYER", Group = "Player (You)", Title = L["External Defensive"], TreeTitle = L["External Defensives"], Desc = L["Auras categorized as external defensives."]},
+	{Key = "CancelablePlayer", Token = "CANCELABLE", Source = "PLAYER", Group = "Player (You)", Title = L["Cancelable"], Desc = L["Auras the player can cancel."]},
+	{Key = "NotCancelablePlayer", Token = "!CANCELABLE", Source = "PLAYER", Group = "Player (You)", Title = L["Not Cancelable"], Desc = L["Auras the player cannot cancel."]},
+	{Key = "Others", Source = "!PLAYER", Group = "Others (Not You)", Title = L["All"], Desc = L["Only auras not cast by the player, their pet, or their vehicle."]},
+	{Key = "Raid", Token = "RAID", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Raid"], Desc = L["Helpful auras the player can apply and harmful auras the player can dispel."]},
+	{Key = "RaidInCombat", Token = "RAID_IN_COMBAT", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Raid in Combat"], Desc = L["Auras flagged to show on raid frames while in combat."]},
+	{Key = "RaidPlayerDispellableOthers", Token = "RAID_PLAYER_DISPELLABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Raid Dispellable"], Desc = L["Auras someone in the player's raid can dispel, including helpful enrages on enemies."]},
+	{Key = "Dispellable", Token = "DISPELLABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Dispellable"], Desc = L["Auras that are dispellable, whether or not the player's raid can dispel them."]},
+	{Key = "Important", Token = "IMPORTANT", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Important"], Desc = L["Auras flagged as important, including helpful auras shown on enemy nameplates even when they are not stealable."]},
+	{Key = "CrowdControl", Token = "CROWD_CONTROL", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Crowd Control"], Desc = L["Auras with a crowd-control effect, such as a stun or fear."]},
+	{Key = "BigDefensive", Token = "BIG_DEFENSIVE", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Big Defensive"], TreeTitle = L["Big Defensives"], Desc = L["Auras categorized as big defensives."]},
+	{Key = "ExternalDefensive", Token = "EXTERNAL_DEFENSIVE", Source = "!PLAYER", Group = "Others (Not You)", Title = L["External Defensive"], TreeTitle = L["External Defensives"], Desc = L["Auras categorized as external defensives."]},
+	{Key = "Cancelable", Token = "CANCELABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Cancelable"], Desc = L["Auras the player can cancel."]},
+	{Key = "NotCancelable", Token = "!CANCELABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Not Cancelable"], Desc = L["Auras the player cannot cancel."]},
 }
 
 UUF.SCMAnchors = {
