@@ -569,9 +569,25 @@ local function ShortenUnitName(unit, maxChars)
     local unitName = UnitName(unit) or ""
     if UUF:IsSecretValue(unitName) then return unitName end
     if maxChars and maxChars > 0 then
-        unitName = string.format("%." .. maxChars .. "s", unitName)
+        -- Proper UTF-8 character count, not byte count (Chinese = 3 bytes per char)
+        local len = #unitName
+        local result = {}
+        local count = 0
+        local i = 1
+        while i <= len and count < maxChars do
+            local b = string.byte(unitName, i)
+            local charLen
+            if b < 128 then charLen = 1
+            elseif b < 224 then charLen = 2
+            elseif b < 240 then charLen = 3
+            else charLen = 4 end
+            result[#result + 1] = string.sub(unitName, i, i + charLen - 1)
+            count = count + 1
+            i = i + charLen
+        end
+        unitName = table.concat(result)
     end
-    return UUF:CleanTruncateUTF8String(unitName)
+    return unitName
 end
 
 for i = 1, 25 do
