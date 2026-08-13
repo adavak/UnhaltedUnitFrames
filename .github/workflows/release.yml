@@ -1,4 +1,4 @@
-name: Package Addon
+name: Release
 
 on:
   push:
