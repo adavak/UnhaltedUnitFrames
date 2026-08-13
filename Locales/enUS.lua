@@ -1,4 +1,4 @@
-﻿local L = LibStub("AceLocale-3.0"):NewLocale("UnhaltedUnitFrames", "enUS", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("UnhaltedUnitFrames", "enUS", true)
 if not L then return end
 
 
@@ -11,6 +11,7 @@ L["%s Limit"] = "%s Limit"
 L["%s Per Row"] = "%s Per Row"
 L["%s Settings"] = "%s Settings"
 L["%s Texture"] = "%s Texture"
+L["%s was not found."] = "%s was not found."
 L[") from this container?"] = ") from this container?"
 L["/"] = "/"
 L["[]"] = "[]"
@@ -47,6 +48,7 @@ L["Alternative Power Bar"] = "Alternative Power Bar"
 L["Alternative Power Bar Settings"] = "Alternative Power Bar Settings"
 L["Anchor From"] = "Anchor From"
 L["Anchor Parent"] = "Anchor Parent"
+L["Anchor Point"] = "Anchor Point"
 L["Anchor To"] = "Anchor To"
 L["Anchor To |cFF8080FFEssential|r Cooldown Viewer. Toggling this will overwrite existing |cFF8080FFLayout|r Settings."] = "Anchor To |cFF8080FFEssential|r Cooldown Viewer. Toggling this will overwrite existing |cFF8080FFLayout|r Settings."
 L["Anchor To Cooldown Viewer"] = "Anchor To Cooldown Viewer"
@@ -408,6 +410,7 @@ L["Reaction Colours"] = "Reaction Colours"
 L["Ready Check"] = "Ready Check"
 L["Ready Check Indicator Settings"] = "Ready Check Indicator Settings"
 L["Ready Check Texture"] = "Ready Check Texture"
+L["Recommended UI Scale: |cFF8080FF%s|r"] = "Recommended UI Scale: |cFF8080FF%s|r"
 L["Reload Now"] = "Reload Now"
 L["Reload UI"] = "Reload UI"
 L["Remove"] = "Remove"

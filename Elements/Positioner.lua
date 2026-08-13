@@ -1,4 +1,5 @@
 local _, UUF = ...
+local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 
 function UUF:CreatePositionController()
     local ECDM = ""
@@ -16,6 +17,6 @@ function UUF:CreatePositionController()
         CDMAnchor:SetAllPoints(ECDM)
         CDMAnchor:SetSize(ECDM:GetWidth() or 300, ECDM:GetHeight() or 48)
     else
-        UUF:PrettyPrint("|cFF8080FFAnchor Point|r was not found.")
+        UUF:PrettyPrint(string.format(L["%s was not found."], "|cFF8080FF" .. L["Anchor Point"] .. "|r"))
     end
 end

@@ -345,7 +345,7 @@ local function CreateUIScaleSettings(containerParent)
     PixelPerfectButton:SetText(L["Pixel Perfect Scale"])
     PixelPerfectButton:SetRelativeWidth(0.33)
     PixelPerfectButton:SetCallback("OnClick", function() local pixelScale = UUF:GetPixelPerfectScale() UUF.db.profile.General.UIScale.Scale = pixelScale UUF:SetUIScale() Slider:SetValue(pixelScale) end)
-    PixelPerfectButton:SetCallback("OnEnter", function() GameTooltip:SetOwner(PixelPerfectButton.frame, "ANCHOR_CURSOR") GameTooltip:AddLine("Recommended UI Scale: |cFF8080FF" .. UUF:GetPixelPerfectScale() .. "|r", 1, 1, 1, false) GameTooltip:Show() end)
+    PixelPerfectButton:SetCallback("OnEnter", function() GameTooltip:SetOwner(PixelPerfectButton.frame, "ANCHOR_CURSOR") GameTooltip:AddLine(string.format(L["Recommended UI Scale: |cFF8080FF%s|r"], UUF:GetPixelPerfectScale()), 1, 1, 1, false) GameTooltip:Show() end)
     PixelPerfectButton:SetCallback("OnLeave", function() GameTooltip:Hide() end)
     Container:AddChild(PixelPerfectButton)
 
@@ -3379,7 +3379,7 @@ local function GetAuraContainerTreeLabel(auraKey, AuraDB)
 			end
 		end
 	end
-	return #filterNames > 0 and AuraDB.Type .. " - " .. table.concat(filterNames, ", ") or auraKey
+	return #filterNames > 0 and L[AuraDB.Type] .. " - " .. table.concat(filterNames, ", ") or auraKey
 end
 
 local function CreateSpecificAuraSettings(containerParent, unit, auraKey, refreshSettings, refreshTree)
@@ -4357,7 +4357,7 @@ local function CreateProfileSettings(containerParent)
     ProfileContainer:AddChild(DeleteProfileDropdown)
 
     ResetProfileButton = AG:Create("Button")
-    ResetProfileButton:SetText("Reset |cFF8080FF" .. UUF.db:GetCurrentProfile() .. "|r Profile")
+    ResetProfileButton:SetText(string.format(L["Reset |cFF8080FF%s|r Profile"], UUF.db:GetCurrentProfile()))
     ResetProfileButton:SetRelativeWidth(0.25)
     ResetProfileButton:SetCallback("OnClick", function() UUF.db:ResetProfile() UUF:ResolveLSM() UUF:SetUIScale() UUF:UpdateAllUnitFrames() RefreshProfiles() end)
     ProfileContainer:AddChild(ResetProfileButton)
