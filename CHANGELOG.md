@@ -1,3 +1,7 @@
+## V12.1.1
+- Complete zhCN localization.
+- Update embedded libraries.
+
 ## V12.1.0
 - Add Party / Raid Frames.
 - Add Dedicated Augmentation Raid Frames.
