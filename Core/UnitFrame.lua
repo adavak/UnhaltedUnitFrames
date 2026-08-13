@@ -13,6 +13,7 @@ end
 
 function UUF:CreateUnitFrame(unitFrame, unit)
     if not unit or not unitFrame then return end
+    unitFrame.unit = unit -- oUF 14 removed the .unit field; Blizzard tooltip and element dispatch read it
 	if unitFrame:GetParent() == UUF.AUGMENTATION_RAID_HEADER then unitFrame.isAugmentationRaidFrame = true end
     local UnitDB = UUF:GetUnitDB(unitFrame, unit)
     local isPlayer = unit == "player"

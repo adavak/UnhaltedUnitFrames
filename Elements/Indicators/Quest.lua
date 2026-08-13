@@ -52,3 +52,46 @@ function UUF:UpdateUnitQuestIndicator(unitFrame, unit)
         end
     end
 end
+
+-- oUF element registration (moved from Libraries/oUF_Elements)
+local oUF = UUF.oUF
+
+local function QuestIndicatorUpdate(self, event, unit)
+	if unit ~= self.unit then return end
+	local element = self.QuestUnitIndicator
+	if not element then return end
+	if element.PreUpdate then element:PreUpdate() end
+	local isQuestUnit = UnitIsQuestBoss(unit) or C_QuestLog.UnitIsRelatedToActiveQuest(unit)
+	element:SetShown(isQuestUnit)
+	if element.PostUpdate then return element:PostUpdate(isQuestUnit) end
+end
+
+local function QuestIndicatorPath(self, ...)
+	return (self.QuestUnitIndicator.Override or QuestIndicatorUpdate)(self, ...)
+end
+
+local function QuestIndicatorForceUpdate(element)
+	return QuestIndicatorPath(element.__owner, "ForceUpdate", element.__owner.unit)
+end
+
+local function QuestIndicatorEnable(self)
+	local element = self.QuestUnitIndicator
+	if element then
+		element.__owner = self
+		element.ForceUpdate = QuestIndicatorForceUpdate
+		self:RegisterEvent("QUEST_LOG_UPDATE", QuestIndicatorPath, true)
+		self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED", QuestIndicatorPath)
+		return true
+	end
+end
+
+local function QuestIndicatorDisable(self)
+	local element = self.QuestUnitIndicator
+	if element then
+		element:Hide()
+		self:UnregisterEvent("QUEST_LOG_UPDATE", QuestIndicatorPath)
+		self:UnregisterEvent("UNIT_CLASSIFICATION_CHANGED", QuestIndicatorPath)
+	end
+end
+
+oUF:AddElement("QuestUnitIndicator", QuestIndicatorPath, QuestIndicatorEnable, QuestIndicatorDisable)

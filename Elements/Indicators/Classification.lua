@@ -47,3 +47,57 @@ function UUF:UpdateUnitClassificationIndicator(unitFrame, unit)
 		unitFrame.ClassificationIndicator = nil
 	end
 end
+
+-- oUF element registration (moved from Libraries/oUF_Elements)
+local oUF = UUF.oUF
+
+local ICONS = {
+	elite = 'nameplates-icon-elite-gold',
+	worldboss = 'nameplates-icon-elite-gold',
+	rareelite = 'nameplates-icon-elite-silver',
+	rare = 'nameplates-icon-elite-silver',
+}
+
+local function ClassificationIndicatorUpdate(self, event, unit)
+	if unit ~= self.unit then return end
+	local element = self.ClassificationIndicator
+	if not element then return end
+	if element.PreUpdate then element:PreUpdate(unit) end
+	local classification = UnitClassification(unit)
+	local icon = ICONS[classification]
+	if icon then
+		element:SetAtlas(icon, element.useAtlasSize)
+		element:Show()
+	else
+		element:Hide()
+	end
+	if element.PostUpdate then return element:PostUpdate(unit, classification) end
+end
+
+local function ClassificationIndicatorPath(self, ...)
+	return (self.ClassificationIndicator.Override or ClassificationIndicatorUpdate)(self, ...)
+end
+
+local function ClassificationIndicatorForceUpdate(element)
+	return ClassificationIndicatorPath(element.__owner, 'ForceUpdate', element.__owner.unit)
+end
+
+local function ClassificationIndicatorEnable(self)
+	local element = self.ClassificationIndicator
+	if element then
+		element.__owner = self
+		element.ForceUpdate = ClassificationIndicatorForceUpdate
+		self:RegisterEvent('UNIT_CLASSIFICATION_CHANGED', ClassificationIndicatorPath)
+		return true
+	end
+end
+
+local function ClassificationIndicatorDisable(self)
+	local element = self.ClassificationIndicator
+	if element then
+		element:Hide()
+		self:UnregisterEvent('UNIT_CLASSIFICATION_CHANGED', ClassificationIndicatorPath)
+	end
+end
+
+oUF:AddElement('ClassificationIndicator', ClassificationIndicatorPath, ClassificationIndicatorEnable, ClassificationIndicatorDisable)
