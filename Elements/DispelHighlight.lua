@@ -22,7 +22,7 @@ DispelCapabilityEventFrame:RegisterEvent("UNIT_FACTION")
 DispelCapabilityEventFrame:SetScript("OnEvent", function(_, event, eventUnit)
 	for unitFrame, state in pairs(DispelHighlightState) do
 		local unit = state.Unit
-		local unitToken = unitFrame.unit
+		local unitToken = unitFrame.__unit
 		if not unitToken then unitToken = unit == "partyplayer" and "player" or unit end
 		local update = event == "SPELLS_CHANGED" or event == "PLAYER_TALENT_UPDATE" or event == "UNIT_FACTION" and (eventUnit == "player" or unitToken == eventUnit) or event == "PLAYER_TARGET_CHANGED" and unit == "target" or event == "PLAYER_FOCUS_CHANGED" and unit == "focus"
 		if update then UUF:UpdateUnitDispelHighlight(unitFrame, unit) end
@@ -30,7 +30,7 @@ DispelCapabilityEventFrame:SetScript("OnEvent", function(_, event, eventUnit)
 end)
 
 function UUF:CreateUnitDispelHighlight(unitFrame, unit)
-	local container = unitFrame:CreateAuras({maxWidth = 1, initialAnchor = "CENTER"})
+	local container = unitFrame:CreateAuras({layoutLimit = 1, initialAnchor = "CENTER"})
 	if not container then return end
 	local state = {Unit = unit, Slots = {}, EnabledTypes = {}}
 	local DispelHighlightDB = UUF:GetUnitDB(unitFrame, unit).HealthBar.DispelHighlight
@@ -61,12 +61,11 @@ function UUF:CreateUnitDispelHighlight(unitFrame, unit)
 	end
 
 	for index, dispelSlot in ipairs(DispelSlots) do
-		container:AddSlot("HARMFUL|DISPELLABLE", {
+		state.Slots[dispelSlot.Key] = container:AddSlot("HARMFUL|DISPELLABLE", {
 			candidateFilters = DisabledCandidateFilters,
 			DispelType = dispelSlot.Key,
 			Level = dispelSlot.Level,
 		})
-		state.Slots[dispelSlot.Key] = container:GetDebugName() .. index
 	end
 	container:SetPoint("CENTER", unitFrame.Health, "CENTER")
 	container:SetSize(1, 1)
@@ -79,7 +78,7 @@ function UUF:UpdateUnitDispelHighlight(unitFrame, unit)
 	local state = DispelHighlightState[unitFrame]
 	if not container or not state then return end
 	state.Unit = unit
-	local unitToken = unitFrame.unit
+	local unitToken = unitFrame.__unit
 	if not unitToken then unitToken = unit == "partyplayer" and "player" or unit end
 	local dispelTypes = UUF.LD:GetMyDispelTypes()
 	for dispelType, slotKey in pairs(state.Slots) do
@@ -92,7 +91,7 @@ function UUF:UpdateUnitDispelHighlight(unitFrame, unit)
 	local canAssist = UnitCanAssist("player", unitToken)
 	local enabled = UUF:GetUnitDB(unitFrame, unit).HealthBar.DispelHighlight.Enabled and not UUF:IsSecretValue(canAssist) and canAssist
 	container:SetUnit(unitToken)
-	container:SetShown(enabled)
+	container:SetEnabled(enabled)
 	if not enabled then return end
 	container:UpdateAllAuras()
 end

@@ -64,7 +64,7 @@ local oUF = ns.oUF
 local function UpdateTooltip(self)
 	if(GameTooltip:IsForbidden()) then return end
 
-	GameTooltip:SetUnitAuraByAuraInstanceID(self:GetParent().__owner.unit, self.auraInstanceID)
+	GameTooltip:SetUnitAuraByAuraInstanceID(self:GetParent().__owner.__unit, self.auraInstanceID)
 end
 
 local function onEnter(self)
@@ -265,7 +265,7 @@ local function updateAura(element, unit, data, position)
 end
 
 local function UpdateCustomAuras(self, event, unit, updateInfo)
-	if(self.unit ~= unit) then return end
+	if(self.__unit ~= unit) then return end
 
 	local element = self.CustomAuras
 	if(not element) then return end
@@ -421,7 +421,7 @@ local function UpdateCustomAuras(self, event, unit, updateInfo)
 end
 
 local function Update(self, event, unit, updateInfo)
-	if(self.unit ~= unit) then return end
+	if(self.__unit ~= unit) then return end
 
 	UpdateCustomAuras(self, event, unit, updateInfo)
 
@@ -445,7 +445,7 @@ local function Path(self, ...)
 end
 
 local function ForceUpdate(element)
-	return Path(element.__owner, 'ForceUpdate', element.__owner.unit)
+	return Path(element.__owner, 'ForceUpdate', element.__owner.__unit)
 end
 
 local function Enable(self)

@@ -205,7 +205,6 @@ function UUF:SpawnAugmentationRaidFrames()
 			"unitsPerColumn", FrameDB.UnitsPerColumn or UUF.MAX_RAID_FRAMES_PER_GROUP,
 			"maxColumns", math.ceil(UUF.MAX_RAID_FRAMES / (FrameDB.UnitsPerColumn or UUF.MAX_RAID_FRAMES_PER_GROUP))
 		)
-	UUF.AUGMENTATION_RAID_HEADER:SetNumAuraContainers(UUF.MAX_AURA_CONTAINERS)
 		UUF.AUGMENTATION_RAID_HEADER:SetParent(UUF.AUGMENTATION_RAID_CONTAINER)
 		UUF.AUGMENTATION_RAID_HEADER:SetVisibility("raid")
 	end
@@ -286,7 +285,6 @@ function UUF:SpawnGroupFrame(groupType)
 				"maxColumns", 1,
 				"sortMethod", FrameDB.SortBy == "INDEX" and "INDEX" or nil
 			)
-			header:SetNumAuraContainers(UUF.MAX_AURA_CONTAINERS)
 			header:SetSize(FrameDB.Width, FrameDB.Height)
 			header:SetParent(UUF.RAID_CONTAINER)
 			header:SetVisibility("raid")
