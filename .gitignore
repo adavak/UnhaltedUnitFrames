@@ -2,3 +2,5 @@ AGENTS.md
 release.sh
 Sources
 .vscode/settings.json
+
+.release/
