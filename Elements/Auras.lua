@@ -163,15 +163,10 @@ local function CreateAuraContainer(unitFrame, unit, auraKey, durationFormatter)
 	AuraContainerState[container] = state
 	container.size = state.Size
 	container.showCount = true
-	-- 12.1 client bug (69299 regression): duration text binding divides by zero
-	-- natively on zero-duration/secret auras; disable until Blizzard hotfixes
-	container.showDuration = false
+	container.showDuration = true
 	container.showBuffBorder = true
 	container.showDebuffBorder = true
-	-- 12.1 client bug: the C_StringUtil numeric rule formatter crashes SetDuration natively
-	-- (zero-duration AND certain non-zero durations); use the default formatting until a
-	-- pure-Lua formatter is verified
-	-- container.durationFormatter = durationFormatter
+	container.durationFormatter = durationFormatter
 	container.PostCreateButton = PostCreateAuraButton
 	return container
 end
