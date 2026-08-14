@@ -285,7 +285,7 @@ function UUF:UpdateUnitHealPrediction(unitFrame, unit)
                 unitFrame.HealthPrediction.healingPlayer:SetPoint("TOPLEFT", unitFrame.Health, "TOPLEFT", 0, 0)
                 unitFrame.HealthPrediction.healingPlayer:SetReverseFill(false)
             end
-            unitFrame.HealthPrediction:ForceUpdate()
+            if unitFrame.HealthPrediction.ForceUpdate then unitFrame.HealthPrediction:ForceUpdate() end -- 12.1/oUF 14: healprediction element was removed upstream; ForceUpdate only exists if the element is enabled
         else
             if unitFrame.HealthPrediction.healingPlayer then
                 unitFrame.HealthPrediction.healingPlayer:Hide()
@@ -344,7 +344,7 @@ function UUF:UpdateUnitHealPrediction(unitFrame, unit)
                 unitFrame.HealthPrediction.overDamageAbsorb:Hide()
                 unitFrame.HealthPrediction.overDamageAbsorb.Clip:Hide()
             end
-            unitFrame.HealthPrediction:ForceUpdate()
+            if unitFrame.HealthPrediction.ForceUpdate then unitFrame.HealthPrediction:ForceUpdate() end -- 12.1/oUF 14: healprediction element was removed upstream; ForceUpdate only exists if the element is enabled
         else
             if unitFrame.HealthPrediction.damageAbsorb then
                 unitFrame.HealthPrediction.damageAbsorb:Hide()
@@ -399,7 +399,7 @@ function UUF:UpdateUnitHealPrediction(unitFrame, unit)
                 unitFrame.HealthPrediction.healAbsorb:SetReverseFill(false)
             end
             unitFrame.HealthPrediction.healAbsorb:SetFrameLevel(unitFrame.Health:GetFrameLevel() + 3)
-            unitFrame.HealthPrediction:ForceUpdate()
+            if unitFrame.HealthPrediction.ForceUpdate then unitFrame.HealthPrediction:ForceUpdate() end -- 12.1/oUF 14: healprediction element was removed upstream; ForceUpdate only exists if the element is enabled
         else
             if unitFrame.HealthPrediction.healAbsorb then
                 unitFrame.HealthPrediction.healAbsorb:Hide()
