@@ -978,8 +978,8 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
                 YPosSlider:SetValue(FrameDB.Layout[4])
             else
                 if unit == "player" then
-                    FrameDB.Layout[1] = L["RIGHT"]
-                    FrameDB.Layout[2] = L["LEFT"]
+                    FrameDB.Layout[1] = L["Right"]
+                    FrameDB.Layout[2] = L["Left"]
                     FrameDB.Layout[3] = 0
                     FrameDB.Layout[4] = 0
                     AnchorFromDropdown:SetValue(FrameDB.Layout[1])
@@ -987,8 +987,8 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
                     XPosSlider:SetValue(FrameDB.Layout[3])
                     YPosSlider:SetValue(FrameDB.Layout[4])
                 elseif unit == "target" then
-                    FrameDB.Layout[1] = L["LEFT"]
-                    FrameDB.Layout[2] = L["RIGHT"]
+                    FrameDB.Layout[1] = L["Left"]
+                    FrameDB.Layout[2] = L["Right"]
                     FrameDB.Layout[3] = 0
                     FrameDB.Layout[4] = 0
                     AnchorFromDropdown:SetValue(FrameDB.Layout[1])
@@ -2863,8 +2863,9 @@ end
 
 local function CreateStatusSettings(containerParent, unit, statusDB, updateCallback)
     local StatusDB = GetUnitDB(unit).Indicators[statusDB]
+    local StatusName = L[statusDB]
 
-    local ToggleContainer = GUIWidgets.CreateInlineGroup(containerParent, L["%s Settings"]:format(statusDB))
+    local ToggleContainer = GUIWidgets.CreateInlineGroup(containerParent, L["%s Settings"]:format(StatusName))
 
     local StatusTextureList = {}
     for key, texture in pairs(StatusTextures[statusDB]) do
@@ -2872,7 +2873,7 @@ local function CreateStatusSettings(containerParent, unit, statusDB, updateCallb
     end
 
     local Toggle = AG:Create("CheckBox")
-    Toggle:SetLabel(L["Enable |cFF8080FF%s|r Indicator"]:format(statusDB))
+    Toggle:SetLabel(L["Enable |cFF8080FF%s|r Indicator"]:format(StatusName))
     Toggle:SetValue(StatusDB.Enabled)
     Toggle:SetCallback("OnValueChanged", function(_, _, value) StatusDB.Enabled = value updateCallback() RefreshStatusGUI() end)
     Toggle:SetRelativeWidth(0.5)
@@ -2880,7 +2881,7 @@ local function CreateStatusSettings(containerParent, unit, statusDB, updateCallb
 
     local StatusTextureDropdown = AG:Create("Dropdown")
     StatusTextureDropdown:SetList(StatusTextureList)
-    StatusTextureDropdown:SetLabel(L["%s Texture"]:format(statusDB))
+    StatusTextureDropdown:SetLabel(L["%s Texture"]:format(StatusName))
     StatusTextureDropdown:SetValue(StatusDB.Texture)
     StatusTextureDropdown:SetRelativeWidth(0.5)
     StatusTextureDropdown:SetCallback("OnValueChanged", function(_, _, value) StatusDB.Texture = value updateCallback() end)
