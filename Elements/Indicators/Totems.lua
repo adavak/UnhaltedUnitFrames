@@ -29,18 +29,15 @@ function UUF:CreateUnitTotems(unitFrame, unit)
         Totem.Icon:SetPoint("BOTTOMRIGHT", Totem, "BOTTOMRIGHT", -1, 1)
         Totem.Icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 
-        -- 12.1 build 69299: oUF totems element passes the secret duration object from
-        -- GetTotemDuration to SetCooldownFromDurationObject, which crashes natively with
-        -- INT_DIVIDE_BY_ZERO. Not creating a Cooldown frame makes the element skip the call.
-        -- Totem.Cooldown = CreateFrame("Cooldown", nil, Totem, "CooldownFrameTemplate")
-        -- Totem.Cooldown:SetPoint("TOPLEFT", Totem, "TOPLEFT", 1, -1)
-        -- Totem.Cooldown:SetPoint("BOTTOMRIGHT", Totem, "BOTTOMRIGHT", -1, 1)
-        -- Totem.Cooldown:SetSwipeColor(0, 0, 0, 0.8)
-        -- Totem.Cooldown:SetDrawEdge(false)
-        -- Totem.Cooldown:SetDrawSwipe(true)
-        -- Totem.Cooldown:SetHideCountdownNumbers(false)
-        -- Totem.Cooldown:SetReverse(true)
-        -- UUF:ApplyCooldownText(Totem.Cooldown)
+        Totem.Cooldown = CreateFrame("Cooldown", nil, Totem, "CooldownFrameTemplate")
+        Totem.Cooldown:SetPoint("TOPLEFT", Totem, "TOPLEFT", 1, -1)
+        Totem.Cooldown:SetPoint("BOTTOMRIGHT", Totem, "BOTTOMRIGHT", -1, 1)
+        Totem.Cooldown:SetSwipeColor(0, 0, 0, 0.8)
+        Totem.Cooldown:SetDrawEdge(false)
+        Totem.Cooldown:SetDrawSwipe(true)
+        Totem.Cooldown:SetHideCountdownNumbers(false)
+        Totem.Cooldown:SetReverse(true)
+        UUF:ApplyCooldownText(Totem.Cooldown)
 
         Totems[index] = Totem
     end
@@ -51,7 +48,7 @@ function UUF:CreateUnitTotems(unitFrame, unit)
     end
 
     Totems.PostUpdate = function(self, slot)
-        if self[totemPriorities[slot]].Cooldown then UUF:ApplyCooldownText(self[totemPriorities[slot]].Cooldown) end
+        UUF:ApplyCooldownText(self[totemPriorities[slot]].Cooldown)
     end
 
     unitFrame.Totems = Totems
@@ -73,7 +70,7 @@ function UUF:UpdateUnitTotems(unitFrame, unit)
             Totem:ClearAllPoints()
             Totem:SetSize(TotemsDB.Size, TotemsDB.Size)
             Totem:SetPoint(TotemsDB.Layout[1], unitFrame.HighLevelContainer, TotemsDB.Layout[2], TotemsDB.Layout[3] + xOffset, TotemsDB.Layout[4])
-            if Totem.Cooldown then UUF:ApplyCooldownText(Totem.Cooldown) end
+            UUF:ApplyCooldownText(Totem.Cooldown)
             Totem:Show()
         end
 
