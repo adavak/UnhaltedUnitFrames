@@ -967,6 +967,7 @@ local function CreateFrameSettings(containerParent, unit, unitHasParent, updateC
         AnchorToCooldownViewerToggle:SetCallback("OnValueChanged",
         function(_, _, value)
             HealthBarDB.AnchorToCooldownViewer = value
+            if value then UUF:CreatePositionController() end
             if not value then
                 FrameDB.Layout[1] = GetDefaultUnitDB(unit).Frame.Layout[1]
                 FrameDB.Layout[2] = GetDefaultUnitDB(unit).Frame.Layout[2]

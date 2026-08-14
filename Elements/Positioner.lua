@@ -2,6 +2,9 @@ local _, UUF = ...
 local L = LibStub("AceLocale-3.0"):GetLocale("UnhaltedUnitFrames")
 
 function UUF:CreatePositionController()
+    local useCDMAnchor = UUF.db.profile.Units.player.HealthBar.AnchorToCooldownViewer or UUF.db.profile.Units.target.HealthBar.AnchorToCooldownViewer
+    if not useCDMAnchor then return end
+
     local ECDM = ""
 
     if C_AddOns.IsAddOnLoaded("SkironCooldownManager") then
