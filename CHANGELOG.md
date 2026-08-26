@@ -1,13 +1,11 @@
-## V12.1.4
-- Weapon oils and imbues are now displayed as buttons leading the player frame's buffs while active (main hand closest to the buffs), shifting the buffs to make room. No enchants = no shift.
-- Can be disabled in General settings. Temporary weapon enchants can still only be cancelled from the default buff icons in the top-right corner.
-
-## V12.1.3
+## V12.1.6
 - Noise debuffs (Sated, Exhaustion, Temporal Displacement, etc.) are now automatically excluded from every debuff container that is not backed by explicit SpellIDs.
 - New candidate filters that filter strings cannot express:
   - Buffs: Boss Auras, Stealable.
   - Debuffs: Others (Not You), Dispel Types (Magic / Curse / Disease / Poison / Bleed).
 - Hidden filters: tokens can now be hidden per container (Player / Others). Hidden tokens are excluded from every matching group, including the automatic defaults.
+- Weapon oils and imbues are now displayed as buttons leading the player frame's buffs while active (main hand closest to the buffs), shifting the buffs to make room. No enchants = no shift.
+- Can be disabled in General settings. Temporary weapon enchants can still only be cancelled from the default buff icons in the top-right corner.
 
 ## V12.1.2
 - Aura containers with no filters configured now filter automatically:
