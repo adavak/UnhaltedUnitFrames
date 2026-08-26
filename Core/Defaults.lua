@@ -296,6 +296,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -518,6 +521,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -669,6 +675,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -863,6 +872,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -1014,6 +1026,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -1204,6 +1219,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -1391,6 +1409,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -1580,6 +1601,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -1769,6 +1793,9 @@ local Defaults = {
                         Type = "Buffs",
                         SpellIDs = {},
                         Filters = {},
+                        HiddenFilters = {Player = {}, Others = {}},
+                        CandidateFilters = {},
+                        DispelTypes = {},
                         Count = {
                             HideStacks = false,
                             Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},
@@ -1956,6 +1983,9 @@ local Defaults = {
 							Type = "Buffs",
 							SpellIDs = {},
 							Filters = {},
+							HiddenFilters = {Player = {}, Others = {}},
+							CandidateFilters = {},
+							DispelTypes = {},
 							Count = {
 								HideStacks = false,
 								Layout = {"BOTTOMRIGHT", "BOTTOMRIGHT", 0, 2},

@@ -1,3 +1,10 @@
+## V12.1.3
+- Noise debuffs (Sated, Exhaustion, Temporal Displacement, etc.) are now automatically excluded from every debuff container that is not backed by explicit SpellIDs.
+- New candidate filters that filter strings cannot express:
+  - Buffs: Boss Auras, Stealable.
+  - Debuffs: Others (Not You), Dispel Types (Magic / Curse / Disease / Poison / Bleed).
+- Hidden filters: tokens can now be hidden per container (Player / Others). Hidden tokens are excluded from every matching group, including the automatic defaults.
+
 ## V12.1.2
 - Aura containers with no filters configured now filter automatically:
   - Buffs: auras cast by the player on friendly units; important auras (Big Defensive, External Defensive, Raid in Combat, Important) on hostile units.

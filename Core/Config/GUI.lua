@@ -3381,6 +3381,14 @@ local function GetAuraContainerTreeLabel(auraKey, AuraDB)
 			end
 		end
 	end
+	if AuraDB.CandidateFilters then
+		for _, candidate in ipairs(UUF.AURA_CANDIDATE_FILTERS) do
+			if AuraDB.CandidateFilters[candidate.Key] and not configuredNames[candidate.Title] then
+				configuredNames[candidate.Title] = true
+				filterNames[#filterNames + 1] = candidate.Title
+			end
+		end
+	end
 	return #filterNames > 0 and L[AuraDB.Type] .. " - " .. table.concat(filterNames, ", ") or auraKey
 end
 
@@ -3454,6 +3462,97 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraKey, refres
             end
         end
         FilterContainer:AddChild(FilterDropdown)
+    end
+
+    local CandidateContainer = GUIWidgets.CreateInlineGroup(SettingsTabs, L["Candidate Filters"])
+    GUIWidgets.CreateInformationTag(CandidateContainer, L["Candidate filters are engine-side selectors that cannot be expressed as filter tokens."])
+    local candidateList = {}
+    local candidateOrder = {}
+    local candidateDescriptions = {}
+    for _, candidate in ipairs(UUF.AURA_CANDIDATE_FILTERS) do
+        if (AuraDB.Type == "Buffs" and candidate.AuraType == "HELPFUL") or (AuraDB.Type == "Debuffs" and candidate.AuraType == "HARMFUL") then
+            candidateList[candidate.Key] = candidate.Title
+            candidateOrder[#candidateOrder + 1] = candidate.Key
+            candidateDescriptions[candidate.Key] = candidate.Desc
+        end
+    end
+    if #candidateOrder > 0 then
+        local CandidateDropdown = AG:Create("Dropdown")
+        CandidateDropdown:SetLabel(L["Candidate Filters"])
+        CandidateDropdown:SetMultiselect(true)
+        CandidateDropdown:SetList(candidateList, candidateOrder)
+        AuraDB.CandidateFilters = AuraDB.CandidateFilters or {}
+        for _, candidateKey in ipairs(candidateOrder) do CandidateDropdown:SetItemValue(candidateKey, AuraDB.CandidateFilters[candidateKey] or false) end
+        CandidateDropdown:SetRelativeWidth(0.5)
+        CandidateDropdown:SetCallback("OnValueChanged", function(_, _, candidateKey, value)
+            AuraDB.CandidateFilters[candidateKey] = value or nil
+            AuraContainer:SetTitle("|cFFFFFFFF" .. GetAuraContainerTreeLabel(auraKey, AuraDB) .. "|r")
+            UpdateAuras()
+            refreshTree()
+        end)
+        for _, dropdownItem in CandidateDropdown.pullout:IterateItems() do
+            local desc = candidateDescriptions[dropdownItem.userdata and dropdownItem.userdata.value]
+            if desc then
+                dropdownItem:SetCallback("OnEnter", function() GameTooltip:SetOwner(dropdownItem.frame, "ANCHOR_CURSOR_RIGHT") GameTooltip:SetFrameStrata("TOOLTIP") GameTooltip:SetFrameLevel((CandidateDropdown.pullout.frame:GetFrameLevel() or 0) + 100) GameTooltip:SetToplevel(true) GameTooltip:AddLine(desc, 1, 1, 1, true) GameTooltip:Show() GameTooltip:SetFrameLevel((CandidateDropdown.pullout.frame:GetFrameLevel() or 0) + 100) end)
+                dropdownItem:SetCallback("OnLeave", function() GameTooltip:Hide() end)
+            end
+        end
+        CandidateContainer:AddChild(CandidateDropdown)
+
+        if AuraDB.Type == "Debuffs" then
+            local DispelTypeDropdown = AG:Create("Dropdown")
+            DispelTypeDropdown:SetLabel(L["Dispel Types"])
+            DispelTypeDropdown:SetMultiselect(true)
+            DispelTypeDropdown:SetList({Magic = L["Magic"], Curse = L["Curse"], Disease = L["Disease"], Poison = L["Poison"], Bleed = L["Bleed"]}, UUF.AURA_DISPEL_TYPES)
+            AuraDB.DispelTypes = AuraDB.DispelTypes or {}
+            for _, dispelType in ipairs(UUF.AURA_DISPEL_TYPES) do DispelTypeDropdown:SetItemValue(dispelType, AuraDB.DispelTypes[dispelType] or false) end
+            DispelTypeDropdown:SetRelativeWidth(0.5)
+            DispelTypeDropdown:SetCallback("OnValueChanged", function(_, _, dispelType, value)
+                AuraDB.DispelTypes[dispelType] = value or nil
+                AuraDB.CandidateFilters.DispelTypes = next(AuraDB.DispelTypes) and true or nil
+                CandidateDropdown:SetItemValue("DispelTypes", AuraDB.CandidateFilters.DispelTypes or false)
+                AuraContainer:SetTitle("|cFFFFFFFF" .. GetAuraContainerTreeLabel(auraKey, AuraDB) .. "|r")
+                UpdateAuras()
+                refreshTree()
+            end)
+            CandidateContainer:AddChild(DispelTypeDropdown)
+        end
+    end
+
+    local HiddenContainer = GUIWidgets.CreateInlineGroup(SettingsTabs, L["Hidden Filters"])
+    GUIWidgets.CreateInformationTag(HiddenContainer, L["Hidden filters are excluded from every group, including the automatic defaults."])
+    for _, hiddenGroup in ipairs({{Key = "Player", FilterGroup = "Player (You)"}, {Key = "Others", FilterGroup = "Others (Not You)"}}) do
+        local hiddenList = {}
+        local hiddenOrder = {}
+        local hiddenDescriptions = {}
+        local HiddenDropdown = AG:Create("Dropdown")
+        for _, filter in ipairs(UUF.AURA_FILTERS) do
+            if filter.Group == hiddenGroup.FilterGroup and filter.Token then
+                hiddenList[filter.Key] = filter.Title
+                hiddenOrder[#hiddenOrder + 1] = filter.Key
+                hiddenDescriptions[filter.Key] = filter.Desc
+            end
+        end
+        AuraDB.HiddenFilters = AuraDB.HiddenFilters or {}
+        AuraDB.HiddenFilters[hiddenGroup.Key] = AuraDB.HiddenFilters[hiddenGroup.Key] or {}
+        HiddenDropdown:SetLabel(L["Hidden %s Filters"]:format(L[hiddenGroup.FilterGroup]))
+        HiddenDropdown:SetMultiselect(true)
+        HiddenDropdown:SetList(hiddenList, hiddenOrder)
+        for _, filterKey in ipairs(hiddenOrder) do HiddenDropdown:SetItemValue(filterKey, AuraDB.HiddenFilters[hiddenGroup.Key][filterKey] or false) end
+        HiddenDropdown:SetRelativeWidth(0.5)
+        HiddenDropdown:SetCallback("OnValueChanged", function(_, _, filterKey, value)
+            AuraDB.HiddenFilters[hiddenGroup.Key][filterKey] = value or nil
+            AuraContainer:SetTitle("|cFFFFFFFF" .. GetAuraContainerTreeLabel(auraKey, AuraDB) .. "|r")
+            UpdateAuras()
+        end)
+        for _, dropdownItem in HiddenDropdown.pullout:IterateItems() do
+            local desc = hiddenDescriptions[dropdownItem.userdata and dropdownItem.userdata.value]
+            if desc then
+                dropdownItem:SetCallback("OnEnter", function() GameTooltip:SetOwner(dropdownItem.frame, "ANCHOR_CURSOR_RIGHT") GameTooltip:SetFrameStrata("TOOLTIP") GameTooltip:SetFrameLevel((HiddenDropdown.pullout.frame:GetFrameLevel() or 0) + 100) GameTooltip:SetToplevel(true) GameTooltip:AddLine(desc, 1, 1, 1, true) GameTooltip:Show() GameTooltip:SetFrameLevel((HiddenDropdown.pullout.frame:GetFrameLevel() or 0) + 100) end)
+                dropdownItem:SetCallback("OnLeave", function() GameTooltip:Hide() end)
+            end
+        end
+        HiddenContainer:AddChild(HiddenDropdown)
     end
 
     local SpellIDContainer = GUIWidgets.CreateInlineGroup(SettingsTabs, L["SpellID Filters"])

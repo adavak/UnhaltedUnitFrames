@@ -753,6 +753,62 @@ UUF.AURA_FILTERS = {
 	{Key = "NotCancelable", Token = "!CANCELABLE", Source = "!PLAYER", Group = "Others (Not You)", Title = L["Not Cancelable"], Desc = L["Auras the player cannot cancel."]},
 }
 
+-- Permanent noise debuffs that would otherwise flood unfiltered debuff
+-- containers (sated / exhaustion-style fatigue auras). Merged into every
+-- harmful group that is not backed by explicit SpellIDs.
+UUF.AURA_DEBUFF_EXCLUSIONS = {
+	[57723] = true, -- Exhaustion
+	[57724] = true, -- Sated
+	[80354] = true, -- Temporal Displacement
+	[95809] = true, -- Insanity
+	[160455] = true, -- Fatigue
+	[264689] = true, -- Exhaustion (Legion)
+	[390435] = true, -- Exhaustion (Dragonflight)
+	[1254550] = true, -- Slain by Unforgiven
+	[308312] = true, -- Weak Soul
+}
+
+-- Candidate filter classes: engine-side boolean selectors that filter
+-- strings cannot express. Each class becomes its own group on the container.
+-- AuraType limits the class to buffs (HELPFUL) or debuffs (HARMFUL)
+-- containers; Filter is the (valid) filter string backing the group.
+UUF.AURA_CANDIDATE_FILTERS = {
+	{
+		Key = "BossAura",
+		AuraType = "HELPFUL",
+		Filter = "HELPFUL",
+		CandidateFilters = {isBossAura = true},
+		Title = L["Boss Auras"],
+		Desc = L["Auras cast by bosses."],
+	},
+	{
+		Key = "Stealable",
+		AuraType = "HELPFUL",
+		Filter = "HELPFUL",
+		CandidateFilters = {isStealable = true},
+		Title = L["Stealable"],
+		Desc = L["Helpful auras that can be stolen."],
+	},
+	{
+		Key = "NonPlayer",
+		AuraType = "HARMFUL",
+		Filter = "HARMFUL",
+		CandidateFilters = {isFromPlayerOrPlayerPet = false},
+		Title = L["Others (Not You)"],
+		Desc = L["Debuffs not cast by the player, their pet, or their vehicle."],
+	},
+	{
+		Key = "DispelTypes",
+		AuraType = "HARMFUL",
+		Filter = "HARMFUL",
+		DispelTypes = true,
+		Title = L["Dispel Types"],
+		Desc = L["Debuffs dispellable by the selected dispel types."],
+	},
+}
+
+UUF.AURA_DISPEL_TYPES = {"Magic", "Curse", "Disease", "Poison", "Bleed"}
+
 UUF.SCMAnchors = {
     ["Player"] = "UUF_Player",
     ["Target"] = "UUF_Target",

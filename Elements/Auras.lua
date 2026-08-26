@@ -111,15 +111,26 @@ local function AddAuraFilter(filters, auraType, source, token, exclusions)
 	filters[#filters + 1] = filter
 end
 
+-- Hidden filter tokens (AuraDB.HiddenFilters) are excluded from every group
+-- they can appear in, including the automatic defaults.
+local function GetHiddenTokens(AuraDB, group)
+	local hidden = AuraDB.HiddenFilters and AuraDB.HiddenFilters[group]
+	if not hidden then return nil end
+	local tokens = {}
+	for _, filter in ipairs(UUF.AURA_FILTERS) do
+		if hidden[filter.Key] and filter.Token then tokens[#tokens + 1] = filter.Token end
+	end
+	return #tokens > 0 and tokens or nil
+end
+
 -- Default containers with no filters configured filter automatically:
 -- buffs show auras cast by the player (friendly units) or important auras cast by
 -- others (hostile units), debuffs show everything (except on player/party/raid frames,
 -- where they always stay visible). See UpdateUnitAuraEligibility.
-local function AddDefaultAuraGroups(filters, auraType, state)
+local function AddDefaultAuraGroups(filters, auraType, state, playerHidden, otherHidden)
 	if auraType == "HELPFUL" then
-		local playerFilter = auraType .. "|PLAYER"
-		filters[#filters + 1] = playerFilter
-		state.DefaultPlayerFilter = playerFilter
+		AddAuraFilter(filters, auraType, "PLAYER", nil, playerHidden)
+		state.DefaultPlayerFilter = filters[#filters]
 		local otherFilters = {}
 		local otherTokens = {
 			{"BIG_DEFENSIVE", {"PLAYER"}},
@@ -128,17 +139,22 @@ local function AddDefaultAuraGroups(filters, auraType, state)
 			{"IMPORTANT", {"PLAYER", "RAID_IN_COMBAT", "EXTERNAL_DEFENSIVE", "BIG_DEFENSIVE"}},
 		}
 		for _, other in ipairs(otherTokens) do
-			local filter = auraType .. "|" .. other[1]
-			for _, exclusion in ipairs(other[2]) do filter = filter .. "|!" .. exclusion end
-			filters[#filters + 1] = filter
-			otherFilters[filter] = true
+			local exclusions = {}
+			for _, exclusion in ipairs(other[2]) do exclusions[#exclusions + 1] = exclusion end
+			if otherHidden then
+				for _, token in ipairs(otherHidden) do exclusions[#exclusions + 1] = token end
+			end
+			AddAuraFilter(filters, auraType, "!PLAYER", other[1], exclusions)
+			otherFilters[filters[#filters]] = true
 		end
 		state.DefaultOtherFilters = otherFilters
 		state.DefaultOtherGroupCount = #otherTokens
 	else
-		local filter = auraType
-		filters[#filters + 1] = filter
-		state.DefaultDebuffFilter = filter
+		local exclusions = {}
+		if playerHidden then for _, token in ipairs(playerHidden) do exclusions[#exclusions + 1] = token end end
+		if otherHidden then for _, token in ipairs(otherHidden) do exclusions[#exclusions + 1] = token end end
+		AddAuraFilter(filters, auraType, nil, nil, exclusions)
+		state.DefaultDebuffFilter = filters[#filters]
 	end
 end
 
@@ -147,6 +163,8 @@ local function GetAuraFilters(AuraDB, auraType)
 	local playerTokens = {}
 	local otherTokens = {}
 	local showAllPlayer, showAllOthers
+	local playerHidden = GetHiddenTokens(AuraDB, "Player")
+	local otherHidden = GetHiddenTokens(AuraDB, "Others")
 	for _, filter in ipairs(UUF.AURA_FILTERS) do
 		if AuraDB.Filters[filter.Key] then
 			if filter.Source == "PLAYER" then
@@ -158,9 +176,10 @@ local function GetAuraFilters(AuraDB, auraType)
 	end
 
 	if showAllPlayer then
-		AddAuraFilter(filters, auraType, "PLAYER")
+		AddAuraFilter(filters, auraType, "PLAYER", nil, playerHidden)
 	else
 		local playerExclusions = {}
+		if playerHidden then for _, token in ipairs(playerHidden) do playerExclusions[#playerExclusions + 1] = token end end
 		for _, token in ipairs(playerTokens) do
 			AddAuraFilter(filters, auraType, "PLAYER", token, playerExclusions)
 			playerExclusions[#playerExclusions + 1] = token
@@ -168,9 +187,10 @@ local function GetAuraFilters(AuraDB, auraType)
 	end
 
 	if showAllOthers then
-		AddAuraFilter(filters, auraType, "!PLAYER")
+		AddAuraFilter(filters, auraType, "!PLAYER", nil, otherHidden)
 	else
 		local otherExclusions = {}
+		if otherHidden then for _, token in ipairs(otherHidden) do otherExclusions[#otherExclusions + 1] = token end end
 		for _, token in ipairs(otherTokens) do
 			AddAuraFilter(filters, auraType, "!PLAYER", token, otherExclusions)
 			otherExclusions[#otherExclusions + 1] = token
@@ -178,6 +198,14 @@ local function GetAuraFilters(AuraDB, auraType)
 	end
 
 	return filters, playerTokens, otherTokens, showAllPlayer, showAllOthers
+end
+
+local function GetDispelTypeFilters(AuraDB)
+	local dispelTypes = {}
+	for _, dispelType in ipairs(UUF.AURA_DISPEL_TYPES) do
+		if AuraDB.DispelTypes and AuraDB.DispelTypes[dispelType] then dispelTypes[dispelType] = true end
+	end
+	return next(dispelTypes) and {includeDispelTypes = dispelTypes} or nil
 end
 
 local function CreateAuraContainer(unitFrame, unit, auraKey, durationFormatter)
@@ -225,7 +253,7 @@ local function UpdateAuraContainer(container, unitFrame, unit, auraKey)
 	state.DefaultOtherGroupCount = nil
 	state.DefaultDebuffFilter = nil
 	if not hasAuraFilters and not hasSpellIDs then
-		AddDefaultAuraGroups(filters, auraType, state)
+		AddDefaultAuraGroups(filters, auraType, state, GetHiddenTokens(AuraDB, "Player"), GetHiddenTokens(AuraDB, "Others"))
 	elseif hasSpellIDs then
 		if not hasAuraFilters then
 			AddAuraFilter(filters, auraType)
@@ -251,7 +279,9 @@ local function UpdateAuraContainer(container, unitFrame, unit, auraKey)
 	local sortDirection = reverse and AuraContainerSortDirection.Reverse or AuraContainerSortDirection.Normal
 	for _, filter in ipairs(filters) do
 		local groupKey = state.Groups[filter]
-		local groupCandidateFilters = activeSpellIDGroups[filter] and candidateFilters or nil
+		-- Explicit SpellIDs always win; every other harmful group additionally
+		-- excludes permanent noise debuffs (sated, exhaustion, etc).
+		local groupCandidateFilters = activeSpellIDGroups[filter] and candidateFilters or auraType == "HARMFUL" and {excludeSpellIDs = UUF.AURA_DEBUFF_EXCLUSIONS} or nil
 		if not groupKey then
 			container.size = state.Size
 			groupKey = container:AddGroup(filter, {
@@ -267,6 +297,34 @@ local function UpdateAuraContainer(container, unitFrame, unit, auraKey)
 		container:SetAuraGroupCandidateFilters(groupKey, groupCandidateFilters)
 		container:SetAuraGroupLayout(groupKey, layout)
 		container:SetAuraGroupSortMethod(groupKey, sortMethod, sortDirection)
+	end
+
+	-- Candidate filter classes: engine-side boolean selectors that filter
+	-- strings cannot express. Each enabled class becomes its own group; the
+	-- cache key is synthetic so classes never collide with token-based groups.
+	for _, candidate in ipairs(UUF.AURA_CANDIDATE_FILTERS) do
+		if candidate.AuraType == auraType and AuraDB.CandidateFilters and AuraDB.CandidateFilters[candidate.Key] then
+			local groupCandidateFilters = candidate.DispelTypes and GetDispelTypeFilters(AuraDB) or candidate.CandidateFilters
+			if groupCandidateFilters then
+				local cacheKey = "CANDIDATE_" .. candidate.Key
+				local groupKey = state.Groups[cacheKey]
+				if not groupKey then
+					container.size = state.Size
+					groupKey = container:AddGroup(candidate.Filter, {
+						candidateFilters = groupCandidateFilters,
+						maxFrameCount = 0,
+						layout = layout,
+						sortMethod = sortMethod,
+						sortDirection = sortDirection,
+					})
+					state.Groups[cacheKey] = groupKey
+				end
+				activeGroups[cacheKey] = true
+				container:SetAuraGroupCandidateFilters(groupKey, groupCandidateFilters)
+				container:SetAuraGroupLayout(groupKey, layout)
+				container:SetAuraGroupSortMethod(groupKey, sortMethod, sortDirection)
+			end
+		end
 	end
 	state.ActiveGroups = activeGroups
 	state.ActiveSpellIDGroups = activeSpellIDGroups
