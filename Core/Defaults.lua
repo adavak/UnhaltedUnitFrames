@@ -13,6 +13,7 @@ local Defaults = {
             Separator = "•",
             ToTSeparator = "»",
             UseCustomAbbreviations = true,
+            WeaponEnchants = true,
             UIScale = {
                 Enabled = false,
                 Scale = 0.53333333333333,

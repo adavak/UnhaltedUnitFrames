@@ -336,8 +336,20 @@ local function UpdateAuraContainer(container, unitFrame, unit, auraKey)
 	local centered = AuraDB.GrowthDirection == "CENTER"
 	local containerAnchor = centered and (AuraDB.WrapDirection == "DOWN" and "TOP" or "BOTTOM") or AuraDB.Layout[1]
 	local auraAnchor = centered and (AuraDB.WrapDirection == "DOWN" and "TOPLEFT" or "BOTTOMLEFT") or AuraDB.Layout[1]
+	-- Weapon enchant buttons own the lead cells while oils/imbues are
+	-- active: the player's main buffs container shifts inward by one cell
+	-- per enchant so the strip (WeaponEnchants.lua) leads it, main hand
+	-- adjacent to the container. Centered containers never shift.
+	local weaponEnchantShift = 0
+	if not centered and unit == "player" and unitFrame == UUF.PLAYER and auraKey == "Container" and AuraDB.Type == "Buffs" then
+		local enchantCount = (UUF.GetWeaponEnchantCount and UUF:GetWeaponEnchantCount()) or 0
+		if enchantCount > 0 then
+			local sign = AuraDB.GrowthDirection == "LEFT" and -1 or 1
+			weaponEnchantShift = sign * enchantCount * (state.Size + AuraDB.Layout[5])
+		end
+	end
 	container:ClearAllPoints()
-	container:SetPoint(containerAnchor, anchorParent, AuraDB.Layout[2], AuraDB.Layout[3], AuraDB.Layout[4])
+	container:SetPoint(containerAnchor, anchorParent, AuraDB.Layout[2], AuraDB.Layout[3] + weaponEnchantShift, AuraDB.Layout[4])
 	container:SetSize(width, height)
 	container:SetFrameStrata(UUF:GetUnitDB(unitFrame, unit).Auras.FrameStrata)
 	container:SetFlowLayoutMaximumLineSize(width)

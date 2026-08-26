@@ -368,6 +368,19 @@ local function CreateUIScaleSettings(containerParent)
     GUIWidgets.DeepDisable(Container, not UUF.db.profile.General.UIScale.Enabled, Toggle)
 end
 
+local function CreateWeaponEnchantSettings(containerParent)
+    local Container = GUIWidgets.CreateInlineGroup(containerParent, L["Weapon Enchants"])
+    GUIWidgets.CreateInformationTag(Container, L["Weapon oils, imbues and other temporary weapon enchants are shown as buttons leading your buffs. They can only be cancelled from the default buff icons in the top-right corner."])
+
+    local Toggle = AG:Create("CheckBox")
+    Toggle:SetLabel(L["Show Weapon Enchants"])
+    Toggle:SetValue(UUF.db.profile.General.WeaponEnchants ~= false)
+    Toggle:SetFullWidth(true)
+    Toggle:SetCallback("OnValueChanged", function(_, _, value) UUF.db.profile.General.WeaponEnchants = value UUF:UpdateWeaponEnchants() end)
+    Toggle:SetRelativeWidth(0.5)
+    Container:AddChild(Toggle)
+end
+
 local function CreateFontSettings(containerParent)
     local Container = GUIWidgets.CreateInlineGroup(containerParent, L["Fonts"])
 
@@ -4631,6 +4644,7 @@ function UUF:CreateGUI()
             local ScrollFrame = GUIWidgets.CreateScrollFrame(Wrapper)
 
             CreateUIScaleSettings(ScrollFrame)
+            CreateWeaponEnchantSettings(ScrollFrame)
             CreateColourSettings(ScrollFrame)
 
             local SupportMeContainer = AG:Create("InlineGroup")

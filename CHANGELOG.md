@@ -1,3 +1,7 @@
+## V12.1.4
+- Weapon oils and imbues are now displayed as buttons leading the player frame's buffs while active (main hand closest to the buffs), shifting the buffs to make room. No enchants = no shift.
+- Can be disabled in General settings. Temporary weapon enchants can still only be cancelled from the default buff icons in the top-right corner.
+
 ## V12.1.3
 - Noise debuffs (Sated, Exhaustion, Temporal Displacement, etc.) are now automatically excluded from every debuff container that is not backed by explicit SpellIDs.
 - New candidate filters that filter strings cannot express:
