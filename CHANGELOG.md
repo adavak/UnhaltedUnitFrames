@@ -1,3 +1,9 @@
+## V12.1.2
+- Aura containers with no filters configured now filter automatically:
+  - Buffs: auras cast by the player on friendly units; important auras (Big Defensive, External Defensive, Raid in Combat, Important) on hostile units.
+  - Debuffs: shown on hostile units; always visible on player / party / raid frames.
+  - Friendly / hostile is determined per frame by can-assist.
+
 ## V12.1.1
 - Complete zhCN localization.
 - Update embedded libraries.

@@ -111,6 +111,37 @@ local function AddAuraFilter(filters, auraType, source, token, exclusions)
 	filters[#filters + 1] = filter
 end
 
+-- Default containers with no filters configured filter automatically:
+-- buffs show auras cast by the player (friendly units) or important auras cast by
+-- others (hostile units), debuffs show everything (except on player/party/raid frames,
+-- where they always stay visible). See UpdateUnitAuraEligibility.
+local function AddDefaultAuraGroups(filters, auraType, state)
+	if auraType == "HELPFUL" then
+		local playerFilter = auraType .. "|PLAYER"
+		filters[#filters + 1] = playerFilter
+		state.DefaultPlayerFilter = playerFilter
+		local otherFilters = {}
+		local otherTokens = {
+			{"BIG_DEFENSIVE", {"PLAYER"}},
+			{"EXTERNAL_DEFENSIVE", {"PLAYER", "BIG_DEFENSIVE"}},
+			{"RAID_IN_COMBAT", {"PLAYER", "EXTERNAL_DEFENSIVE", "BIG_DEFENSIVE"}},
+			{"IMPORTANT", {"PLAYER", "RAID_IN_COMBAT", "EXTERNAL_DEFENSIVE", "BIG_DEFENSIVE"}},
+		}
+		for _, other in ipairs(otherTokens) do
+			local filter = auraType .. "|" .. other[1]
+			for _, exclusion in ipairs(other[2]) do filter = filter .. "|!" .. exclusion end
+			filters[#filters + 1] = filter
+			otherFilters[filter] = true
+		end
+		state.DefaultOtherFilters = otherFilters
+		state.DefaultOtherGroupCount = #otherTokens
+	else
+		local filter = auraType
+		filters[#filters + 1] = filter
+		state.DefaultDebuffFilter = filter
+	end
+end
+
 local function GetAuraFilters(AuraDB, auraType)
 	local filters = {}
 	local playerTokens = {}
@@ -189,8 +220,12 @@ local function UpdateAuraContainer(container, unitFrame, unit, auraKey)
 	local filters, playerTokens, otherTokens, showAllPlayer, showAllOthers = GetAuraFilters(AuraDB, auraType)
 	local hasAuraFilters = #filters > 0
 	local activeSpellIDGroups = {}
+	state.DefaultPlayerFilter = nil
+	state.DefaultOtherFilters = nil
+	state.DefaultOtherGroupCount = nil
+	state.DefaultDebuffFilter = nil
 	if not hasAuraFilters and not hasSpellIDs then
-		AddAuraFilter(filters, auraType)
+		AddDefaultAuraGroups(filters, auraType, state)
 	elseif hasSpellIDs then
 		if not hasAuraFilters then
 			AddAuraFilter(filters, auraType)
@@ -260,6 +295,7 @@ function UUF:UpdateUnitAuraEligibility(unitFrame, unit)
 	if not unitToken then unitToken = unit == "partyplayer" and "player" or unit end
 	local canAssist = UnitCanAssist("player", unitToken)
 	local assistabilityKnown = not UUF:IsSecretValue(canAssist)
+	local persistentDebuffs = unit == "player" or unit:match("^party") or unit:match("^raid")
 	for auraKey, container in pairs(unitFrame.AuraContainers or {}) do
 		local AuraDB = AurasDB.Containers[auraKey]
 		local state = container and AuraContainerState[container]
@@ -268,9 +304,26 @@ function UUF:UpdateUnitAuraEligibility(unitFrame, unit)
 			local spellIDsEligible = assistabilityKnown and (auraType == "HELPFUL" and canAssist or auraType == "HARMFUL" and not canAssist)
 			local shown = false
 			container:SetUnit(unitToken)
+			local defaultOtherShown = assistabilityKnown and not canAssist
+			local otherGroupCount = state.DefaultOtherGroupCount or 0
+			local otherPer = otherGroupCount > 0 and math.floor(AuraDB.Num / otherGroupCount) or 0
+			local otherRemainder = otherGroupCount > 0 and AuraDB.Num % otherGroupCount or 0
+			local otherIndex = 0
 			for configuredFilter, configuredGroupKey in pairs(state.Groups) do
-				local groupShown = state.ActiveGroups[configuredFilter] and (not state.ActiveSpellIDGroups[configuredFilter] or spellIDsEligible)
-				container:SetAuraGroupMaxFrameCount(configuredGroupKey, groupShown and AuraDB.Num or 0)
+				local groupShown
+				local groupCount = AuraDB.Num
+				if configuredFilter == state.DefaultPlayerFilter then
+					groupShown = assistabilityKnown and canAssist
+				elseif state.DefaultOtherFilters and state.DefaultOtherFilters[configuredFilter] then
+					otherIndex = otherIndex + 1
+					groupShown = defaultOtherShown
+					groupCount = defaultOtherShown and otherPer + (otherIndex <= otherRemainder and 1 or 0) or 0
+				elseif configuredFilter == state.DefaultDebuffFilter then
+					groupShown = persistentDebuffs or (assistabilityKnown and not canAssist)
+				else
+					groupShown = state.ActiveGroups[configuredFilter] and (not state.ActiveSpellIDGroups[configuredFilter] or spellIDsEligible)
+				end
+				container:SetAuraGroupMaxFrameCount(configuredGroupKey, groupShown and groupCount or 0)
 				if groupShown then shown = true end
 			end
 			container:SetEnabled(shown)
