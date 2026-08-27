@@ -3477,8 +3477,8 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraKey, refres
         FilterContainer:AddChild(FilterDropdown)
     end
 
-    local CandidateContainer = GUIWidgets.CreateInlineGroup(SettingsTabs, L["Candidate Filters"])
-    GUIWidgets.CreateInformationTag(CandidateContainer, L["Candidate filters are engine-side selectors that cannot be expressed as filter tokens."])
+    local AdvancedContainer = GUIWidgets.CreateInlineGroup(SettingsTabs, L["Advanced Filters"])
+    GUIWidgets.CreateInformationTag(AdvancedContainer, L["Advanced filters for fine-tuning what gets displayed."])
     local candidateList = {}
     local candidateOrder = {}
     local candidateDescriptions = {}
@@ -3510,7 +3510,7 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraKey, refres
                 dropdownItem:SetCallback("OnLeave", function() GameTooltip:Hide() end)
             end
         end
-        CandidateContainer:AddChild(CandidateDropdown)
+        AdvancedContainer:AddChild(CandidateDropdown)
 
         if AuraDB.Type == "Debuffs" then
             local DispelTypeDropdown = AG:Create("Dropdown")
@@ -3528,12 +3528,10 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraKey, refres
                 UpdateAuras()
                 refreshTree()
             end)
-            CandidateContainer:AddChild(DispelTypeDropdown)
+            AdvancedContainer:AddChild(DispelTypeDropdown)
         end
     end
 
-    local HiddenContainer = GUIWidgets.CreateInlineGroup(SettingsTabs, L["Hidden Filters"])
-    GUIWidgets.CreateInformationTag(HiddenContainer, L["Hidden filters are excluded from every group, including the automatic defaults."])
     for _, hiddenGroup in ipairs({{Key = "Player", FilterGroup = "Player (You)"}, {Key = "Others", FilterGroup = "Others (Not You)"}}) do
         local hiddenList = {}
         local hiddenOrder = {}
@@ -3565,7 +3563,7 @@ local function CreateSpecificAuraSettings(containerParent, unit, auraKey, refres
                 dropdownItem:SetCallback("OnLeave", function() GameTooltip:Hide() end)
             end
         end
-        HiddenContainer:AddChild(HiddenDropdown)
+        AdvancedContainer:AddChild(HiddenDropdown)
     end
 
     local SpellIDContainer = GUIWidgets.CreateInlineGroup(SettingsTabs, L["SpellID Filters"])
