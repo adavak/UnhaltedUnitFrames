@@ -862,7 +862,7 @@ local Defaults = {
                     },
                     Container = {
                         AnchorParent = "Frame",
-                        Size = 20,
+                        Size = 32,
                         Layout = {"BOTTOMLEFT", "TOPLEFT", 0, 1, 1},
                         Num = 6,
                         Wrap = 6,
@@ -1016,7 +1016,7 @@ local Defaults = {
                     },
                     Container = {
                         AnchorParent = "Frame",
-                        Size = 20,
+                        Size = 32,
                         Layout = {"BOTTOMLEFT", "TOPLEFT", 0, 1, 1},
                         Num = 6,
                         Wrap = 6,
@@ -1209,7 +1209,7 @@ local Defaults = {
                     },
                     Container = {
                         AnchorParent = "Frame",
-                        Size = 20,
+                        Size = 32,
                         Layout = {"BOTTOMLEFT", "TOPLEFT", 0, 1, 1},
                         Num = 6,
                         Wrap = 6,
@@ -1399,7 +1399,7 @@ local Defaults = {
                     },
                     Container = {
                         AnchorParent = "Frame",
-                        Size = 20,
+                        Size = 32,
                         Layout = {"BOTTOMLEFT", "TOPLEFT", 0, 1, 1},
                         Num = 6,
                         Wrap = 6,
@@ -1591,7 +1591,7 @@ local Defaults = {
                     },
                     Container = {
                         AnchorParent = "Frame",
-                        Size = 20,
+                        Size = 32,
                         Layout = {"BOTTOMLEFT", "TOPLEFT", 0, 1, 1},
                         Num = 6,
                         Wrap = 6,
@@ -1783,7 +1783,7 @@ local Defaults = {
                     },
                     Container = {
                         AnchorParent = "Frame",
-                        Size = 20,
+                        Size = 32,
                         Layout = {"BOTTOMLEFT", "TOPLEFT", 0, 1, 1},
                         Num = 6,
                         Wrap = 6,
@@ -1973,7 +1973,7 @@ local Defaults = {
 						},
 						Container = {
 							AnchorParent = "Frame",
-							Size = 20,
+							Size = 32,
 							Layout = {"BOTTOMLEFT", "TOPLEFT", 0, 1, 1},
 							Num = 6,
 							Wrap = 6,
