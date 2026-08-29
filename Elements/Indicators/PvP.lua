@@ -11,6 +11,27 @@ function UUF:CreateUnitPvPIndicator(unitFrame, unit)
     PvPIndicator.Badge:SetSize(PvPIndicatorDB.Size * 5 / 3, PvPIndicatorDB.Size * 26 / 15)
     PvPIndicator.Badge:SetPoint("CENTER", PvPIndicator, "CENTER", 0, 0)
 
+    -- Override the stock element update path: it shows the faction / honor
+    -- badge whenever the unit is NOT PvP-flagged, which reads as an enabled
+    -- PvP icon for players with war mode off. Only show the classic banner
+    -- while the unit is actually PvP flagged (war mode, FFA, PvP realm in
+    -- the wild).
+    PvPIndicator.Override = function(self, event, unit)
+        if unit and unit ~= self.__unit then return end
+        unit = unit or self.__unit
+        local element = self.PvPIndicator
+        local isFFA = UnitIsPVPFreeForAll(unit)
+        if not isFFA and not UnitIsPVP(unit) then
+            element:Hide()
+            element.Badge:Hide()
+            return
+        end
+        element:SetTexture([[Interface\TargetingFrame\UI-PVP-]] .. (isFFA and "FFA" or UnitFactionGroup(unit)))
+        element:SetTexCoord(0, 0.65625, 0, 0.65625)
+        element:Show()
+        element.Badge:Hide()
+    end
+
     if PvPIndicatorDB.Enabled then
         unitFrame.PvPIndicator = PvPIndicator
     else
@@ -48,3 +69,11 @@ function UUF:UpdateUnitPvPIndicator(unitFrame, unit)
         end
     end
 end
+
+-- War mode toggling fires PLAYER_FLAGS_CHANGED, which the element's registered
+-- events don't cover; refresh the indicator so it updates promptly.
+local PvPEventFrame = CreateFrame("Frame")
+PvPEventFrame:RegisterEvent("PLAYER_FLAGS_CHANGED")
+PvPEventFrame:SetScript("OnEvent", function()
+    if UUF.PLAYER then UUF:UpdateUnitPvPIndicator(UUF.PLAYER, "player") end
+end)
