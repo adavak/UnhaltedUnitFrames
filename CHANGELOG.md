@@ -1,3 +1,6 @@
+## V12.1.7
+- PvP indicator now refreshes immediately when war mode is toggled, instead of waiting for the next faction update. Also fixes a Lua error from registering a misspelled event name.
+
 ## V12.1.6
 - Noise debuffs (Sated, Exhaustion, Temporal Displacement, etc.) are now automatically excluded from every debuff container that is not backed by explicit SpellIDs.
 - New candidate filters that filter strings cannot express:
