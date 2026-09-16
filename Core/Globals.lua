@@ -464,6 +464,12 @@ function UUF:GetReactionColour(reaction)
 end
 
 function UUF:GetNormalizedUnit(unit)
+    -- A secure unit button can be pointed at its owner's pet through the "unitsuffix"
+    -- attribute, and the client then reports that frame's unit as e.g. partypet1 or
+    -- raidpet26 (SecureButton_GetModifiedUnit joins owner and suffix). No profile is
+    -- stored for those, so fall back to the owner's group.
+    local petOwner = unit:match("^(.-)pet%d+$") or unit:match("^(.-)pet$")
+    if petOwner and petOwner ~= "" then return UUF:GetNormalizedUnit(petOwner) end
     local normalizedUnit = unit == "vehicle" and "player" or unit == "partyplayer" and "party" or unit:match("^boss%d+$") and "boss" or unit:match("^party%d+$") and "party" or unit:match("^raid%d+$") and "raid" or unit
     return normalizedUnit
 end
