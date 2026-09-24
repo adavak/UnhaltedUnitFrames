@@ -1,3 +1,7 @@
+## V12.1.8
+- Aura styling no longer raises "Attempt to access forbidden object from code tainted by an AddOn" in combat. The client forbids addon access to aura buttons while auras are secret, so a restyle that gets rejected is now replayed once combat ends.
+- Fixed a Lua error on frames switched to their owner's pet. Pet-mode party and raid frames now keep using their owner's group profile instead of failing every profile lookup.
+
 ## V12.1.7
 - PvP indicator now refreshes immediately when war mode is toggled, instead of waiting for the next faction update. Also fixes a Lua error from registering a misspelled event name.
 
