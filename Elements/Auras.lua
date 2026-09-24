@@ -67,8 +67,9 @@ end
 local function ApplyAuraButtonStyle(button, unitFrame, unit, auraKey, size)
 	local AuraDB = GetAuraDB(unitFrame, unit, auraKey)
 	if not AuraDB then return end
-	-- 12.1: AuraButtons carry forbidden layout aspects, live restyling from addon code errors out;
-	-- pcall so the trusted initializeFrame path works while later restyles degrade gracefully
+	-- 12.1: AuraButton components only answer addon code while the button is being set up, and the
+	-- whole subtree turns forbidden while auras are secret; every poke is guarded so a rejected
+	-- restyle degrades instead of erroring (StyleAuraButton replays it once combat ends)
 	pcall(button.SetSize, button, size, size)
 	button.Icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 	button.Cooldown:SetDrawEdge(false)
@@ -90,12 +91,41 @@ local function ApplyAuraButtonStyle(button, unitFrame, unit, auraKey, size)
 	button:SetAuraBorder(button.Border, AuraBorderOptions[AuraDB.ShowType == true])
 end
 
+-- AuraButtons stop answering addon code entirely while auras are secret (combat); IsForbidden is
+-- the one call left, so a restyle rejected that way is queued here and replayed on combat end.
+local PendingRestyle = setmetatable({}, {__mode = "k"})
+local RestyleRetryArmed = false
+local RestyleRetryFrame = CreateFrame("Frame")
+RestyleRetryFrame:SetScript("OnEvent", function()
+	RestyleRetryArmed = false
+	RestyleRetryFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	local pending = PendingRestyle
+	PendingRestyle = setmetatable({}, {__mode = "k"})
+	for unitFrame in pairs(pending) do
+		local unit = AuraUnitFrames[unitFrame]
+		if unit and unitFrame.AuraContainers then pcall(UUF.UpdateUnitAuras, UUF, unitFrame, unit) end
+	end
+end)
+
+local function QueueRestyle(unitFrame)
+	PendingRestyle[unitFrame] = true
+	if RestyleRetryArmed then return end
+	RestyleRetryArmed = true
+	RestyleRetryFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+end
+
+local function StyleAuraButton(button, unitFrame, unit, auraKey, size)
+	local answered, forbidden = pcall(button.IsForbidden, button)
+	if not answered or forbidden then QueueRestyle(unitFrame) return end
+	if not pcall(ApplyAuraButtonStyle, button, unitFrame, unit, auraKey, size) then QueueRestyle(unitFrame) end
+end
+
 local function PostCreateAuraButton(container, button)
 	local state = AuraContainerState[container]
 	if not state then return end
 	state.Buttons[#state.Buttons + 1] = button
-	CreateAuraButtonBorder(button)
-	ApplyAuraButtonStyle(button, state.UnitFrame, state.Unit, state.AuraKey, state.Size)
+	pcall(CreateAuraButtonBorder, button)
+	StyleAuraButton(button, state.UnitFrame, state.Unit, state.AuraKey, state.Size)
 end
 
 local function AddAuraFilter(filters, auraType, source, token, exclusions)
@@ -244,7 +274,7 @@ local function UpdateAuraContainer(container, unitFrame, unit, auraKey)
 	local candidateFilters = hasSpellIDs and {includeSpellIDs = AuraDB.SpellIDs} or nil
 	state.Size = AuraDB.Size
 	container.size = AuraDB.Size
-	for _, button in ipairs(state.Buttons) do ApplyAuraButtonStyle(button, unitFrame, unit, auraKey, state.Size) end
+	for _, button in ipairs(state.Buttons) do StyleAuraButton(button, unitFrame, unit, auraKey, state.Size) end
 	local filters, playerTokens, otherTokens, showAllPlayer, showAllOthers = GetAuraFilters(AuraDB, auraType)
 	local hasAuraFilters = #filters > 0
 	local activeSpellIDGroups = {}
